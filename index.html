@@ -34,7 +34,7 @@
         <div class="row">
             <div class="col-md">
                 <h4>DA40 W&B</h4>
-                <form>
+                <form id="form_input">
                     <div class="form-group row">
                         <label for="aircraftSelect" class="col-sm-3 col-form-label">Aircraft:</label>
                         <div class="col-sm-3">
@@ -49,7 +49,7 @@
                     <div class="form-group row" id="noseStationDiv">
                         <label for="noseStation" class="col-sm-3 col-form-label">Nose Baggage:</label>
                         <div class="col-sm-3">
-                            <input type="number" class="form-control" id="noseStation" placeholder="lbs" min="0" max="66" onchange="reCompute()" required>
+                            <input type="number" class="form-control" id="noseStation" placeholder="lbs" min="0" max="66" form="form_input" onchange="reCompute()" required>
                         </div>
                         <small id="noseStationNote" class="col-form-label">
                             Max 66 lbs
@@ -58,7 +58,7 @@
                     <div class="form-group row" id ="deIceStationDiv">
                         <label for="deIceStation" class="col-sm-3 col-form-label">De-icing Fluid:</label>
                         <div class="col-sm-3">
-                            <input type="text" class="form-control" id="deIceStation" placeholder="lbs" onchange="reCompute()" required>
+                            <input type="text" class="form-control" id="deIceStation" placeholder="US Gal" form="form_input" onchange="reCompute()" required>
                         </div>
                         <small id="deIceStationNote" class="col-form-label">
                             Max 8.3 Gallons
@@ -67,19 +67,19 @@
                     <div class="form-group row">
                         <label for="frontStation" class="col-sm-3 col-form-label">Front Seats:</label>
                         <div class="col-sm-3">
-                            <input type="number" class="form-control" id="frontStation" placeholder="lbs" min="0" onchange="reCompute()" required>
+                            <input type="number" class="form-control" id="frontStation" placeholder="lbs" min="0" form="form_input" onchange="reCompute()" required>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label for="rearStation" class="col-sm-3 col-form-label">Rear Seats:</label>
                         <div class="col-sm-3">
-                            <input type="number" class="form-control" id="rearStation" placeholder="lbs" min="0" onchange="reCompute()" required>
+                            <input type="number" class="form-control" id="rearStation" placeholder="lbs" min="0" form="form_input" onchange="reCompute()" required>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label for="baggageStation1" class="col-sm-3 col-form-label">Baggage:</label>
                         <div class="col-sm-3">
-                            <input type="number" class="form-control" id="baggageStation1" placeholder="lbs" min="0" max="66" onchange="reCompute()" required>
+                            <input type="number" class="form-control" id="baggageStation1" placeholder="lbs" min="0" max="66" form="form_input" onchange="reCompute()" required>
                         </div>
                         <small id="baggage1MaxNote" class="col-form-label">
                             Max 66 lbs
@@ -88,7 +88,7 @@
                     <div class="form-group row" id="baggageStation2Div">
                         <label for="baggageStation2" class="col-sm-3 col-form-label">Baggage Extension:</label>
                         <div class="col-sm-3">
-                            <input type="number" class="form-control" id="baggageStation2" placeholder="lbs" min="0" max="66" onchange="reCompute()" required>
+                            <input type="number" class="form-control" id="baggageStation2" placeholder="lbs" min="0" max="66" form="form_input" onchange="reCompute()" required>
                         </div>
                         <small id="baggage2MaxNote" class="col-form-label">
                             Max 40 lbs
@@ -97,7 +97,7 @@
                     <div class="form-group row">
                         <label for="fuelStation" class="col-sm-3 col-form-label">Fuel:</label>
                         <div class="col-sm-3">
-                            <input type="number" class="form-control" id="fuelStation" placeholder="US Gal" min="0" max="40" onchange="reCompute()" required>
+                            <input type="number" class="form-control" id="fuelStation" placeholder="US Gal" min="0" max="40" form="form_input" onchange="reCompute()" required>
                         </div>
                         <small id="fuelMaxNote" class="col-form-label">
                             Max 40 Gallons
@@ -106,7 +106,7 @@
                     <div class="form-group row" id="auxFuelStationDiv">
                         <label for="auxFuelStation" class="col-sm-3 col-form-label">Aux Fuel:</label>
                         <div class="col-sm-3">
-                            <input type="number" class="form-control" id="auxFuelStation" placeholder="US Gal" min="0" max="40" onchange="reCompute()" required>
+                            <input type="number" class="form-control" id="auxFuelStation" placeholder="US Gal" min="0" max="26" form="form_input" onchange="reCompute()" required>
                         </div>
                         <small id="auxFuelMaxNote" class="col-form-label">
                             Max 26 Gallons
@@ -115,7 +115,7 @@
                     <div class="form-group row">
                         <label for="fuelBurn" class="col-sm-3 col-form-label">Fuel Burn:</label>
                         <div class="col-sm-3">
-                            <input type="number" class="form-control" id="fuelBurn" placeholder="US Gal" min="0" max="40" onchange="reCompute()" required>
+                            <input type="number" class="form-control" id="fuelBurn" placeholder="US Gal" min="0" max="40" form="form_input" onchange="reCompute()" required>
                         </div>
                         <small id="fuelBurnNote" class="col-form-label">
                             In Flight Consumption

@@ -180,6 +180,7 @@ const aircraftModels = [
     {
         model: "DA40F",
         maxFuel: 40,
+        maxBaggage: 66,
         frontStationCG: 90.6,
         rearStationCG: 128,
         baggageStationCG: 143.7,
@@ -200,6 +201,7 @@ const aircraftModels = [
     {
         model: "DA40CS",
         maxFuel: 40,
+        maxBaggage: 66,
         frontStationCG: 90.6,
         rearStationCG: 128,
         baggageStationCG: 153.1,
@@ -220,6 +222,9 @@ const aircraftModels = [
     {
         model: "DA40XL",
         maxFuel: 50,
+        maxBaggage1 : 100,
+        maxBaggage2 : 40,
+        maxBaggage : 100,
         frontStationCG: 90.6,
         rearStationCG: 128,
         baggageStationCG: 153.1,
@@ -241,6 +246,12 @@ const aircraftModels = [
     {
         model: "DA42",
         maxFuel: 50,
+        maxAuxFuel : 26,
+        maxNoseBaggage: 66,
+        maxDeIce : 8.3,
+        maxBaggage1 : 100,
+        maxBaggage2 : 40,
+        maxBaggage : 100,
         frontStationCG: 90.6,
         rearStationCG: 128,
         noseBagStationCG: 23.6,
