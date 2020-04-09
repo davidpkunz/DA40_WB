@@ -205,6 +205,8 @@ function reCompute(){
     else {
         /*DA42 CG Check*/
     }
+
+    return [newData, userInput, toFwdCG];
 }
 
 function checkInputConstraints(modelData, userInput){
@@ -289,20 +291,20 @@ function computeWB(aircraftObj, userInput){
     var modelData = aircraftModels.find(x => x.model === aircraftObj.model);
     var computedData = {};
     /*Multiply all weights and arms(CG) to get moments*/
-    computedData["emptyMoment"] = parseFloat(aircraftObj.emptyWeight) * parseFloat(aircraftObj.aircraftArm);
-    computedData["frontMoment"] = parseFloat(modelData.frontStationCG) * userInput.frontStationWeight;
-    computedData["rearMoment"] = parseFloat(modelData.rearStationCG) * userInput.rearStationWeight;
-    computedData["baggageMoment"] = parseFloat(modelData.baggageStationCG) * userInput.baggage1Weight;
+    computedData["emptyMoment"] = Math.round((parseFloat(aircraftObj.emptyWeight) * parseFloat(aircraftObj.aircraftArm) + Number.EPSILON) * 100) / 100;
+    computedData["frontMoment"] = Math.round((parseFloat(modelData.frontStationCG) * userInput.frontStationWeight + Number.EPSILON) * 100) / 100;
+    computedData["rearMoment"] = Math.round((parseFloat(modelData.rearStationCG) * userInput.rearStationWeight + Number.EPSILON) * 100) / 100;
+    computedData["baggageMoment"] = Math.round((parseFloat(modelData.baggageStationCG) * userInput.baggage1Weight + Number.EPSILON) * 100) / 100;
 
-    computedData["fuelMoment"] = parseFloat(modelData.fuelStationCG) * userInput.fuelWeight;
-    computedData["fuelBurnMoment"] = parseFloat(modelData.fuelStationCG) * userInput.fuelBurnWeight;
+    computedData["fuelMoment"] = Math.round((parseFloat(modelData.fuelStationCG) * userInput.fuelWeight + Number.EPSILON) * 100) / 100;
+    computedData["fuelBurnMoment"] = Math.round((parseFloat(modelData.fuelStationCG) * userInput.fuelBurnWeight + Number.EPSILON) * 100) / 100;
 
     /*DA42 needs more computations for nose baggage, aux fuel, de-ice*/
     if (aircraftObj.model === "DA42") {
-        computedData["noseBagMoment"] = parseFloat(modelData.noseBagStationCG) * userInput.noseWeight;
-        computedData["auxFuelMoment"] = parseFloat(modelData.auxStationCG) * userInput.auxFuelWeight;
-        computedData["deIceMoment"] = parseFloat(modelData.deIceStationCG) * userInput.deIceWeight;
-        computedData["baggage2Moment"] = parseFloat(modelData.baggageStation2CG) * userInput.baggage2Weight;
+        computedData["noseBagMoment"] = Math.round((parseFloat(modelData.noseBagStationCG) * userInput.noseWeight + Number.EPSILON) * 100) / 100;
+        computedData["auxFuelMoment"] = Math.round((parseFloat(modelData.auxStationCG) * userInput.auxFuelWeight + Number.EPSILON) * 100) / 100;
+        computedData["deIceMoment"] = Math.round((parseFloat(modelData.deIceStationCG) * userInput.deIceWeight + Number.EPSILON) * 100) / 100;
+        computedData["baggage2Moment"] = Math.round((parseFloat(modelData.baggageStation2CG) * userInput.baggage2Weight + Number.EPSILON) * 100) / 100;
         computedData["zeroFuelMoment"] = computedData.emptyMoment + computedData.noseBagMoment +
             computedData.deIceMoment + computedData.frontMoment + computedData.rearMoment +
             computedData.baggageMoment + computedData.baggage2Moment;
@@ -315,7 +317,7 @@ function computeWB(aircraftObj, userInput){
     }
     /*XL for the second baggage area*/
     else if(aircraftObj.model === "DA40XL"){
-        computedData["baggage2Moment"] = parseFloat(modelData.baggageStation2CG) * userInput.baggage2Weight;
+        computedData["baggage2Moment"] = Math.round((parseFloat(modelData.baggageStation2CG) * userInput.baggage2Weight + Number.EPSILON) * 100) / 100;
         computedData["zeroFuelMoment"] = computedData.emptyMoment + computedData.frontMoment
             + computedData.rearMoment + computedData.baggageMoment + computedData.baggage2Moment;
         computedData["zeroFuelWeight"] = aircraftObj.emptyWeight + userInput.frontStationWeight
@@ -337,7 +339,7 @@ function computeWB(aircraftObj, userInput){
     computedData["zeroFuelCG"] = Math.round((computedData.zeroFuelMoment / computedData.zeroFuelWeight + Number.EPSILON) * 100) / 100;
     computedData["takeoffCG"] = Math.round((computedData.takeOffMoment / computedData.takeOffWeight + Number.EPSILON) * 100) / 100;
     computedData["landingWeight"] = computedData.takeOffWeight - userInput.fuelBurnWeight;
-    computedData["landingMoment"] = computedData.takeOffMoment - computedData.fuelBurnMoment;
+    computedData["landingMoment"] = Math.round((computedData.takeOffMoment - computedData.fuelBurnMoment + Number.EPSILON) * 100) / 100;
     computedData["landingCG"] = Math.round((computedData.landingMoment / computedData.landingWeight + Number.EPSILON) * 100) / 100;
     return computedData;
 }
@@ -355,6 +357,105 @@ function clearResults(){
     document.getElementById("result_takeoff").innerHTML = "Takeoff:";
     document.getElementById("result_landing").innerHTML = "Landing:";
 }
+
+function auditMode(){
+    /**Show detailed view**/
+    const data = reCompute();
+    const computedData = data[0]
+    const userInput = data[1]
+    var tailNumber = document.getElementById('aircraftSelect').value;
+    var aircraftObj = aircraft.find(x => x.tail === tailNumber);
+    var modelData = aircraftModels.find(x => x.model === aircraftObj.model);
+
+    document.getElementById("empty_wt_td").innerHTML = aircraftObj.emptyWeight;
+    document.getElementById("empty_cg_td").innerHTML = aircraftObj.aircraftArm;
+    document.getElementById("empty_mnt_td").innerHTML = computedData.emptyMoment;
+
+    document.getElementById("front_wt_td").innerHTML = userInput.frontStationWeight;
+    document.getElementById("front_cg_td").innerHTML = modelData.frontStationCG;
+    document.getElementById("front_mnt_td").innerHTML = computedData.frontMoment;
+
+    document.getElementById("rear_wt_td").innerHTML = userInput.rearStationWeight;
+    document.getElementById("rear_cg_td").innerHTML = modelData.rearStationCG;
+    document.getElementById("rear_mnt_td").innerHTML = computedData.rearMoment;
+
+    document.getElementById("zero_wt_td").innerHTML = computedData.zeroFuelWeight;
+    document.getElementById("zero_cg_td").innerHTML = computedData.zeroFuelCG;
+    document.getElementById("zero_mnt_td").innerHTML = computedData.zeroFuelMoment;
+
+    document.getElementById("fuel_wt_td").innerHTML = userInput.fuelWeight;
+    document.getElementById("fuel_cg_td").innerHTML = modelData.fuelStationCG;
+    document.getElementById("fuel_mnt_td").innerHTML = computedData.fuelMoment;
+
+    document.getElementById("takeoff_wt_td").innerHTML = computedData.takeOffWeight;
+    document.getElementById("takeoff_cg_td").innerHTML = computedData.takeoffCG;
+    document.getElementById("takeoff_mnt_td").innerHTML = computedData.takeOffMoment;
+
+    document.getElementById("burn_wt_td").innerHTML = userInput.fuelBurnWeight;
+    document.getElementById("burn_cg_td").innerHTML = modelData.fuelStationCG;
+    document.getElementById("burn_mnt_td").innerHTML = computedData.fuelBurnMoment;
+
+    document.getElementById("landing_wt_td").innerHTML = computedData.landingWeight;
+    document.getElementById("landing_cg_td").innerHTML = computedData.landingCG;
+    document.getElementById("landing_mnt_td").innerHTML = computedData.landingMoment;
+
+    document.getElementById("max_wt_td").innerHTML = aircraftObj.maxWeight;
+
+    document.getElementById("fwd_cg").innerHTML = data[2];
+    document.getElementById("act_cg").innerHTML = computedData.takeoffCG;
+    document.getElementById("aft_cg").innerHTML = modelData.cgRange.midAft;
+
+    document.getElementById("bag_wt_td").innerHTML = userInput.baggage1Weight;
+    document.getElementById("bag_cg_td").innerHTML = modelData.baggageStationCG;
+    document.getElementById("bag_mnt_td").innerHTML = computedData.baggageMoment;
+
+    if (aircraftObj.model === "DA42"){
+        document.getElementById("nose_wt_td").innerHTML = userInput.noseWeight;
+        document.getElementById("nose_cg_td").innerHTML = modelData.noseBagStationCG;
+        document.getElementById("nose_mnt_td").innerHTML = computedData.noseBagMoment;
+
+        document.getElementById("deIce_wt_td").innerHTML = userInput.deIceWeight;
+        document.getElementById("deIce_cg_td").innerHTML = modelData.deIceStationCG;
+        document.getElementById("deIce_mnt_td").innerHTML = computedData.deIceMoment;
+
+        document.getElementById("aux_wt_td").innerHTML = userInput.auxFuelWeight;
+        document.getElementById("aux_cg_td").innerHTML = modelData.auxStationCG;
+        document.getElementById("aux_mnt_td").innerHTML = computedData.auxFuelMoment;
+
+        document.getElementById("bag2_th").style.display = "flex";
+        document.getElementById("bag_wt_td").innerHTML = userInput.baggage2Weight;
+        document.getElementById("bag_cg_td").innerHTML = modelData.baggageStation2CG;
+        document.getElementById("bag_mnt_td").innerHTML = computedData.baggage2Moment;
+    }
+    else {
+
+        document.getElementById("bag2_th").style.display = "none";
+
+        document.getElementById("nose_wt_td").innerHTML = "-";
+        document.getElementById("nose_cg_td").innerHTML = "-";
+        document.getElementById("nose_mnt_td").innerHTML = "-";
+
+        document.getElementById("deIce_wt_td").innerHTML = "-";
+        document.getElementById("deIce_cg_td").innerHTML = "-";
+        document.getElementById("deIce_mnt_td").innerHTML = "-";
+
+        document.getElementById("aux_wt_td").innerHTML = "-";
+        document.getElementById("aux_cg_td").innerHTML = "-";
+        document.getElementById("aux_mnt_td").innerHTML = "-";
+    }
+
+    if (aircraftObj.model === "DA40XL"){
+        document.getElementById("bag2_th").style.display = "flex";
+        document.getElementById("bag_wt_td").innerHTML = userInput.baggage2Weight;
+        document.getElementById("bag_cg_td").innerHTML = modelData.baggageStation2CG;
+        document.getElementById("bag_mnt_td").innerHTML = computedData.baggage2Moment;
+    }
+
+    document.getElementById("auditDiv").style.display = "block";
+
+}
+
+
 
 function resultWarning(warningText){
     /**Sets top result HTML to red and displays warning text**/

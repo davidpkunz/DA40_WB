@@ -36,94 +36,95 @@
                 <h4>DA40 W&B</h4>
                 <form id="form_input">
                     <div class="form-group row">
-                        <label for="aircraftSelect" class="col-sm-3 col-form-label">Aircraft:</label>
+                        <label for="aircraftSelect" class="col-sm-2 col-form-label">Aircraft:</label>
                         <div class="col-sm-3">
                             <select id="aircraftSelect" class="form-control" onchange="aircraftSelection()"> <!--Fill this with aircraft tail #s-->
                                 <option selected>Tail #</option>
                             </select>
                         </div>
-                            <small class="col-form-label" id="emptyAircraftInfo">
+                            <small class="col-sm-6 col-form-label" id="emptyAircraftInfo">
                                 <!--Change this based on Tail #-->
                             </small>
                     </div>
+                    <hr>
                     <div class="form-group row" id="noseStationDiv">
-                        <label for="noseStation" class="col-sm-3 col-form-label">Nose Baggage:</label>
+                        <label for="noseStation" class="col-sm-4 col-form-label">Nose Baggage:</label>
                         <div class="col-sm-3">
                             <input type="number" class="form-control" id="noseStation" placeholder="lbs" min="0" max="66" form="form_input" onchange="reCompute()" required>
                         </div>
-                        <small id="noseStationNote" class="col-form-label">
+                        <small id="noseStationNote" class="col-sm-5">
                             Max 66 lbs
                         </small>
                     </div>
                     <div class="form-group row" id ="deIceStationDiv">
-                        <label for="deIceStation" class="col-sm-3 col-form-label">De-icing Fluid:</label>
+                        <label for="deIceStation" class="col-sm-4 col-form-label">De-icing Fluid:</label>
                         <div class="col-sm-3">
                             <input type="text" class="form-control" id="deIceStation" placeholder="US Gal" form="form_input" onchange="reCompute()" required>
                         </div>
-                        <small id="deIceStationNote" class="col-form-label">
+                        <small id="deIceStationNote" class="col-sm-5">
                             Max 8.3 Gallons
                         </small>
                     </div>
                     <div class="form-group row">
-                        <label for="frontStation" class="col-sm-3 col-form-label">Front Seats:</label>
+                        <label for="frontStation" class="col-sm-4 col-form-label">Front Seats:</label>
                         <div class="col-sm-3">
                             <input type="number" class="form-control" id="frontStation" placeholder="lbs" min="0" form="form_input" onchange="reCompute()" required>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label for="rearStation" class="col-sm-3 col-form-label">Rear Seats:</label>
+                        <label for="rearStation" class="col-sm-4 col-form-label">Rear Seats:</label>
                         <div class="col-sm-3">
                             <input type="number" class="form-control" id="rearStation" placeholder="lbs" min="0" form="form_input" onchange="reCompute()" required>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label for="baggageStation1" class="col-sm-3 col-form-label">Baggage:</label>
+                        <label for="baggageStation1" class="col-sm-4 col-form-label">Baggage:</label>
                         <div class="col-sm-3">
                             <input type="number" class="form-control" id="baggageStation1" placeholder="lbs" min="0" max="66" form="form_input" onchange="reCompute()" required>
                         </div>
-                        <small id="baggage1MaxNote" class="col-form-label">
+                        <small id="baggage1MaxNote" class="col-sm-5">
                             Max 66 lbs
                         </small>
                     </div>
                     <div class="form-group row" id="baggageStation2Div">
-                        <label for="baggageStation2" class="col-sm-3 col-form-label">Baggage Extension:</label>
+                        <label for="baggageStation2" class="col-sm-4 col-form-label">Baggage Extension:</label>
                         <div class="col-sm-3">
                             <input type="number" class="form-control" id="baggageStation2" placeholder="lbs" min="0" max="66" form="form_input" onchange="reCompute()" required>
                         </div>
-                        <small id="baggage2MaxNote" class="col-form-label">
+                        <small id="baggage2MaxNote" class="col-sm-5">
                             Max 40 lbs
                         </small>
                     </div>
                     <div class="form-group row">
-                        <label for="fuelStation" class="col-sm-3 col-form-label">Fuel:</label>
+                        <label for="fuelStation" class="col-sm-4 col-form-label">Fuel:</label>
                         <div class="col-sm-3">
                             <input type="number" class="form-control" id="fuelStation" placeholder="US Gal" min="0" max="40" form="form_input" onchange="reCompute()" required>
                         </div>
-                        <small id="fuelMaxNote" class="col-form-label">
+                        <small id="fuelMaxNote" class="col-sm-5">
                             Max 40 Gallons
                         </small>
                     </div>
                     <div class="form-group row" id="auxFuelStationDiv">
-                        <label for="auxFuelStation" class="col-sm-3 col-form-label">Aux Fuel:</label>
+                        <label for="auxFuelStation" class="col-sm-4 col-form-label">Aux Fuel:</label>
                         <div class="col-sm-3">
                             <input type="number" class="form-control" id="auxFuelStation" placeholder="US Gal" min="0" max="26" form="form_input" onchange="reCompute()" required>
                         </div>
-                        <small id="auxFuelMaxNote" class="col-form-label">
+                        <small id="auxFuelMaxNote" class="col-sm-5">
                             Max 26 Gallons
                         </small>
                     </div>
                     <div class="form-group row">
-                        <label for="fuelBurn" class="col-sm-3 col-form-label">Fuel Burn:</label>
+                        <label for="fuelBurn" class="col-sm-4 col-form-label">Fuel Burn:</label>
                         <div class="col-sm-3">
                             <input type="number" class="form-control" id="fuelBurn" placeholder="US Gal" min="0" max="40" form="form_input" onchange="reCompute()" required>
                         </div>
-                        <small id="fuelBurnNote" class="col-form-label">
+                        <small id="fuelBurnNote" class="col-sm-5">
                             In Flight Consumption
                         </small>
                     </div>
                     <div>
                         <hr>
-                        <h5 align="center">Results</h5>
+                        <h5>Results</h5>
                         <ul class="list-group">
                             <li id="overall_result" class="list-group-item">Limits:</li>
                             <li id="result_zero" class="list-group-item">Zero Fuel:</li>
@@ -139,9 +140,132 @@
                 <hr>
                 <div class="row justify-content-center">
                     <br>
-                    <button type="button" class="btn btn-secondary m-2">Audit Mode</button>
+                    <button type="button" class="btn btn-secondary m-2" onclick="auditMode()">Audit Mode</button>
                     <button type="button" class="btn btn-secondary m-2">Email</button>
                 </div>
+                <hr>
+                <div class="container" id="auditDiv" style="display: none">
+                    <h5>Audit</h5>
+                    <table class="table table-sm table-striped table-bordered">
+                        <thead>
+                        <tr>
+                            <th scope="col" class="table-dark"></th>
+                            <th scope="col">Weight</th>
+                            <th scope="col">Arm</th>
+                            <th scope="col">Moment</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <th scope="row">Empty Weight</th>
+                            <td id="empty_wt_td"></td>
+                            <td id="empty_cg_td"></td>
+                            <td id="empty_mnt_td"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Nose Baggage</th>
+                            <td id="nose_wt_td"></td>
+                            <td id="nose_cg_td"></td>
+                            <td id="nose_mnt_td"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">De-icing Fluid</th>
+                            <td id="deIce_wt_td"></td>
+                            <td id="deIce_cg_td"></td>
+                            <td id="deIce_mnt_td"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Pilot & Front PAX</th>
+                            <td id="front_wt_td"></td>
+                            <td id="front_cg_td"></td>
+                            <td id="front_mnt_td"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Rear PAX</th>
+                            <td id="rear_wt_td"></td>
+                            <td id="rear_cg_td"></td>
+                            <td id="rear_mnt_td"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Baggage</th>
+                            <td id="bag_wt_td"></td>
+                            <td id="bag_cg_td"></td>
+                            <td id="bag_mnt_td"></td>
+                        </tr>
+
+                        <tr>
+                            <th scope="row" id="bag2_th" style="display: none">Baggage 2</th>
+                            <td id="bag2_wt_td"></td>
+                            <td id="bag2_cg_td"></td>
+                            <td id="bag2_mnt_td"></td>
+                        </tr>
+
+                        <tr style="border-top: 2px solid black;">
+                            <th scope="row">Zero Fuel CG</th>
+                            <td id="zero_wt_td"></td>
+                            <td id="zero_cg_td"></td>
+                            <td id="zero_mnt_td"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">AUX Fuel</th>
+                            <td id="aux_wt_td"></td>
+                            <td id="aux_cg_td"></td>
+                            <td id="aux_mnt_td"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Fuel in LBS</th>
+                            <td id="fuel_wt_td"></td>
+                            <td id="fuel_cg_td"></td>
+                            <td id="fuel_mnt_td"></td>
+                        </tr>
+
+                        <tr style="border-top: 2px solid black;">
+                            <th scope="row">Take Off Weight</th>
+                            <td id="takeoff_wt_td"></td>
+                            <td id="takeoff_cg_td"></td>
+                            <td id="takeoff_mnt_td"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Fuel Burn</th>
+                            <td id="burn_wt_td"></td>
+                            <td id="burn_cg_td"></td>
+                            <td id="burn_mnt_td"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Landing Weight</th>
+                            <td id="landing_wt_td"></td>
+                            <td id="landing_cg_td"></td>
+                            <td id="landing_mnt_td"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Max Gross Weight</th>
+                            <td colspan="2" id="max_wt_td"></td>
+                            <td class="table-dark"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="table-dark"></th>
+                            <td >Forward</td>
+                            <td>Actual</td>
+                            <td>Aft</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">CG</th>
+                            <td id="fwd_cg"></td>
+                            <td id="act_cg"></td>
+                            <td id="aft_cg"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+
+
+
+
+
+                </div>
+
+
+
             </div>
 
             <div class="col-md">
