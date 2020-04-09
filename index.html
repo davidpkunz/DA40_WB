@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/bootstrap-grid.css">
+    <link rel="stylesheet" href="css/custom.css">
+
+    <title>Hello, world!</title>
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" href="#">DA40 Weight and Balance</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<main role="main" class="container">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md">
+                <h4>DA40 W&B</h4>
+                <form>
+                    <div class="form-group row">
+                        <label for="aircraftSelect" class="col-sm-3 col-form-label">Aircraft:</label>
+                        <div class="col-sm-3">
+                            <select id="aircraftSelect" class="form-control"> <!--Fill this with aircraft tail #s-->
+                                <option selected>Tail #</option>
+                                <option>N420FP</option>
+                                <option>N422FP</option>
+                                <option>N423FP</option>
+                            </select>
+                        </div>
+                            <small class="col-form-label" id="emptyAircraftInfo">
+                                Empty: 1650 lbs. CG: 97.1   <!--Change this based on Tail #-->
+                            </small>
+                    </div>
+                    <div class="form-group row">
+                        <label for="frontStation" class="col-sm-3 col-form-label">Front Seats:</label>
+                        <div class="col-sm-3">
+                            <input type="number" class="form-control" id="frontStation" placeholder="lbs" min="0" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="rearStation" class="col-sm-3 col-form-label">Rear Seats:</label>
+                        <div class="col-sm-3">
+                            <input type="number" class="form-control" id="rearStation" placeholder="lbs" min="0" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="baggageStation1" class="col-sm-3 col-form-label">Baggage:</label>
+                        <div class="col-sm-3">
+                            <input type="number" class="form-control" id="baggageStation1" placeholder="lbs" min="0" max="66" required>
+                        </div>
+                        <small id="baggageMaxNote" class="col-form-label">
+                            Max 66 lbs.
+                        </small>
+                    </div>
+                    <div class="form-group row">
+                        <label for="fuelStationText" class="col-sm-3 col-form-label">Fuel:</label>
+                        <div class="col-sm-3">
+                            <input type="number" class="form-control" id="fuelStationText" placeholder="US Gal" min="0" max="40" required>
+                        </div>
+                        <small id="fuelMaxNote" class="col-form-label">
+                            Max 40 Gallons.
+                        </small>
+                    </div>
+                    <div class="form-group row">
+                        <label for="fuelBurn" class="col-sm-3 col-form-label">Fuel Burn:</label>
+                        <div class="col-sm-3">
+                            <input type="number" class="form-control" id="fuelBurn" placeholder="US Gal" min="0" max="40" required>
+                        </div>
+                        <small id="fuelBurnNote" class="col-form-label">
+                            In Flight Consumption.
+                        </small>
+                    </div>
+                    <div>
+                        <hr>
+                        <h5 align="center">Results</h5>
+                        <ul class="list-group">
+                            <li class="list-group-item list-group-item-danger">Not within Limits. Exceeded Max Weight.</li>
+                            <li class="list-group-item">Empty:</li>
+                            <li class="list-group-item">Zero Fuel:</li>
+                            <li class="list-group-item">Takeoff:</li>
+                            <li class="list-group-item">Landing:</li>
+                        </ul>
+                    </div>
+                    <button type="reset" class="btn btn-secondary m-2">Reset</button>
+
+
+                </form>
+
+                <hr>
+                <div class="row justify-content-center">
+                    <br>
+                    <button type="button" class="btn btn-secondary m-2">Audit Mode</button>
+                    <button type="button" class="btn btn-secondary m-2">Email</button>
+                </div>
+            </div>
+
+            <div class="col-md">
+                <h4>CG Envolope</h4>
+                <canvas id="cgCanvas" width="400" height="400" style="border: 1px solid black"></canvas>
+
+
+
+
+
+
+
+
+            </div>
+        </div>
+    </div>
+
+</main><!-- /.container -->
+<script src="compute.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+</body>
+</html>
