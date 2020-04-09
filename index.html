@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="css/bootstrap-grid.css">
     <link rel="stylesheet" href="css/custom.css">
 
-    <title>Hello, world!</title>
+    <title>DA40 W&B</title>
 </head>
 <body>
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
@@ -38,68 +38,100 @@
                     <div class="form-group row">
                         <label for="aircraftSelect" class="col-sm-3 col-form-label">Aircraft:</label>
                         <div class="col-sm-3">
-                            <select id="aircraftSelect" class="form-control"> <!--Fill this with aircraft tail #s-->
+                            <select id="aircraftSelect" class="form-control" onchange="aircraftSelection()"> <!--Fill this with aircraft tail #s-->
                                 <option selected>Tail #</option>
-                                <option>N420FP</option>
-                                <option>N422FP</option>
-                                <option>N423FP</option>
                             </select>
                         </div>
                             <small class="col-form-label" id="emptyAircraftInfo">
-                                Empty: 1650 lbs. CG: 97.1   <!--Change this based on Tail #-->
+                                <!--Change this based on Tail #-->
                             </small>
+                    </div>
+                    <div class="form-group row" id="noseStationDiv">
+                        <label for="noseStation" class="col-sm-3 col-form-label">Nose Baggage:</label>
+                        <div class="col-sm-3">
+                            <input type="number" class="form-control" id="noseStation" placeholder="lbs" min="0" max="66" onchange="reCompute()" required>
+                        </div>
+                        <small id="noseStationNote" class="col-form-label">
+                            Max 66 lbs
+                        </small>
+                    </div>
+                    <div class="form-group row" id ="deIceStationDiv">
+                        <label for="deIceStation" class="col-sm-3 col-form-label">De-icing Fluid:</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control" id="deIceStation" placeholder="lbs" onchange="reCompute()" required>
+                        </div>
+                        <small id="deIceStationNote" class="col-form-label">
+                            Max 8.3 Gallons
+                        </small>
                     </div>
                     <div class="form-group row">
                         <label for="frontStation" class="col-sm-3 col-form-label">Front Seats:</label>
                         <div class="col-sm-3">
-                            <input type="number" class="form-control" id="frontStation" placeholder="lbs" min="0" required>
+                            <input type="number" class="form-control" id="frontStation" placeholder="lbs" min="0" onchange="reCompute()" required>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label for="rearStation" class="col-sm-3 col-form-label">Rear Seats:</label>
                         <div class="col-sm-3">
-                            <input type="number" class="form-control" id="rearStation" placeholder="lbs" min="0" required>
+                            <input type="number" class="form-control" id="rearStation" placeholder="lbs" min="0" onchange="reCompute()" required>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label for="baggageStation1" class="col-sm-3 col-form-label">Baggage:</label>
                         <div class="col-sm-3">
-                            <input type="number" class="form-control" id="baggageStation1" placeholder="lbs" min="0" max="66" required>
+                            <input type="number" class="form-control" id="baggageStation1" placeholder="lbs" min="0" max="66" onchange="reCompute()" required>
                         </div>
-                        <small id="baggageMaxNote" class="col-form-label">
-                            Max 66 lbs.
+                        <small id="baggage1MaxNote" class="col-form-label">
+                            Max 66 lbs
+                        </small>
+                    </div>
+                    <div class="form-group row" id="baggageStation2Div">
+                        <label for="baggageStation2" class="col-sm-3 col-form-label">Baggage Extension:</label>
+                        <div class="col-sm-3">
+                            <input type="number" class="form-control" id="baggageStation2" placeholder="lbs" min="0" max="66" onchange="reCompute()" required>
+                        </div>
+                        <small id="baggage2MaxNote" class="col-form-label">
+                            Max 40 lbs
                         </small>
                     </div>
                     <div class="form-group row">
-                        <label for="fuelStationText" class="col-sm-3 col-form-label">Fuel:</label>
+                        <label for="fuelStation" class="col-sm-3 col-form-label">Fuel:</label>
                         <div class="col-sm-3">
-                            <input type="number" class="form-control" id="fuelStationText" placeholder="US Gal" min="0" max="40" required>
+                            <input type="number" class="form-control" id="fuelStation" placeholder="US Gal" min="0" max="40" onchange="reCompute()" required>
                         </div>
                         <small id="fuelMaxNote" class="col-form-label">
-                            Max 40 Gallons.
+                            Max 40 Gallons
+                        </small>
+                    </div>
+                    <div class="form-group row" id="auxFuelStationDiv">
+                        <label for="auxFuelStation" class="col-sm-3 col-form-label">Aux Fuel:</label>
+                        <div class="col-sm-3">
+                            <input type="number" class="form-control" id="auxFuelStation" placeholder="US Gal" min="0" max="40" onchange="reCompute()" required>
+                        </div>
+                        <small id="auxFuelMaxNote" class="col-form-label">
+                            Max 26 Gallons
                         </small>
                     </div>
                     <div class="form-group row">
                         <label for="fuelBurn" class="col-sm-3 col-form-label">Fuel Burn:</label>
                         <div class="col-sm-3">
-                            <input type="number" class="form-control" id="fuelBurn" placeholder="US Gal" min="0" max="40" required>
+                            <input type="number" class="form-control" id="fuelBurn" placeholder="US Gal" min="0" max="40" onchange="reCompute()" required>
                         </div>
                         <small id="fuelBurnNote" class="col-form-label">
-                            In Flight Consumption.
+                            In Flight Consumption
                         </small>
                     </div>
                     <div>
                         <hr>
                         <h5 align="center">Results</h5>
                         <ul class="list-group">
-                            <li class="list-group-item list-group-item-danger">Not within Limits. Exceeded Max Weight.</li>
-                            <li class="list-group-item">Empty:</li>
-                            <li class="list-group-item">Zero Fuel:</li>
-                            <li class="list-group-item">Takeoff:</li>
-                            <li class="list-group-item">Landing:</li>
+                            <li id="overall_result" class="list-group-item">Limits:</li>
+                            <li id="result_zero" class="list-group-item">Zero Fuel:</li>
+                            <li id="result_takeoff" class="list-group-item">Takeoff:</li>
+                            <li id="result_landing" class="list-group-item">Landing:</li>
                         </ul>
                     </div>
-                    <button type="reset" class="btn btn-secondary m-2">Reset</button>
+                    <button type="reset" class="btn btn-secondary m-2" onclick="clearResults()">Reset</button>
 
 
                 </form>
@@ -128,6 +160,7 @@
     </div>
 
 </main><!-- /.container -->
+<script src="aircraft.js"></script>
 <script src="compute.js"></script>
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
