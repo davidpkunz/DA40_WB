@@ -112,17 +112,20 @@ function reCompute(){
 
     /*computes all weights/CGs/Moments and returns dict with values*/
     var newData = computeWB(aircraftObj, userInput);
+    var colors = {takeoff : "green", landing : "green", zero : "grey"};
 
     /*We now validate the results based on CG limits and output the results*/
 
     /*First make sure takoff weight(heaviest of the 3) is not over max*/
     if (newData.takeOffWeight > aircraftObj.maxWeight){
         resultWarning("Takeoff weight exceeds " + aircraftObj.maxWeight + " lbs.");
+        colors["takeoff"] = "red";
         cgValid = false;
     }
     var zeroFwdCG;
     var toFwdCG;
     var ldgFwdCG;
+
         /*Now check if DA40 is within CG*/
         if (aircraftObj.model !== "DA42"){
             /*Light takeoff weight under 2161 lbs*/
@@ -131,6 +134,7 @@ function reCompute(){
                 if (!((parseFloat(modelData.cgRange.midFwd) <= newData.takeoffCG) &&
                     (newData.takeoffCG <= parseFloat(modelData.cgRange.midAft)))) {
                     resultWarning("Takeoff CG out of limits.");
+                    colors["takeoff"] = "red";
                     cgValid = false;
                 }
             }
@@ -141,6 +145,7 @@ function reCompute(){
                 toFwdCG = lineX;
                 if(!((lineX <= newData.takeoffCG) && (newData.takeoffCG <= parseFloat(modelData.cgRange.midAft)))) {
                     resultWarning("Takeoff CG out of limits.");
+                    colors["takeoff"] = "red";
                     cgValid = false;
                 }
             }
@@ -150,6 +155,7 @@ function reCompute(){
                 if (!((parseFloat(modelData.cgRange.midFwd) <= newData.zeroFuelCG) &&
                     (newData.zeroFuelCG <= parseFloat(modelData.cgRange.midAft)))) {
                     resultWarning("Zero Fuel CG out of limits.");
+                    colors["zero"] = "red";
                     cgValid = false;
                 }
             }
@@ -160,6 +166,7 @@ function reCompute(){
                 zeroFwdCG = lineX;
                 if(!((lineX <= newData.zeroFuelCG) && (newData.zeroFuelCG <= parseFloat(modelData.cgRange.midAft)))) {
                     resultWarning("Zero Fuel CG out of limits.");
+                    colors["zero"] = "red";
                     cgValid = false;
                 }
 
@@ -168,13 +175,14 @@ function reCompute(){
             if (newData.landingWeight <= parseFloat(modelData.cgRange.midWgt)) {
                 ldgFwdCG = modelData.cgRange.midFwd;
             }
-            /*Heavier landing weight over 20161 lbs where the fwd CG is sloped line*/
+            /*Heavier landing weight over 2161 lbs where the fwd CG is sloped line*/
             else if (newData.landingWeight > parseFloat(modelData.cgRange.midWgt)){
                 lineX = lineEquation(newData.landingWeight, parseFloat(modelData.cgRange.maxWgt), parseFloat(modelData.cgRange.midWgt),
                     modelData.cgRange.maxFwd, modelData.cgRange.midFwd);
                 ldgFwdCG = lineX;
                 if(!((lineX <= newData.landingCG) && (newData.landingCG <= parseFloat(modelData.cgRange.midAft)))) {
                     resultWarning("Landing CG out of limits.");
+                    colors["landing"] = "red";
                     cgValid = false;
                 }
             }
@@ -205,7 +213,7 @@ function reCompute(){
     else {
         /*DA42 CG Check*/
     }
-
+    drawCG(newData, userInput, modelData, colors);
     return [newData, userInput, toFwdCG];
 }
 
@@ -359,100 +367,104 @@ function clearResults(){
 }
 
 function auditMode(){
-    /**Show detailed view**/
-    const data = reCompute();
-    const computedData = data[0]
-    const userInput = data[1]
-    var tailNumber = document.getElementById('aircraftSelect').value;
-    var aircraftObj = aircraft.find(x => x.tail === tailNumber);
-    var modelData = aircraftModels.find(x => x.model === aircraftObj.model);
+    /**Show detailed view in table format**/
 
-    document.getElementById("empty_wt_td").innerHTML = aircraftObj.emptyWeight;
-    document.getElementById("empty_cg_td").innerHTML = aircraftObj.aircraftArm;
-    document.getElementById("empty_mnt_td").innerHTML = computedData.emptyMoment;
-
-    document.getElementById("front_wt_td").innerHTML = userInput.frontStationWeight;
-    document.getElementById("front_cg_td").innerHTML = modelData.frontStationCG;
-    document.getElementById("front_mnt_td").innerHTML = computedData.frontMoment;
-
-    document.getElementById("rear_wt_td").innerHTML = userInput.rearStationWeight;
-    document.getElementById("rear_cg_td").innerHTML = modelData.rearStationCG;
-    document.getElementById("rear_mnt_td").innerHTML = computedData.rearMoment;
-
-    document.getElementById("zero_wt_td").innerHTML = computedData.zeroFuelWeight;
-    document.getElementById("zero_cg_td").innerHTML = computedData.zeroFuelCG;
-    document.getElementById("zero_mnt_td").innerHTML = computedData.zeroFuelMoment;
-
-    document.getElementById("fuel_wt_td").innerHTML = userInput.fuelWeight;
-    document.getElementById("fuel_cg_td").innerHTML = modelData.fuelStationCG;
-    document.getElementById("fuel_mnt_td").innerHTML = computedData.fuelMoment;
-
-    document.getElementById("takeoff_wt_td").innerHTML = computedData.takeOffWeight;
-    document.getElementById("takeoff_cg_td").innerHTML = computedData.takeoffCG;
-    document.getElementById("takeoff_mnt_td").innerHTML = computedData.takeOffMoment;
-
-    document.getElementById("burn_wt_td").innerHTML = userInput.fuelBurnWeight;
-    document.getElementById("burn_cg_td").innerHTML = modelData.fuelStationCG;
-    document.getElementById("burn_mnt_td").innerHTML = computedData.fuelBurnMoment;
-
-    document.getElementById("landing_wt_td").innerHTML = computedData.landingWeight;
-    document.getElementById("landing_cg_td").innerHTML = computedData.landingCG;
-    document.getElementById("landing_mnt_td").innerHTML = computedData.landingMoment;
-
-    document.getElementById("max_wt_td").innerHTML = aircraftObj.maxWeight;
-
-    document.getElementById("fwd_cg").innerHTML = data[2];
-    document.getElementById("act_cg").innerHTML = computedData.takeoffCG;
-    document.getElementById("aft_cg").innerHTML = modelData.cgRange.midAft;
-
-    document.getElementById("bag_wt_td").innerHTML = userInput.baggage1Weight;
-    document.getElementById("bag_cg_td").innerHTML = modelData.baggageStationCG;
-    document.getElementById("bag_mnt_td").innerHTML = computedData.baggageMoment;
-
-    if (aircraftObj.model === "DA42"){
-        document.getElementById("nose_wt_td").innerHTML = userInput.noseWeight;
-        document.getElementById("nose_cg_td").innerHTML = modelData.noseBagStationCG;
-        document.getElementById("nose_mnt_td").innerHTML = computedData.noseBagMoment;
-
-        document.getElementById("deIce_wt_td").innerHTML = userInput.deIceWeight;
-        document.getElementById("deIce_cg_td").innerHTML = modelData.deIceStationCG;
-        document.getElementById("deIce_mnt_td").innerHTML = computedData.deIceMoment;
-
-        document.getElementById("aux_wt_td").innerHTML = userInput.auxFuelWeight;
-        document.getElementById("aux_cg_td").innerHTML = modelData.auxStationCG;
-        document.getElementById("aux_mnt_td").innerHTML = computedData.auxFuelMoment;
-
-        document.getElementById("bag2_th").style.display = "flex";
-        document.getElementById("bag_wt_td").innerHTML = userInput.baggage2Weight;
-        document.getElementById("bag_cg_td").innerHTML = modelData.baggageStation2CG;
-        document.getElementById("bag_mnt_td").innerHTML = computedData.baggage2Moment;
+    if(!(document.getElementById("auditDiv").style.display === "none")){
+        document.getElementById("auditDiv").style.display = "none";
     }
     else {
+        const data = reCompute();
+        const computedData = data[0]
+        const userInput = data[1]
+        var tailNumber = document.getElementById('aircraftSelect').value;
+        var aircraftObj = aircraft.find(x => x.tail === tailNumber);
+        var modelData = aircraftModels.find(x => x.model === aircraftObj.model);
 
-        document.getElementById("bag2_th").style.display = "none";
+        document.getElementById("empty_wt_td").innerHTML = aircraftObj.emptyWeight;
+        document.getElementById("empty_cg_td").innerHTML = aircraftObj.aircraftArm;
+        document.getElementById("empty_mnt_td").innerHTML = computedData.emptyMoment;
 
-        document.getElementById("nose_wt_td").innerHTML = "-";
-        document.getElementById("nose_cg_td").innerHTML = "-";
-        document.getElementById("nose_mnt_td").innerHTML = "-";
+        document.getElementById("front_wt_td").innerHTML = userInput.frontStationWeight;
+        document.getElementById("front_cg_td").innerHTML = modelData.frontStationCG;
+        document.getElementById("front_mnt_td").innerHTML = computedData.frontMoment;
 
-        document.getElementById("deIce_wt_td").innerHTML = "-";
-        document.getElementById("deIce_cg_td").innerHTML = "-";
-        document.getElementById("deIce_mnt_td").innerHTML = "-";
+        document.getElementById("rear_wt_td").innerHTML = userInput.rearStationWeight;
+        document.getElementById("rear_cg_td").innerHTML = modelData.rearStationCG;
+        document.getElementById("rear_mnt_td").innerHTML = computedData.rearMoment;
 
-        document.getElementById("aux_wt_td").innerHTML = "-";
-        document.getElementById("aux_cg_td").innerHTML = "-";
-        document.getElementById("aux_mnt_td").innerHTML = "-";
+        document.getElementById("zero_wt_td").innerHTML = computedData.zeroFuelWeight;
+        document.getElementById("zero_cg_td").innerHTML = computedData.zeroFuelCG;
+        document.getElementById("zero_mnt_td").innerHTML = computedData.zeroFuelMoment;
+
+        document.getElementById("fuel_wt_td").innerHTML = userInput.fuelWeight;
+        document.getElementById("fuel_cg_td").innerHTML = modelData.fuelStationCG;
+        document.getElementById("fuel_mnt_td").innerHTML = computedData.fuelMoment;
+
+        document.getElementById("takeoff_wt_td").innerHTML = computedData.takeOffWeight;
+        document.getElementById("takeoff_cg_td").innerHTML = computedData.takeoffCG;
+        document.getElementById("takeoff_mnt_td").innerHTML = computedData.takeOffMoment;
+
+        document.getElementById("burn_wt_td").innerHTML = userInput.fuelBurnWeight;
+        document.getElementById("burn_cg_td").innerHTML = modelData.fuelStationCG;
+        document.getElementById("burn_mnt_td").innerHTML = computedData.fuelBurnMoment;
+
+        document.getElementById("landing_wt_td").innerHTML = computedData.landingWeight;
+        document.getElementById("landing_cg_td").innerHTML = computedData.landingCG;
+        document.getElementById("landing_mnt_td").innerHTML = computedData.landingMoment;
+
+        document.getElementById("max_wt_td").innerHTML = aircraftObj.maxWeight;
+
+        document.getElementById("fwd_cg").innerHTML = data[2];
+        document.getElementById("act_cg").innerHTML = computedData.takeoffCG;
+        document.getElementById("aft_cg").innerHTML = modelData.cgRange.midAft;
+
+        document.getElementById("bag_wt_td").innerHTML = userInput.baggage1Weight;
+        document.getElementById("bag_cg_td").innerHTML = modelData.baggageStationCG;
+        document.getElementById("bag_mnt_td").innerHTML = computedData.baggageMoment;
+
+        if (aircraftObj.model === "DA42") {
+            document.getElementById("nose_wt_td").innerHTML = userInput.noseWeight;
+            document.getElementById("nose_cg_td").innerHTML = modelData.noseBagStationCG;
+            document.getElementById("nose_mnt_td").innerHTML = computedData.noseBagMoment;
+
+            document.getElementById("deIce_wt_td").innerHTML = userInput.deIceWeight;
+            document.getElementById("deIce_cg_td").innerHTML = modelData.deIceStationCG;
+            document.getElementById("deIce_mnt_td").innerHTML = computedData.deIceMoment;
+
+            document.getElementById("aux_wt_td").innerHTML = userInput.auxFuelWeight;
+            document.getElementById("aux_cg_td").innerHTML = modelData.auxStationCG;
+            document.getElementById("aux_mnt_td").innerHTML = computedData.auxFuelMoment;
+
+            document.getElementById("bag2_tr").style.display = "";
+            document.getElementById("bag2_wt_td").innerHTML = userInput.baggage2Weight;
+            document.getElementById("bag2_cg_td").innerHTML = modelData.baggageStation2CG;
+            document.getElementById("bag2_mnt_td").innerHTML = computedData.baggage2Moment;
+        } else {
+
+            document.getElementById("bag2_tr").style.display = "none";
+
+            document.getElementById("nose_wt_td").innerHTML = "-";
+            document.getElementById("nose_cg_td").innerHTML = "-";
+            document.getElementById("nose_mnt_td").innerHTML = "-";
+
+            document.getElementById("deIce_wt_td").innerHTML = "-";
+            document.getElementById("deIce_cg_td").innerHTML = "-";
+            document.getElementById("deIce_mnt_td").innerHTML = "-";
+
+            document.getElementById("aux_wt_td").innerHTML = "-";
+            document.getElementById("aux_cg_td").innerHTML = "-";
+            document.getElementById("aux_mnt_td").innerHTML = "-";
+        }
+
+        if (aircraftObj.model === "DA40XL") {
+            document.getElementById("bag2_tr").style.display = "";
+            document.getElementById("bag2_wt_td").innerHTML = userInput.baggage2Weight;
+            document.getElementById("bag2_cg_td").innerHTML = modelData.baggageStation2CG;
+            document.getElementById("bag2_mnt_td").innerHTML = computedData.baggage2Moment;
+        }
+
+        document.getElementById("auditDiv").style.display = "block";
     }
-
-    if (aircraftObj.model === "DA40XL"){
-        document.getElementById("bag2_th").style.display = "flex";
-        document.getElementById("bag_wt_td").innerHTML = userInput.baggage2Weight;
-        document.getElementById("bag_cg_td").innerHTML = modelData.baggageStation2CG;
-        document.getElementById("bag_mnt_td").innerHTML = computedData.baggage2Moment;
-    }
-
-    document.getElementById("auditDiv").style.display = "block";
-
 }
 
 

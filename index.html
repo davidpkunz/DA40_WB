@@ -32,7 +32,7 @@
 
     <div class="container">
         <div class="row">
-            <div class="col-md">
+            <div class="col-lg">
                 <h4>DA40 W&B</h4>
                 <form id="form_input">
                     <div class="form-group row">
@@ -193,8 +193,8 @@
                             <td id="bag_mnt_td"></td>
                         </tr>
 
-                        <tr>
-                            <th scope="row" id="bag2_th" style="display: none">Baggage 2</th>
+                        <tr id="bag2_tr" style="display: none">
+                            <th scope="row">Baggage 2</th>
                             <td id="bag2_wt_td"></td>
                             <td id="bag2_cg_td"></td>
                             <td id="bag2_mnt_td"></td>
@@ -256,29 +256,12 @@
                         </tr>
                         </tbody>
                     </table>
-
-
-
-
-
-
                 </div>
-
-
-
             </div>
 
-            <div class="col-md">
-                <h4>CG Envolope</h4>
-                <canvas id="cgCanvas" width="400" height="400" style="border: 1px solid black"></canvas>
-
-
-
-
-
-
-
-
+            <div class="col-lg">
+                <h4>CG Envelope</h4>
+                <canvas id="cgCanvas" width="600" height="400" style="border: 1px solid black"></canvas>
             </div>
         </div>
     </div>
@@ -286,6 +269,7 @@
 </main><!-- /.container -->
 <script src="aircraft.js"></script>
 <script src="compute.js"></script>
+<script src="draw.js"></script>
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>

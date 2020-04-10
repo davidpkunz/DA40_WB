@@ -1,3 +1,8 @@
 body {
     padding-top: 5rem;
 }
+
+canvas {
+    width: 100%;
+    height: auto;
+}
