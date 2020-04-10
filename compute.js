@@ -412,8 +412,6 @@ function auditMode(){
         document.getElementById("landing_cg_td").innerHTML = computedData.landingCG;
         document.getElementById("landing_mnt_td").innerHTML = computedData.landingMoment;
 
-        document.getElementById("max_wt_td").innerHTML = aircraftObj.maxWeight;
-
         document.getElementById("fwd_cg").innerHTML = data[2];
         document.getElementById("act_cg").innerHTML = computedData.takeoffCG;
         document.getElementById("aft_cg").innerHTML = modelData.cgRange.midAft;
@@ -439,8 +437,11 @@ function auditMode(){
             document.getElementById("bag2_wt_td").innerHTML = userInput.baggage2Weight;
             document.getElementById("bag2_cg_td").innerHTML = modelData.baggageStation2CG;
             document.getElementById("bag2_mnt_td").innerHTML = computedData.baggage2Moment;
-        } else {
 
+            document.getElementById("max_wt_td").innerHTML = aircraftObj.maxTOWeight;
+
+        } else {
+            document.getElementById("max_wt_td").innerHTML = aircraftObj.maxWeight;
             document.getElementById("bag2_tr").style.display = "none";
 
             document.getElementById("nose_wt_td").innerHTML = "-";
@@ -466,8 +467,6 @@ function auditMode(){
         document.getElementById("auditDiv").style.display = "block";
     }
 }
-
-
 
 function resultWarning(warningText){
     /**Sets top result HTML to red and displays warning text**/
