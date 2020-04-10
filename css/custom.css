@@ -6,3 +6,19 @@ canvas {
     width: 100%;
     height: auto;
 }
+.bg-dark{
+background-color: #0f2439 !important;
+}
+
+.btn-secondary{
+    background-color: #0f2439;
+
+}
+
+root{
+    --gray: #f8f8f8;
+    --blue: #4d5f80;
+    --blue-dark: #384660;
+    --blue-bright: #2472b5;
+    --blue-light: #d9dfe8;
+}
