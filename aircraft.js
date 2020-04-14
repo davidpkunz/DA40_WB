@@ -4,37 +4,37 @@ const aircraft = [
     {
         tail: "N383PS",
         model: "DA40F",
-        emptyWeight: 1707.4,
+        emptyWeight: 1700.0,
         maxWeight: 2535,
-        aircraftArm: 97.48
+        aircraftArm: 96.87
     },
     {
         tail: "N422FP",
         model: "DA40F",
-        emptyWeight: 1715.5,
+        emptyWeight: 1697.0,
         maxWeight: 2535,
-        aircraftArm: 97.37
+        aircraftArm: 96.76
     },
     {
         tail: "N423FP",
         model: "DA40F",
-        emptyWeight: 1694.4,
+        emptyWeight: 1686.0,
         maxWeight: 2535,
-        aircraftArm: 97.29
+        aircraftArm: 97.06
     },
     {
         tail: "N424FP",
         model: "DA40F",
-        emptyWeight: 1697,
+        emptyWeight: 1703.4,
         maxWeight: 2535,
-        aircraftArm: 96.89
+        aircraftArm: 97.52
     },
     {
         tail: "N425FP",
         model: "DA40F",
-        emptyWeight: 1705.4,
+        emptyWeight: 1697.0,
         maxWeight: 2535,
-        aircraftArm: 97.49
+        aircraftArm: 97.18
     },
     {
         tail: "N416FP",
@@ -46,9 +46,9 @@ const aircraft = [
     {
         tail: "N417FP",
         model: "DA40F",
-        emptyWeight: 1709.3,
+        emptyWeight: 1694.0,
         maxWeight: 2535,
-        aircraftArm: 97.28
+        aircraftArm: 96.65
     },
     {
         tail: "N418FP",
@@ -67,9 +67,9 @@ const aircraft = [
     {
         tail: "N118GM",
         model: "DA40CS",
-        emptyWeight: 1713.63,
+        emptyWeight: 1727.0,
         maxWeight: 2535,
-        aircraftArm: 96.88
+        aircraftArm: 96.94
     },
     {
         tail: "N415AM",
@@ -88,51 +88,51 @@ const aircraft = [
     {
         tail: "N543JW",
         model: "DA40CS",
-        emptyWeight: 1728.9,
+        emptyWeight: 1758.6,
         maxWeight: 2535,
-        aircraftArm: 96.63
+        aircraftArm: 96.486
     },
     {
         tail: "N127KC",
         model: "DA40XL",
-        emptyWeight: 1809,
+        emptyWeight: 1809.0,
         maxWeight: 2646,
         aircraftArm: 98.32
     },
     {
         tail: "N230DC",
         model: "DA40XL",
-        emptyWeight: 1848,
+        emptyWeight: 1842.0,
         maxWeight: 2646,
-        aircraftArm: 97.92
+        aircraftArm: 97.94
     },
     {
-        tail: "N605CA*",
+        tail: "N605CA",
         model: "DA40XL",
-        emptyWeight: 1848,
+        emptyWeight: 1804.0,
         maxWeight: 2646,
-        aircraftArm: 97.92
+        aircraftArm: 99.04
     },
     {
-        tail: "N759PA*",
+        tail: "N759PA",
         model: "DA40XL",
-        emptyWeight: 1848,
+        emptyWeight: 1800.56,
         maxWeight: 2646,
-        aircraftArm: 97.92
+        aircraftArm: 97.11
     },
     {
-        tail: "N704PA*",
+        tail: "N704PA",
         model: "DA40XL",
-        emptyWeight: 1848,
+        emptyWeight: 1803.86,
         maxWeight: 2646,
-        aircraftArm: 97.92
+        aircraftArm: 97.74
     },
     {
-        tail: "N831JL*",
+        tail: "N831JL",
         model: "DA40XL",
-        emptyWeight: 1848,
+        emptyWeight: 1818.58,
         maxWeight: 2646,
-        aircraftArm: 97.92
+        aircraftArm: 97.91
     },
     {
         tail: "N132TS",
