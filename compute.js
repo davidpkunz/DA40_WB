@@ -54,8 +54,14 @@ function aircraftSelection(){
             if (aircraftObj.auxTanks){
                 document.getElementById("auxFuelStationDiv").style.display = "flex";
             }
+            else{
+                document.getElementById("auxFuelStationDiv").style.display = "none";
+            }
             if (aircraftObj.deIce){
                 document.getElementById("deIceStationDiv").style.display = "flex";
+            }
+            else{
+                document.getElementById("deIceStationDiv").style.display = "none";
             }
             document.getElementById("fuelStation").max = "50";
             document.getElementById("fuelMaxNote").innerHTML = "Max 50 Gallons";
@@ -88,11 +94,23 @@ function reCompute(){
     /*If DA42 we have to compute w/ JetA density*/
     if (aircraftObj.model === "DA42"){
         userInput["noseWeight"] = parseFloat(document.getElementById("noseStation").value);
-        userInput["deIceWeight"] = parseFloat(document.getElementById("deIceStation").value) * 9.125;
         userInput["baggage2Weight"] = parseFloat(document.getElementById("baggageStation2").value);
         userInput["fuelWeight"] = parseFloat(document.getElementById("fuelStation").value) * 6.75;
-        userInput["auxFuelWeight"] = parseFloat(document.getElementById("auxFuelStation").value) * 6.75;
+
         userInput["fuelBurnWeight"] = parseFloat(document.getElementById("fuelBurn").value) * 6.75;
+        if (aircraftObj.deIce){
+            userInput["deIceWeight"] = parseFloat(document.getElementById("deIceStation").value) * 9.125;
+        }
+        else{
+            userInput["deIceWeight"] = 0.0;
+        }
+        if (aircraftObj.auxTanks){
+            userInput["auxFuelWeight"] = parseFloat(document.getElementById("auxFuelStation").value) * 6.75;
+        }
+        else{
+            userInput["auxFuelWeight"] = 0.0;
+        }
+
     }/*Otherwise just use avgas/100LL density*/
     else{
         userInput["fuelWeight"] = parseFloat(document.getElementById("fuelStation").value) * 6.0;
@@ -116,103 +134,235 @@ function reCompute(){
 
     /*We now validate the results based on CG limits and output the results*/
 
-    /*First make sure takoff weight(heaviest of the 3) is not over max*/
-    if (newData.takeOffWeight > aircraftObj.maxWeight){
-        resultWarning("Takeoff weight exceeds " + aircraftObj.maxWeight + " lbs.");
-        colors["takeoff"] = "red";
-        cgValid = false;
-    }
+
+
     var zeroFwdCG;
     var toFwdCG;
     var ldgFwdCG;
+    var zeroAftCG, toAftCG, ldgAftCG;
 
-        /*Now check if DA40 is within CG*/
-        if (aircraftObj.model !== "DA42"){
-            /*Light takeoff weight under 2161 lbs*/
-            if (newData.takeOffWeight <= parseFloat(modelData.cgRange.midWgt)) {
-                toFwdCG = modelData.cgRange.minFwd;
-                if (!((parseFloat(modelData.cgRange.midFwd) <= newData.takeoffCG) &&
-                    (newData.takeoffCG <= parseFloat(modelData.cgRange.midAft)))) {
-                    resultWarning("Takeoff CG out of limits.");
-                    colors["takeoff"] = "red";
-                    cgValid = false;
-                }
-            }
-            /*Heavier takeoff weight over 2161 lbs where the fwd CG is sloped line*/
-            else if (newData.takeOffWeight > parseFloat(modelData.cgRange.midWgt)){
-                var lineX = lineEquation(newData.takeOffWeight, parseFloat(modelData.cgRange.maxWgt), parseFloat(modelData.cgRange.midWgt),
-                                        modelData.cgRange.maxFwd, modelData.cgRange.midFwd);
-                toFwdCG = lineX;
-                if(!((lineX <= newData.takeoffCG) && (newData.takeoffCG <= parseFloat(modelData.cgRange.midAft)))) {
-                    resultWarning("Takeoff CG out of limits.");
-                    colors["takeoff"] = "red";
-                    cgValid = false;
-                }
-            }
-            /*Light zero fuel weight*/
-            if (newData.zeroFuelWeight <= parseFloat(modelData.cgRange.midWgt)) {
-                zeroFwdCG = parseFloat(modelData.cgRange.midFwd);
-                if (!((parseFloat(modelData.cgRange.midFwd) <= newData.zeroFuelCG) &&
-                    (newData.zeroFuelCG <= parseFloat(modelData.cgRange.midAft)))) {
-                    resultWarning("Zero Fuel CG out of limits.");
-                    colors["zero"] = "red";
-                    cgValid = false;
-                }
-            }
-            /*Heavier zero fuel weight over 2161 lbs where the fwd CG is sloped line*/
-            else if (newData.zeroFuelWeight > parseFloat(modelData.cgRange.midWgt)){
-                lineX = lineEquation(newData.zeroFuelWeight, parseFloat(modelData.cgRange.maxWgt), parseFloat(modelData.cgRange.midWgt),
-                    modelData.cgRange.maxFwd, modelData.cgRange.midFwd);
-                zeroFwdCG = lineX;
-                if(!((lineX <= newData.zeroFuelCG) && (newData.zeroFuelCG <= parseFloat(modelData.cgRange.midAft)))) {
-                    resultWarning("Zero Fuel CG out of limits.");
-                    colors["zero"] = "red";
-                    cgValid = false;
-                }
+    /*Now check if DA40 is within CG*/
+    if (aircraftObj.model !== "DA42"){
+        zeroAftCG = modelData.cgRange.midAft;
+        toAftCG = modelData.cgRange.midAft;
+        ldgAftCG = modelData.cgRange.midAft;
 
+        /*First make sure takoff weight(heaviest of the 3) is not over max*/
+        if (newData.takeOffWeight > aircraftObj.maxWeight){
+            resultWarning("Takeoff weight exceeds " + aircraftObj.maxWeight + " lbs.");
+            colors["takeoff"] = "red";
+            cgValid = false;
+        }
+
+        /*Light takeoff weight under 2161 lbs*/
+        if (newData.takeOffWeight <= parseFloat(modelData.cgRange.midWgt)) {
+            toFwdCG = modelData.cgRange.minFwd;
+            if (!((parseFloat(modelData.cgRange.midFwd) <= newData.takeoffCG) &&
+                (newData.takeoffCG <= parseFloat(modelData.cgRange.midAft)))) {
+                resultWarning("Takeoff CG out of limits.");
+                colors["takeoff"] = "red";
+                cgValid = false;
             }
-            /*Light landing weight*/
-            if (newData.landingWeight <= parseFloat(modelData.cgRange.midWgt)) {
-                ldgFwdCG = modelData.cgRange.midFwd;
+        }
+        /*Heavier takeoff weight over 2161 lbs where the fwd CG is sloped line*/
+        else if (newData.takeOffWeight > parseFloat(modelData.cgRange.midWgt)){
+            var lineX = lineEquation(newData.takeOffWeight, parseFloat(modelData.cgRange.maxWgt), parseFloat(modelData.cgRange.midWgt),
+                                    modelData.cgRange.maxFwd, modelData.cgRange.midFwd);
+            toFwdCG = lineX;
+            if(!((lineX <= newData.takeoffCG) && (newData.takeoffCG <= parseFloat(modelData.cgRange.midAft)))) {
+                resultWarning("Takeoff CG out of limits.");
+                colors["takeoff"] = "red";
+                cgValid = false;
             }
-            /*Heavier landing weight over 2161 lbs where the fwd CG is sloped line*/
-            else if (newData.landingWeight > parseFloat(modelData.cgRange.midWgt)){
-                lineX = lineEquation(newData.landingWeight, parseFloat(modelData.cgRange.maxWgt), parseFloat(modelData.cgRange.midWgt),
-                    modelData.cgRange.maxFwd, modelData.cgRange.midFwd);
-                ldgFwdCG = lineX;
-                if(!((lineX <= newData.landingCG) && (newData.landingCG <= parseFloat(modelData.cgRange.midAft)))) {
-                    resultWarning("Landing CG out of limits.");
-                    colors["landing"] = "red";
-                    cgValid = false;
-                }
+        }
+        /*Light zero fuel weight*/
+        if (newData.zeroFuelWeight <= parseFloat(modelData.cgRange.midWgt)) {
+            zeroFwdCG = parseFloat(modelData.cgRange.midFwd);
+            if (!((parseFloat(modelData.cgRange.midFwd) <= newData.zeroFuelCG) &&
+                (newData.zeroFuelCG <= parseFloat(modelData.cgRange.midAft)))) {
+                resultWarning("Zero Fuel CG out of limits.");
+                colors["zero"] = "red";
+                cgValid = false;
+            }
+        }
+        /*Heavier zero fuel weight over 2161 lbs where the fwd CG is sloped line*/
+        else if (newData.zeroFuelWeight > parseFloat(modelData.cgRange.midWgt)){
+            lineX = lineEquation(newData.zeroFuelWeight, parseFloat(modelData.cgRange.maxWgt), parseFloat(modelData.cgRange.midWgt),
+                modelData.cgRange.maxFwd, modelData.cgRange.midFwd);
+            zeroFwdCG = lineX;
+            if(!((lineX <= newData.zeroFuelCG) && (newData.zeroFuelCG <= parseFloat(modelData.cgRange.midAft)))) {
+                resultWarning("Zero Fuel CG out of limits.");
+                colors["zero"] = "red";
+                cgValid = false;
             }
 
-
-            /*We want to display results regardless of in/out of CG so the user can see and troubleshoot CG
-            * but we don't want to display if some values are empty/NaN
-            * */
-            if (!isNaN(newData.zeroFuelWeight && newData.takeOffWeight && newData.landingWeight)){
-                document.getElementById("result_zero").innerHTML = "Zero Fuel: " + newData.zeroFuelWeight +
-                    " lbs | CG Range: " + zeroFwdCG + " - " + parseFloat(modelData.cgRange.minAft) +
-                    " | CG Actual: " + newData.zeroFuelCG;
-                document.getElementById("result_takeoff").innerHTML = "Takeoff: " + newData.takeOffWeight +
-                    " lbs | CG Range: " + toFwdCG + " - " + parseFloat(modelData.cgRange.maxAft) +
-                    " | CG Actual: " + newData.takeoffCG;
-                document.getElementById("result_landing").innerHTML = "Landing: " + newData.landingWeight +
-                    " lbs | CG Range: " + ldgFwdCG + " - " + parseFloat(modelData.cgRange.midAft) +
-                    " | CG Actual: " + newData.landingCG;
+        }
+        /*Light landing weight*/
+        if (newData.landingWeight <= parseFloat(modelData.cgRange.midWgt)) {
+            ldgFwdCG = modelData.cgRange.midFwd;
+        }
+        /*Heavier landing weight over 2161 lbs where the fwd CG is sloped line*/
+        else if (newData.landingWeight > parseFloat(modelData.cgRange.midWgt)){
+            lineX = lineEquation(newData.landingWeight, parseFloat(modelData.cgRange.maxWgt), parseFloat(modelData.cgRange.midWgt),
+                modelData.cgRange.maxFwd, modelData.cgRange.midFwd);
+            ldgFwdCG = lineX;
+            if(!((lineX <= newData.landingCG) && (newData.landingCG <= parseFloat(modelData.cgRange.midAft)))) {
+                resultWarning("Landing CG out of limits.");
+                colors["landing"] = "red";
+                cgValid = false;
             }
-            else{
-                cgValid = false
-            }
-            /*We are within CG!*/
-            if (cgValid) {
-                resultSuccess();
-            }
+        }
     }
     else {
         /*DA42 CG Check*/
+        if (newData.takeOffWeight > aircraftObj.maxTOWeight){
+            resultWarning("Takeoff weight exceeds " + aircraftObj.maxTOWeight + " lbs.");
+            colors["takeoff"] = "red";
+            cgValid = false;
+        }
+
+        /*light takeoff weight*/
+        if (newData.takeOffWeight <= modelData.cgRange.midWgtFwd){
+            lineX = lineEquation(newData.takeOffWeight, modelData.cgRange.minWgt, modelData.cgRange.midWgtAft,
+                                    modelData.cgRange.minAft, modelData.cgRange.midAft);
+            toFwdCG = modelData.cgRange.minFwd;
+            toAftCG = lineX;
+            if((newData.takeoffCG > lineX) || (newData.takeoffCG < toFwdCG)){
+                resultWarning("Takeoff CG out of limits.");
+                colors["takeoff"] = "red";
+                cgValid = false;
+            }
+        }
+        /*Mid takeoff weight*/
+        else if (newData.takeOffWeight <= modelData.cgRange.midWgtAft){
+            aftLineX = lineEquation(newData.takeOffWeight, modelData.cgRange.minWgt, modelData.cgRange.midWgtAft,
+                modelData.cgRange.minAft, modelData.cgRange.midAft);
+            fwdLineX = lineEquation(newData.takeOffWeight, modelData.cgRange.maxWgt, modelData.cgRange.midWgtFwd,
+                modelData.cgRange.maxFwd, modelData.cgRange.midFwd);
+            toFwdCG = fwdLineX;
+            toAftCG = aftLineX;
+            if ((newData.takeoffCG < fwdLineX)||(newData.takeoffCG > aftLineX)){
+                resultWarning("Takeoff CG out of limits.");
+                colors["takeoff"] = "red";
+                cgValid = false;
+            }
+        }
+        /*Heavy takeoff weight*/
+        else{
+            lineX = lineEquation(newData.takeOffWeight, modelData.cgRange.maxWgt, modelData.cgRange.midWgtFwd,
+                modelData.cgRange.maxFwd, modelData.cgRange.midFwd);
+            toFwdCG = lineX;
+            toAftCG = modelData.cgRange.maxAft;
+            if ((newData.takeoffCG < lineX) || (newData.takeoffCG > modelData.cgRange.maxAft)){
+                resultWarning("Takeoff CG out of limits.");
+                colors["takeoff"] = "red";
+                cgValid = false;
+            }
+        }
+
+        /*light zero fuel weight*/
+        if (newData.zeroFuelWeight <= modelData.cgRange.midWgtFwd){
+            lineX = lineEquation(newData.zeroFuelWeight, modelData.cgRange.minWgt, modelData.cgRange.midWgtAft,
+                modelData.cgRange.minAft, modelData.cgRange.midAft);
+            zeroFwdCG = modelData.cgRange.minFwd;
+            zeroAftCG = lineX;
+            if((newData.zeroFuelCG > lineX) || (newData.zeroFuelCG < toFwdCG)){
+                resultWarning("Zero Fuel CG out of limits.");
+                colors["zero"] = "red";
+                cgValid = false;
+            }
+        }
+        /*Mid zero fuel weight*/
+        else if (newData.zeroFuelWeight <= modelData.cgRange.midWgtAft){
+            aftLineX = lineEquation(newData.zeroFuelWeight, modelData.cgRange.minWgt, modelData.cgRange.midWgtAft,
+                modelData.cgRange.minAft, modelData.cgRange.midAft);
+            fwdLineX = lineEquation(newData.zeroFuelWeight, modelData.cgRange.maxWgt, modelData.cgRange.midWgtFwd,
+                modelData.cgRange.maxFwd, modelData.cgRange.midFwd);
+            zeroFwdCG = fwdLineX;
+            zeroAftCG = aftLineX;
+            if ((newData.zeroFuelCG < fwdLineX)||(newData.zeroFuelCG > aftLineX)){
+                resultWarning("Zero Fuel CG out of limits.");
+                colors["zero"] = "red";
+                cgValid = false;
+            }
+        }
+        /*Heavy zero fuel weight*/
+        else{
+            lineX = lineEquation(newData.zeroFuelWeight, modelData.cgRange.maxWgt, modelData.cgRange.midWgtFwd,
+                modelData.cgRange.maxFwd, modelData.cgRange.midFwd);
+            zeroFwdCG = lineX;
+            zeroAftCG = modelData.cgRange.maxAft;
+            if ((newData.zeroFuelCG < lineX) || (newData.zeroFuelCG > modelData.cgRange.maxAft)){
+                resultWarning("Zero Fuel CG out of limits.");
+                colors["zero"] = "red";
+                cgValid = false;
+            }
+        }
+
+        /*light landing weight*/
+        if (newData.landingWeight <= modelData.cgRange.midWgtFwd){
+            lineX = lineEquation(newData.landingWeight, modelData.cgRange.minWgt, modelData.cgRange.midWgtAft,
+                modelData.cgRange.minAft, modelData.cgRange.midAft);
+            ldgFwdCG = modelData.cgRange.minFwd;
+            ldgAftCG = lineX;
+            if((newData.landingCG > lineX) || (newData.landingCG < toFwdCG)){
+                resultWarning("Landing CG out of limits.");
+                colors["landing"] = "red";
+                cgValid = false;
+            }
+        }
+        /*Mid landing weight*/
+        else if (newData.landingWeight <= modelData.cgRange.midWgtAft){
+            aftLineX = lineEquation(newData.landingWeight, modelData.cgRange.minWgt, modelData.cgRange.midWgtAft,
+                modelData.cgRange.minAft, modelData.cgRange.midAft);
+            fwdLineX = lineEquation(newData.landingWeight, modelData.cgRange.maxWgt, modelData.cgRange.midWgtFwd,
+                modelData.cgRange.maxFwd, modelData.cgRange.midFwd);
+            ldgFwdCG = fwdLineX;
+            ldgAftCG = aftLineX;
+            if ((newData.landingCG < fwdLineX)||(newData.landingCG > aftLineX)){
+                resultWarning("Landing CG out of limits.");
+                colors["landing"] = "red";
+                cgValid = false;
+            }
+        }
+        /*Heavy landing weight*/
+        else if (newData.landingWeight <= aircraftObj.maxLDGWeight){
+            lineX = lineEquation(newData.landingWeight, modelData.cgRange.maxWgt, modelData.cgRange.midWgtFwd,
+                modelData.cgRange.maxFwd, modelData.cgRange.midFwd);
+            ldgFwdCG = lineX;
+            ldgAftCG = modelData.cgRange.maxAft;
+            if ((newData.landingCG < lineX) || (newData.landingCG > modelData.cgRange.maxAft)){
+                resultWarning("Landing CG out of limits.");
+                colors["landing"] = "red";
+                cgValid = false;
+            }
+        }
+        else if (newData.landingWeight > aircraftObj.maxLDGWeight){
+            resultWarning("Landing weight exceeds " + aircraftObj.maxLDGWeight + " lbs.");
+            colors["landing"] = "red";
+            cgValid = false;
+        }
     }
+
+    if (!isNaN(newData.zeroFuelWeight && newData.takeOffWeight && newData.landingWeight)){
+        document.getElementById("result_zero").innerHTML = "Zero Fuel: " + newData.zeroFuelWeight +
+            " lbs | CG Range: " + zeroFwdCG + " - " + zeroAftCG +
+            " | CG Actual: " + newData.zeroFuelCG;
+        document.getElementById("result_takeoff").innerHTML = "Takeoff: " + newData.takeOffWeight +
+            " lbs | CG Range: " + toFwdCG + " - " + toAftCG +
+            " | CG Actual: " + newData.takeoffCG;
+        document.getElementById("result_landing").innerHTML = "Landing: " + newData.landingWeight +
+            " lbs | CG Range: " + ldgFwdCG + " - " + ldgAftCG +
+            " | CG Actual: " + newData.landingCG;
+    }
+    else{
+        cgValid = false
+    }
+    /*We are within CG!*/
+    if (cgValid) {
+        resultSuccess();
+    }
+
     drawCG(newData, userInput, modelData, colors);
     return [newData, userInput, toFwdCG];
 }
@@ -309,9 +459,19 @@ function computeWB(aircraftObj, userInput){
 
     /*DA42 needs more computations for nose baggage, aux fuel, de-ice*/
     if (aircraftObj.model === "DA42") {
+        if(aircraftObj.deIce){
+            computedData["deIceMoment"] = Math.round((parseFloat(modelData.deIceStationCG) * userInput.deIceWeight + Number.EPSILON) * 100) / 100;
+        }
+        else{
+            computedData["deIceMoment"] = 0.0;
+        }
+        if(aircraftObj.auxTanks){
+            computedData["auxFuelMoment"] = Math.round((parseFloat(modelData.auxStationCG) * userInput.auxFuelWeight + Number.EPSILON) * 100) / 100;
+        }
+        else{
+            computedData["auxFuelMoment"] = 0.0;
+        }
         computedData["noseBagMoment"] = Math.round((parseFloat(modelData.noseBagStationCG) * userInput.noseWeight + Number.EPSILON) * 100) / 100;
-        computedData["auxFuelMoment"] = Math.round((parseFloat(modelData.auxStationCG) * userInput.auxFuelWeight + Number.EPSILON) * 100) / 100;
-        computedData["deIceMoment"] = Math.round((parseFloat(modelData.deIceStationCG) * userInput.deIceWeight + Number.EPSILON) * 100) / 100;
         computedData["baggage2Moment"] = Math.round((parseFloat(modelData.baggageStation2CG) * userInput.baggage2Weight + Number.EPSILON) * 100) / 100;
         computedData["zeroFuelMoment"] = computedData.emptyMoment + computedData.noseBagMoment +
             computedData.deIceMoment + computedData.frontMoment + computedData.rearMoment +
