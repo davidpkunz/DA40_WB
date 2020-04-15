@@ -118,7 +118,7 @@ function drawEnvelope(c, ctx, modelData, newData){
         var zero_cg = convertCoordinates(c, newData.zeroFuelCG, newData.zeroFuelWeight, DA40Borders);
     }
     else{
-        var DA42Borders = {maxx : 98.5, maxy : 4100, minx : 90.5, miny : 2400}
+        var DA42Borders = {maxx : 98.5, maxy : 4100, minx : 91.5, miny : 2400}
         pnt1 = convertCoordinates(c, modelData.cgRange.minFwd, modelData.cgRange.minWgt, DA42Borders);
         ctx.beginPath();
         ctx.moveTo(pnt1.x, pnt1.y);

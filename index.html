@@ -46,7 +46,7 @@
                             </small>
                     </div>
                     <hr>
-                    <div class="form-group row" id="noseStationDiv">
+                    <div class="form-group row" id="noseStationDiv" style="display: none">
                         <label for="noseStation" class="col-sm-4 col-form-label">Nose Baggage:</label>
                         <div class="col-sm-3">
                             <input type="number" class="form-control" id="noseStation" placeholder="lbs" min="0" max="66" form="form_input" onchange="reCompute()" required>
@@ -55,7 +55,7 @@
                             Max 66 lbs
                         </small>
                     </div>
-                    <div class="form-group row" id ="deIceStationDiv">
+                    <div class="form-group row" id ="deIceStationDiv" style="display: none">
                         <label for="deIceStation" class="col-sm-4 col-form-label">De-icing Fluid:</label>
                         <div class="col-sm-3">
                             <input type="text" class="form-control" id="deIceStation" placeholder="US Gal" form="form_input" onchange="reCompute()" required>
@@ -85,10 +85,10 @@
                             Max 66 lbs
                         </small>
                     </div>
-                    <div class="form-group row" id="baggageStation2Div">
+                    <div class="form-group row" id="baggageStation2Div" style="display: none">
                         <label for="baggageStation2" class="col-sm-4 col-form-label">Baggage Extension:</label>
                         <div class="col-sm-3">
-                            <input type="number" class="form-control" id="baggageStation2" placeholder="lbs" min="0" max="66" form="form_input" onchange="reCompute()" required>
+                            <input type="number" class="form-control" id="baggageStation2" value="0" min="0" max="66" form="form_input" onchange="reCompute()" required>
                         </div>
                         <small id="baggage2MaxNote" class="col-sm-5">
                             Max 40 lbs
@@ -103,7 +103,7 @@
                             Max 40 Gallons
                         </small>
                     </div>
-                    <div class="form-group row" id="auxFuelStationDiv">
+                    <div class="form-group row" id="auxFuelStationDiv" style="display: none">
                         <label for="auxFuelStation" class="col-sm-4 col-form-label">Aux Fuel:</label>
                         <div class="col-sm-3">
                             <input type="number" class="form-control" id="auxFuelStation" placeholder="US Gal" min="0" max="26" form="form_input" onchange="reCompute()" required>
@@ -139,12 +139,12 @@
                 <hr>
                 <div class="row justify-content-center">
                     <br>
-                    <button type="button" class="btn btn-secondary m-2" onclick="auditMode()">Audit Mode</button>
-                    <button type="button" class="btn btn-secondary m-2">Email</button>
+                    <button type="button" class="btn btn-secondary m-2" onclick="showAudit()">Audit Mode</button>
+                    <button type="button" class="btn btn-secondary m-2" onclick="printResults()">Print</button>
                 </div>
                 <hr>
                 <div class="container" id="auditDiv" style="display: none">
-                    <h5>Audit</h5>
+                    <h5 id="auditTitle">Audit</h5>
                     <table class="table table-sm table-striped table-bordered">
                         <thead>
                         <tr>
@@ -269,8 +269,11 @@
 <script src="aircraft.js"></script>
 <script src="compute.js"></script>
 <script src="draw.js"></script>
+
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+<script src="printThis/printThis.js"></script>
 </body>
 </html>
