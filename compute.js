@@ -429,7 +429,7 @@ function checkInputConstraints(modelData, userInput){
             return "Fuel burn exceeds fuel available."
         }
     }
-    return ""
+    return "";
 }
 
 function lineEquation(yValue,y,y1,x,x1){
@@ -533,9 +533,11 @@ function clearResults(){
 function showAudit(){
     if(!(document.getElementById("auditDiv").style.display === "none")){
         document.getElementById("auditDiv").style.display = "none";
+        document.getElementById("audit_btn").innerHTML = "Show Details";
     }
     else{
         document.getElementById("auditDiv").style.display = "block";
+        document.getElementById("audit_btn").innerHTML = "Hide Details";
     }
 }
 
@@ -663,6 +665,12 @@ function printResults(){
         loadCSS : "https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css",
         canvas : true
     });
+}
+
+function emailResults(){
+    var tailNumber = document.getElementById('aircraftSelect').value;
+    window.open('mailto:dispatchusu@gmail.com?subject=' + tailNumber + ' Weight and Balance&body=' +
+        '<html><body><h1>This is a Heading.</h1><p>This is a paragraph.</p></body></html>');
 }
 
 
