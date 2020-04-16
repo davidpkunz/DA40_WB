@@ -78,9 +78,11 @@ function reCompute(){
     /**Runs when a change in the user input is detected, this keeps the results updated with having to submit
      *
      **/
+
     var tailNumber = document.getElementById('aircraftSelect').value;
     var aircraftObj = aircraft.find(x => x.tail === tailNumber)
     var userInput = {tail : aircraftObj.tail}
+
 
     /*Collect all user input and put into dict/object */
     userInput["frontStationWeight"] = parseFloat(document.getElementById("frontStation").value);
@@ -127,6 +129,9 @@ function reCompute(){
         resultWarning(validInputString);
         return;
     }
+
+    /*Store user input data */
+    localStorage.setItem("userInput", JSON.stringify(userInput));
 
     /*computes all weights/CGs/Moments and returns dict with values*/
     var newData = computeWB(aircraftObj, userInput);
@@ -432,6 +437,37 @@ function checkInputConstraints(modelData, userInput){
     return "";
 }
 
+function loadUserData(){
+    var userData = JSON.parse(localStorage.getItem("userInput"));
+    var aircraftObj = aircraft.find(x => x.tail === userData.tail);
+
+    document.getElementById("aircraftSelect").value = userData.tail;
+    document.getElementById("frontStation").value = userData.frontStationWeight;
+    document.getElementById("rearStation").value = userData.rearStationWeight;
+    document.getElementById("baggageStation1").value = userData.baggage1Weight;
+    document.getElementById("fuelStation").value = userData.fuelWeight/6;
+    document.getElementById("fuelBurn").value = userData.fuelBurnWeight/6;
+
+    if (aircraftObj.model === "DA40XL"){
+        document.getElementById("baggageStation2").value = userData.baggage2Weight;
+    }
+    if (aircraftObj.model === "DA42"){
+        document.getElementById("fuelStation").value = userData.fuelWeight/6.75;
+        document.getElementById("fuelBurn").value = userData.fuelBurnWeight/6.75;
+        document.getElementById("baggageStation2").value = userData.baggage2Weight;
+        document.getElementById("noseStation").value = userData.noseWeight;
+        if (aircraftObj.auxTanks){
+            document.getElementById("auxFuelStation").value = userData.auxFuelWeight/6.75;
+        }
+        if (aircraftObj.deIce){
+            document.getElementById("deIceStation").value = userData.deIceWeight/9.125;
+        }
+    }
+    return userData;
+}
+
+
+
 function lineEquation(yValue,y,y1,x,x1){
     /**We take the yValue(aircraft weight) and two points on the line (x,y),(x1,y1)
      * We then find the slope of the line (m) and the y-intercept (b)
@@ -676,3 +712,7 @@ function emailResults(){
 
 /*call to fill in the dropdown selector with tail numbers*/
 fillData()
+if (localStorage.getItem("userInput") !== null){
+    loadUserData();
+    reCompute();
+}
