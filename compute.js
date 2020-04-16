@@ -706,13 +706,14 @@ function printResults(){
 function emailResults(){
     var tailNumber = document.getElementById('aircraftSelect').value;
     window.open('mailto:dispatchusu@gmail.com?subject=' + tailNumber + ' Weight and Balance&body=' +
-        '<html><body><h1>This is a Heading.</h1><p>This is a paragraph.</p></body></html>');
+        '');
 }
 
 
 /*call to fill in the dropdown selector with tail numbers*/
 fillData()
+/*if local data exists, load it*/
 if (localStorage.getItem("userInput") !== null){
     loadUserData();
-    reCompute();
+    aircraftSelection();
 }

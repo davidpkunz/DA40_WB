@@ -13,7 +13,7 @@
 </head>
 <body>
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-    <a class="navbar-brand" href="#">DA40/42 Weight and Balance</a>
+    <a class="navbar-brand" href="index.html">DA40/42 Weight and Balance</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -34,10 +34,55 @@
     <div class="container">
         <div class="row">
             <div class="col-lg">
+                <h4>Weather</h4>
+                <div class="form-group row" id = "weatherDiv">
+                    <label for="weatherID" class="col-sm-2 col-form-label">Station ID: </label>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="weatherID">
+                    </div>
+                    <button type="button" class="btn btn-secondary col-sm-1" onclick="getWeather()">Submit</button>
+                </div>
 
+                <h5 id="weatherTitle">Station Weather</h5>
+                <div class="w-50">
+                    <table class="table table-sm table-striped table-bordered">
+                        <tbody>
+                        <tr>
+                            <th scope="col">Time</th>
+                            <th>Something Longer</th>
+                        </tr>
+                        <tr>
+                            <th scope="col">Wind Dir/Vel</th>
+                            <th>1</th>
+                        </tr>
+                        <tr>
+                            <th scope="col">Visibility</th>
+                            <th>1</th>
+                        </tr>
+                        <tr>
+                            <th scope="col">Ceilings</th>
+                            <th>1</th>
+                        </tr>
+                        <tr>
+                            <th scope="col">Temp/Dewpoint</th>
+                            <th>1</th>
+                        </tr>
+                        <tr>
+                            <th scope="col">Alitimeter</th>
+                            <th>1</th>
+                        </tr>
+                        <tr>
+                            <th scope="col">Density Alt.</th>
+                            <th>1</th>
+                        </tr>
+                        <tr>
+                            <th scope="col">Pressure Alt.</th>
+                            <th>1</th>
+                        </tr>
 
-
-
+                        </tbody>
+                    </table>
+                </div>
 
             </div>
 
@@ -45,19 +90,16 @@
     </div>
 
 
-
-
-
 </main>
 
-<script src="aircraft.js"></script>
-<script src="compute.js"></script>
-<script src="draw.js"></script>
 
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 
+<script src="aircraft.js"></script>
+<script src="performance.js"></script>
 <script src="printThis/printThis.js"></script>
+
 </body>
 </html>
