@@ -15,6 +15,8 @@ function getWeather(){
         if (this.readyState===4 && this.status===200){
             var weatherData = JSON.parse(this.responseText);
 
+
+            document.getElementById("weatherData").style.display = "block";
             document.getElementById("wRaw").innerHTML = weatherData.raw_text;
             var obsTime = new Date(weatherData.observation_time);
             document.getElementById("wTime").innerHTML = obsTime.getHours() + ":" + obsTime.getMinutes()
@@ -33,13 +35,21 @@ function getWeather(){
                 }
                 if ("wind_gust_kt" in weatherData){
                     document.getElementById("wWind").innerHTML = windDir + " @ " + weatherData.wind_speed_kt
-                                                                         + "kt G " + weatherData.wind_gust_kt + "kt";
+                                                                         + " kts G " + weatherData.wind_gust_kt + " kts";
                 }
                 else {
-                    document.getElementById("wWind").innerHTML = windDir + " @ " + weatherData.wind_speed_kt + "kt";
+                    document.getElementById("wWind").innerHTML = windDir + " @ " + weatherData.wind_speed_kt + " kts";
                 }
             }
             document.getElementById("wVisibility").innerHTML = parseFloat(weatherData.visibility_statute_mi) + " sm";
+            var rawCeilings = weatherData.sky_condition;
+            var ceilingString = "";
+            for (var i = 0; i < rawCeilings.length; i++){
+                var ceilingAttribute = rawCeilings[i]["@attributes"];
+                ceilingString += "<p>" + ceilingAttribute["sky_cover"] + " @ " + ceilingAttribute["cloud_base_ft_agl"] + "'</p>";
+            }
+            document.getElementById("wCeilings").innerHTML = ceilingString;
+
             var temp = parseFloat(weatherData.temp_c);
             var dewpoint = parseFloat(weatherData.dewpoint_c);
             document.getElementById("wTemp").innerHTML = temp + " &degC";

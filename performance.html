@@ -13,7 +13,7 @@
 </head>
 <body>
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-    <a class="navbar-brand" href="index.html">DA40/42 Weight and Balance</a>
+    <a class="navbar-brand" href="index.html">DA40/42</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -21,10 +21,10 @@
     <div class="collapse navbar-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-                <a class="nav-link" href="index.html">W & B <span class="sr-only">(current)</span></a>
+                <a class="nav-link" href="index.html">Weight & Balance <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item active">
-                <a class="nav-link" href="performance.html">Performance <span class="sr-only">(current)</span></a>
+                <a class="nav-link" href="performance.html">Weather & Performance <span class="sr-only">(current)</span></a>
             </li>
         </ul>
     </div>
@@ -36,16 +36,15 @@
             <div class="col-lg">
                 <h4>Weather</h4>
                 <div class="form-group row" id = "weatherDiv">
-                    <label for="weatherID" class="col-sm-2 col-form-label">Station ID: </label>
+                    <label for="weatherID" class="col-sm-3 col-form-label">Station ID: </label>
                     <div class="col-sm-3">
                         <input type="text" class="form-control" id="weatherID">
                     </div>
-                    <button type="button" class="btn btn-secondary col-sm-1" onclick="getWeather()">Submit</button>
+                    <button type="button" class="btn btn-secondary col-sm-3" onclick="getWeather()">Submit</button>
                 </div>
-
-                <h5 id="weatherTitle">Station Weather</h5>
-                <p id="wRaw"></p>
-                <div class="w-50" id ="weatherData">
+                <div id="weatherData" style="display: none">
+                    <h5 id="weatherTitle">Station Weather</h5>
+                    <p id="wRaw"></p>
                     <table class="table table-sm table-striped table-bordered">
                         <tbody>
                         <tr>
@@ -61,7 +60,7 @@
                             <th id="wVisibility"></th>
                         </tr>
                         <tr>
-                            <th scope="col">Ceilings</th>
+                            <th scope="col">Clouds</th>
                             <th id="wCeilings"></th>
                         </tr>
                         <tr>
@@ -69,11 +68,11 @@
                             <th id="wTemp"></th>
                         </tr>
                         <tr>
-                            <th scope="col">DewPoint</th>
+                            <th scope="col">Dew Point</th>
                             <th id="wDewpoint"></th>
                         </tr>
                         <tr>
-                            <th scope="col">Alitimeter</th>
+                            <th scope="col">Altimeter</th>
                             <th id="wAltimeter"></th>
                         </tr>
                         <tr>
@@ -88,6 +87,12 @@
                         </tbody>
                     </table>
                 </div>
+
+            </div>
+            <div class="col-lg">
+                <h4>Takeoff and Landing Performance</h4>
+                <p>Performance data is an estimate only and does not take into
+                    consideration runway condition, aircraft condition, or pilot technique.</p>
 
             </div>
 
