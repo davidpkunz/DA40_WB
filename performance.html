@@ -38,7 +38,7 @@
                 <div class="form-group row" id = "weatherDiv">
                     <label for="weatherID" class="col-sm-3 col-form-label">Station ID: </label>
                     <div class="col-sm-3">
-                        <input type="text" class="form-control" id="weatherID">
+                        <input type="text" class="form-control" id="weatherID" autocomplete="on">
                     </div>
                     <button type="button" class="btn btn-secondary col-sm-3" onclick="getWeather()">Submit</button>
                 </div>
@@ -113,13 +113,22 @@
                     </tr>
                     <tr>
                         <th scope="row">Takeoff</th>
-                        <td>Ground Roll:</td>
+                        <td id ="TODistance">Ground Roll:</td>
                         <td>Over 50':</td>
                     </tr>
                     <tr>
                         <th scope="row">Landing</th>
                         <td>Ground Roll:</td>
                         <td>Over 50':</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Touch and Go Distance</th>
+                        <td id="tgDistance"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Rate of Climb</th>
+                        <td id="climbFPM"></td>
+                        <td id="climbNM"></td>
                     </tr>
                     </tbody>
                 </table>
@@ -136,6 +145,7 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 
 <script src="aircraft.js"></script>
+<script src="perfdata.js"></script>
 <script src="performance.js"></script>
 <script src="printThis/printThis.js"></script>
 

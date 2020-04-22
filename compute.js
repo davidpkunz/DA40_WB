@@ -139,7 +139,7 @@ function reCompute(){
 
     /*We now validate the results based on CG limits and output the results*/
 
-
+    localStorage.setItem("computedData", JSON.stringify(newData));
 
     var zeroFwdCG;
     var toFwdCG;
