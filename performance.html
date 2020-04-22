@@ -93,9 +93,37 @@
                 <h4>Takeoff and Landing Performance</h4>
                 <p>Performance data is an estimate only and does not take into
                     consideration runway condition, aircraft condition, or pilot technique.</p>
+                <div class="container form-group row">
+                    <label for="runwayHdg" class="col-sm-4 col-form-label">Runway Heading: </label>
+                    <div class="col-sm-4">
+                        <input type="number" class="form-control" id="runwayHdg" min=1 max=360 placeholder="Degrees" onchange=runwayChange(this.value)>
+                    </div>
+                </div>
+                <table class="table table-sm table-bordered">
+                    <tbody>
+                    <tr>
+                        <th scope="row">Head Wind</th>
+                        <td id="headWind"></td>
 
+                    </tr>
+                    <tr>
+                        <th scope="row">Cross Wind</th>
+                        <td id="xWind"></td>
+
+                    </tr>
+                    <tr>
+                        <th scope="row">Takeoff</th>
+                        <td>Ground Roll:</td>
+                        <td>Over 50':</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Landing</th>
+                        <td>Ground Roll:</td>
+                        <td>Over 50':</td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
-
         </div>
     </div>
 

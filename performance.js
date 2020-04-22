@@ -82,19 +82,44 @@ function getWeather(){
             var densityAlt = (145442.16*(1-((17.326*stationPressure)/(tempRankine))**0.235));
             document.getElementById("wPressureAlt").innerHTML = pressureAlt.toFixed(0) + " ft";
             document.getElementById("wDensityAlt").innerHTML = densityAlt.toFixed(0) + " ft";
-
-
-
-
-
-
-
-
+            localStorage.setItem("weatherData", JSON.stringify(weatherData));
+            runwayChange(document.getElementById("runwayHdg").value);
         }
     }
     request.open("GET", "server.php?q="+stationID,true);
     request.send();
+}
 
+function runwayChange(str){
+    heading = parseFloat(str);
+    if ((heading > 360)|| (heading < 1)){
+        document.getElementById("xWind").innerHTML = "";
+        document.getElementById("headWind").innerHTML = "";
+        return;
+    }
+    var weatherData = JSON.parse(localStorage.getItem("weatherData"));
+    winds = windComponents(heading, weatherData["wind_dir_degrees"], weatherData["wind_speed_kt"]);
+    document.getElementById("headWind").innerHTML = winds.hWind.toFixed(0);
+    if (winds.xWind < 0){
+        document.getElementById("xWind").innerHTML = -winds.xWind.toFixed(0) + " (Right)";
+    }
+    else if (winds.xWind === 0){
+        document.getElementById("xWind").innerHTML = winds.xWind.toFixed(0);
+    }
+    else{
+        document.getElementById("xWind").innerHTML = winds.xWind.toFixed(0) + " (Left)";
+    }
+}
 
+function windComponents(heading, windDir, windSpeed){
+    var diffAngle = heading - parseFloat(windDir);
+    var radAngle = diffAngle*Math.PI/180;
+    var xWindSpd = Math.sin(radAngle)*parseFloat(windSpeed);
+    var hWindSpd = Math.cos(radAngle)*parseFloat(windSpeed);
+    return {xWind : xWindSpd, hWind : hWindSpd};
+}
 
+function performanceCompute(){
+    var userData = JSON.parse(localStorage.getItem("userInput"));
+    var weatherData = JSON.parse(localStorage.getItem("weatherData"));
 }
