@@ -282,6 +282,59 @@ function takeoffDA40FP(pressureAlt, temp, takeoffWeight, hWind){
                 windResult = -0.8103 * hWind + 84.633 + skew;
             }
         }
+        else if(hWind < 0){
+            /*If we have a tail wind*/
+            hWind = Math.abs(hWind);
+            if (weightResult <= 26.58) {
+                windResult = .6829 * hWind + 26.58;
+            }
+            else if ((weightResult > 26.58) && (weightResult <= 30.057)) {
+                skew = (weightResult - 26.58) / (30.057 - 26.58);
+                topValue = 0.8055 * hWind + 30.057;
+                bottomValue = .6829 * hWind + 26.58;
+                windResult = ((topValue - bottomValue) * skew) + bottomValue;
+            }
+            else if ((weightResult > 30.057) && (weightResult <= 34.918)) {
+                skew = (weightResult - 30.057) / (34.918 - 30.057);
+                topValue = 1.0687 * hWind + 34.918;
+                bottomValue = 0.8055 * hWind + 30.057;
+                windResult = ((topValue - bottomValue) * skew) + bottomValue;
+            }
+            else if ((weightResult > 34.918) && (weightResult <= 40.052)) {
+                skew = (weightResult - 34.918) / (40.052 - 34.918);
+                topValue = 1.1517 * hWind + 40.052;
+                bottomValue = 1.0687 * hWind + 34.918;
+                windResult = ((topValue - bottomValue) * skew) + bottomValue;
+            }
+            else if ((weightResult > 40.052) && (weightResult <= 47.032)) {
+                skew = (weightResult - 40.052) / (47.032 - 40.052);
+                topValue = 1.3759 * hWind + 47.032;
+                bottomValue = 1.1517 * hWind + 40.052;
+                windResult = ((topValue - bottomValue) * skew) + bottomValue;
+            }
+            else if ((weightResult > 47.032) && (weightResult <= 56.6)) {
+                skew = (weightResult-47.032)/(56.6-47.032);
+                topValue = 1.8477 * hWind + 56.6;
+                bottomValue = 1.3759 * hWind + 47.032;
+                windResult = ((topValue-bottomValue)*skew)+bottomValue;
+            }
+            else if ((weightResult > 56.6) && (weightResult <= 68.379)) {
+                skew = (weightResult - 56.6) / (68.379 - 56.6);
+                topValue = 2.253 * hWind + 68.379;
+                bottomValue = 1.3759 * hWind + 56.6;
+                windResult = ((topValue - bottomValue) * skew) + bottomValue;
+            }
+            else if ((weightResult > 68.379) && (weightResult <= 84.863)) {
+                skew = (weightResult - 68.379) / (84.863- 68.379);
+                topValue = 2.6908 * hWind + 84.863;
+                bottomValue = 2.253 * hWind + 68.379;
+                windResult = ((topValue - bottomValue) * skew) + bottomValue;
+            }
+            else if (weightResult > 68.379) {
+                skew = weightResult - 68.379;
+                windResult = 2.6908 * hWind + 84.863 + skew;
+            }
+        }
     }
     else{
         windResult = weightResult;
