@@ -31,7 +31,13 @@ function getWeather(){
                     windDir = "Variable";
                 }
                 else{
-                    windDir = weatherData.wind_dir_degrees + "&deg";
+                    windDir = parseFloat(weatherData.wind_dir_degrees);
+                    if (windDir < 100){
+                        windDir = "0" + windDir.toFixed(0).toString() + "&deg";
+                    }
+                    else{
+                        windDir = windDir.toFixed(0).toString() + "&deg";
+                    }
                 }
                 if ("wind_gust_kt" in weatherData){
                     document.getElementById("wWind").innerHTML = windDir + " @ " + weatherData.wind_speed_kt
@@ -44,10 +50,23 @@ function getWeather(){
             document.getElementById("wVisibility").innerHTML = parseFloat(weatherData.visibility_statute_mi) + " sm";
             var rawCeilings = weatherData.sky_condition;
             var ceilingString = "";
-            for (var i = 0; i < rawCeilings.length; i++){
-                var ceilingAttribute = rawCeilings[i]["@attributes"];
-                ceilingString += "<p>" + ceilingAttribute["sky_cover"] + " @ " + ceilingAttribute["cloud_base_ft_agl"] + "'</p>";
+            if (Array.isArray(rawCeilings)){
+                for (var i = 0; i < rawCeilings.length; i++){
+                    var ceilingAttribute = rawCeilings[i]["@attributes"];
+                    ceilingString += "<p style='margin: 0'>" + ceilingAttribute["sky_cover"] + " @ " + ceilingAttribute["cloud_base_ft_agl"] + "'</p>";
+                }
             }
+            else{
+                ceilingAttribute = rawCeilings["@attributes"];
+                if (ceilingAttribute["sky_cover"] === "CLR"){
+                    ceilingString = "Clear";
+                }
+                else{
+                    ceilingString += "<p style='margin: 0'>" + ceilingAttribute["sky_cover"] + " @ "
+                                    + ceilingAttribute["cloud_base_ft_agl"] + "'</p>";
+                }
+            }
+
             document.getElementById("wCeilings").innerHTML = ceilingString;
 
             var temp = parseFloat(weatherData.temp_c);
@@ -57,8 +76,10 @@ function getWeather(){
             document.getElementById("wAltimeter").innerHTML = parseFloat(weatherData.altim_in_hg).toFixed(2) + " inHg";
             var fldAlt = parseFloat(weatherData.elevation_m)*3.281;
             var pressureAlt = fldAlt + ((29.92 - parseFloat(weatherData.altim_in_hg))*1000);
-            var isa = 15 - ((pressureAlt/500));
-            var densityAlt = pressureAlt + (120*(temp - isa));
+            var altimeterHg = parseFloat(weatherData.altim_in_hg);
+            var stationPressure = ((altimeterHg**0.1903)-(.00001313*fldAlt))**5.255;
+            var tempRankine = ((9/5)*(temp+273.15));
+            var densityAlt = (145442.16*(1-((17.326*stationPressure)/(tempRankine))**0.235));
             document.getElementById("wPressureAlt").innerHTML = pressureAlt.toFixed(0) + " ft";
             document.getElementById("wDensityAlt").innerHTML = densityAlt.toFixed(0) + " ft";
 
