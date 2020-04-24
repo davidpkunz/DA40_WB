@@ -113,6 +113,8 @@ function runwayChange(str){
 }
 
 function windComponents(heading, windDir, windSpeed){
+    /**Takes the runway heading, wind direction, and wind speed in kts
+     * Returns the cross wind and head wind components for the given runway **/
     var diffAngle = heading - parseFloat(windDir);
     var radAngle = diffAngle*Math.PI/180;
     var xWindSpd = Math.sin(radAngle)*parseFloat(windSpeed);
@@ -121,6 +123,8 @@ function windComponents(heading, windDir, windSpeed){
 }
 
 function performanceCompute(winds){
+    /**Takes wind data, then imports weight data, weather data, aircraft data from local storage
+     * Uses stored data to compute takeoff/landing/climb performance values depending on aircraft model**/
     var userData = JSON.parse(localStorage.getItem("userInput"));
     var weatherData = JSON.parse(localStorage.getItem("weatherData"));
     var computedData = JSON.parse(localStorage.getItem("computedData"));
@@ -131,15 +135,23 @@ function performanceCompute(winds){
     var fldAlt = parseFloat(weatherData.elevation_m)*3.281;
     var pressureAlt = fldAlt + ((29.92 - parseFloat(weatherData.altim_in_hg))*1000);
     if (aircraftObj.model === "DA40F"){
-        var takeoffDistance = takeoffDA40FP(pressureAlt, temp, takeoffWeight, winds.hWind);
-        document.getElementById("TODistance").innerHTML = "Ground Roll: " + (takeoffDistance/100).toFixed(0)*100 + " ft";
+        var takeoffDistance = takeoffDA40FP(pressureAlt, temp, takeoffWeight, winds.hWind)*3.281;
+        document.getElementById("TODistance").innerHTML = "Ground Roll: " + (takeoffDistance/10).toFixed(0)*10 + " ft";
+        var takeoff50 = takeoffOver50(takeoffDistance/3.281)*3.281;
+        document.getElementById("TO50Distance").innerHTML = "Over 50': " + (takeoff50/10).toFixed(0)*10 + " ft";
     }
-
 }
 
 function takeoffDA40FP(pressureAlt, temp, takeoffWeight, hWind){
+    /**Takes pressure altitude, temperature, takeoff Weight, and head wind
+     * Computes takeoff distance using DA40F AFM chart for Takeoff distance gnd roll, see readme for more info
+     * Returns the takeoff distance ground roll in meters**/
     var DA_result;
     var skew;
+    /*Need to adapt this section to be more like 50ft obstacle function -> too much redundant code, need to set object
+    * to hold all the line data.*/
+
+    /*First section uses DA40 chart that takes OAT and pressure altitude to give result*/
     if(pressureAlt<=0) {
         /*Use 0ft line*/
         DA_result = 0.1227*temp + 33.047;
@@ -182,6 +194,8 @@ function takeoffDA40FP(pressureAlt, temp, takeoffWeight, hWind){
             DA_result += ((pressureAlt - 10000) / 100);
         }
     }
+    /*We now have the value from the first portion of the chart,
+     * so now we take aircraft takeoff weight and find next value*/
     var weightResult;
     if (DA_result <= 29.05) {
         weightResult = 0.0069 * takeoffWeight + 11.557;
@@ -229,8 +243,10 @@ function takeoffDA40FP(pressureAlt, temp, takeoffWeight, hWind){
         weightResult = ((topValue - bottomValue) * skew) + bottomValue;
     }
 
+    /*Now we have value from weight portion of table and so we compute wind portion*/
     var windResult;
     if (!(hWind === 0)){
+        /*This is if we have a headwind*/
         if(hWind > 0) {
             if (weightResult <= 26.89) {
                 windResult = -0.1966 * hWind + 26.89;
@@ -337,10 +353,59 @@ function takeoffDA40FP(pressureAlt, temp, takeoffWeight, hWind){
         }
     }
     else{
+        /*If we have no wind we just go straight across the chart*/
         windResult = weightResult;
     }
-    return (windResult*16 - 200)*3.281;
+    /*We now convert to the output scale (-200 to 1400m) and convert to feet*/
+    return (windResult*16 - 200);
 }
 function interpolateLines(topLine, bottomLine, xValue, yValue) {
 
+}
+
+function takeoffOver50(toDistance) {
+    /**Given takeoff distance in meters, use table to convert to takeoff over 50 feet
+     * This uses the chart in the DA40CS POH, the values are representive of the DA40FP standalone 50ft chart.
+     * This means we can use it for all DA40 type aircraft.
+     * Returns takeoff over 50 ft distance in meters**/
+    const lines = {
+        /*y intercept : slope(m)*/
+        138.57 : 2.4851,
+        225.7 : 2.5519,
+        315.52 : 2.7423,
+        392.03 : 3.5998,
+        469.22 : 4.3267,
+        517.52 : 5.3505,
+        617.45 : 5.5147,
+        722.18 : 6.8121,
+        942.59 : 7.8029
+    }
+    const lineIntercepts = Object.keys(lines);
+    for (i = 0; i < lineIntercepts.length; i++){
+        bottomIntercept = parseFloat(lineIntercepts[i]);
+        if (i+1 >= lineIntercepts.length){
+            /*This means we are on the last(top) line, so we should only be here if takeoff distance is at or above line*/
+            if (toDistance >= bottomIntercept){
+                return parseFloat(lines[lineIntercepts[i]]) * 50 + bottomIntercept + (toDistance - bottomIntercept);
+            }
+            else{
+                /*Hopefully will never get here*/
+                return 0;
+            }
+        }
+        else{
+            topIntercept = parseFloat(lineIntercepts[i+1]);
+        }
+        /*Should only get it when takeoff distance is below the lowest line*/
+        if (toDistance < bottomIntercept){
+            return parseFloat(lines[lineIntercepts[i]]) * 50 + bottomIntercept - (bottomIntercept-toDistance);
+        }
+        /*Most should fall in this statement, being between 2 lines*/
+        else if ((toDistance >= bottomIntercept) && (toDistance < topIntercept)){
+            skew = (toDistance - bottomIntercept)/(topIntercept-bottomIntercept);
+            topValue = parseFloat(lines[lineIntercepts[i+1]]) * 50 + topIntercept;
+            bottomValue = parseFloat(lines[lineIntercepts[i]]) * 50 + bottomIntercept;
+            return ((topValue - bottomValue) * skew) + bottomValue;
+        }
+    }
 }
