@@ -438,6 +438,9 @@ function checkInputConstraints(modelData, userInput){
 }
 
 function loadUserData(){
+    /**If the local storage data exists we need to load it into the form
+     * This changes all the HTML elements to match the previous user data
+     * It returns the userData object**/
     var userData = JSON.parse(localStorage.getItem("userInput"));
     var aircraftObj = aircraft.find(x => x.tail === userData.tail);
 
@@ -695,6 +698,8 @@ function resultSuccess(){
 }
 
 function printResults(){
+    /**Called when user clicks print button
+     * First we show the elements that need to be printed then we use printThis to print those elements**/
     document.getElementById("auditDiv").style.display = "block";
     $('#auditDiv, #cgCanvas').printThis({
         importCSS : false,
@@ -704,6 +709,9 @@ function printResults(){
 }
 
 function emailResults(){
+    /**Called when user clicks email button (not implemented)
+     * We will open a mailto link with the subject and body filled in with info
+     * Still need to come up with body text to send. Can't send the canvas image or tables, only text**/
     var tailNumber = document.getElementById('aircraftSelect').value;
     window.open('mailto:dispatchusu@gmail.com?subject=' + tailNumber + ' Weight and Balance&body=' +
         '');

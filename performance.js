@@ -1,10 +1,14 @@
 function getWeather(){
+    /**Called when submit button is clicked
+     * tries to retieve AWS METAR for the provided Station ID
+     * Uses PHP backend to get the XML weather and return it as JSON format**/
     var stationID = document.getElementById("weatherID").value;
     var url = "http://aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=" + stationID;
     if (stationID===""){
         return;
     }
-
+    /*Section retrieves weather from aviationweather.gov using simple PHP backend.
+    * Won't work if no PHP server setup*/
     if (window.XMLHttpRequest){
         var request = new XMLHttpRequest();
     }
@@ -14,7 +18,6 @@ function getWeather(){
     request.onreadystatechange=function(){
         if (this.readyState===4 && this.status===200){
             var weatherData = JSON.parse(this.responseText);
-
 
             document.getElementById("weatherData").style.display = "block";
             document.getElementById("wRaw").innerHTML = weatherData.raw_text;
@@ -77,6 +80,7 @@ function getWeather(){
             var fldAlt = parseFloat(weatherData.elevation_m)*3.281;
             var pressureAlt = fldAlt + ((29.92 - parseFloat(weatherData.altim_in_hg))*1000);
             var altimeterHg = parseFloat(weatherData.altim_in_hg);
+            /*variables below used to compute Density altitude without humidity compensation, so slightly off*/
             var stationPressure = ((altimeterHg**0.1903)-(.00001313*fldAlt))**5.255;
             var tempRankine = ((9/5)*(temp+273.15));
             var densityAlt = (145442.16*(1-((17.326*stationPressure)/(tempRankine))**0.235));
@@ -91,6 +95,8 @@ function getWeather(){
 }
 
 function runwayChange(str){
+    /**Called when the runway heading input changes,
+     * it then calls the compute functions to recalculate distances**/
     heading = parseFloat(str);
     if ((heading > 360)|| (heading < 1)){
         document.getElementById("xWind").innerHTML = "";
