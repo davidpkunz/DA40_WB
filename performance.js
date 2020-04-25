@@ -3,7 +3,6 @@ function getWeather(){
      * tries to retieve AWS METAR for the provided Station ID
      * Uses PHP backend to get the XML weather and return it as JSON format**/
     var stationID = document.getElementById("weatherID").value;
-    var url = "http://aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=" + stationID;
     if (stationID===""){
         return;
     }
@@ -145,6 +144,8 @@ function performanceCompute(winds){
         document.getElementById("TODistance").innerHTML = "Ground Roll: " + (takeoffDistance/10).toFixed(0)*10 + " ft";
         var takeoff50 = takeoffOver50(takeoffDistance/3.281)*3.281;
         document.getElementById("TO50Distance").innerHTML = "Over 50': " + (takeoff50/10).toFixed(0)*10 + " ft";
+        var landingDistance = landingDA40FP(pressureAlt, temp, landingWeight, winds.hWind)*3.281;
+        document.getElementById("LDGDistance").innerHTML = "Ground Roll: " + (landingDistance/10).toFixed(0)*10 + " ft";
     }
 }
 
@@ -362,11 +363,8 @@ function takeoffDA40FP(pressureAlt, temp, takeoffWeight, hWind){
         /*If we have no wind we just go straight across the chart*/
         windResult = weightResult;
     }
-    /*We now convert to the output scale (-200 to 1400m) and convert to feet*/
+    /*We now convert to the output scale (-200 to 1400m)*/
     return (windResult*16 - 200);
-}
-function interpolateLines(topLine, bottomLine, xValue, yValue) {
-
 }
 
 function takeoffOver50(toDistance) {
@@ -412,6 +410,169 @@ function takeoffOver50(toDistance) {
             topValue = parseFloat(lines[lineIntercepts[i+1]]) * 50 + topIntercept;
             bottomValue = parseFloat(lines[lineIntercepts[i]]) * 50 + bottomIntercept;
             return ((topValue - bottomValue) * skew) + bottomValue;
+        }
+    }
+}
+
+function landingDA40FP(pressureAlt, temp, landingWeight, hWind){
+    /**Computes landing distance**/
+    var DA_Result = landingDA40FP_DA(pressureAlt, temp);
+    var weight_Result = landingDA40FP_Weight(DA_Result, landingWeight);
+    var wind_Result = landingDA40FP_Wind(weight_Result, hWind);
+    /*Convert to scale (200 to 800) and return in meters*/
+    return wind_Result*6 + 200;
+}
+
+function  landingDA40FP_DA(pressureAlt, temp){
+    /**Takes pressure Altitude and OAT and outputs first part of landing chart**/
+    const PA_lines = {
+        0 : {
+            m : 0.2194,
+            b : 40.86
+        },
+        2000 : {
+            m : 0.2276,
+            b : 45.261
+        },
+        4000 : {
+            m : 0.2457,
+            b : 50.106
+        },
+        6000 : {
+            m : 0.2636,
+            b : 55.06
+        },
+        8000 : {
+            m : 0.2819,
+            b : 60.798
+        },
+        10000 : {
+            m : 0.2964,
+            b : 67.006
+        }
+    }
+    const PA_Values = Object.keys(PA_lines);
+    for (i = 0; i < PA_Values.length; i++) {
+        bottomPA = parseFloat(PA_Values[i]);
+        if (i + 1 >= PA_Values.length) {
+            /*We have reached the end of lines but haven't found our value, so just use top line*/
+            return parseFloat(PA_lines[bottomPA].m) * temp + parseFloat(PA_lines[bottomPA].b);
+        }
+        else {
+            topPA = parseFloat(PA_Values[i + 1]);
+            if (pressureAlt < bottomPA) {
+                /*if less than 0 PA just use 0 PA*/
+                return parseFloat(PA_lines[bottomPA].m) * temp + parseFloat(PA_lines[bottomPA].b);
+            } else if ((pressureAlt >= bottomPA) && (pressureAlt < topPA)) {
+                /*Between two lines (usually we use this) */
+                skew = (pressureAlt - bottomPA) / (topPA - bottomPA);
+                topValue = parseFloat(PA_lines[topPA].m) * temp + parseFloat(PA_lines[topPA].b);
+                bottomValue = parseFloat(PA_lines[bottomPA].m) * temp + parseFloat(PA_lines[bottomPA].b);
+                return ((topValue - bottomValue) * skew) + bottomValue;
+            }
+        }
+    }
+}
+
+function landingDA40FP_Weight(DA_Result, landingWeight){
+    /**Takes the result from the first portion of the chart(DA_Result) and landing weight to find the next section**/
+    const lines = [
+        /* slope (m), y intercept (b) */
+        {m : 0.0174, b : -11.112},
+        {m : 0.0185, b : -9.8256},
+        {m : 0.0201, b : -9.4669},
+        {m : 0.0213, b : -8.1493},
+        {m : 0.0231, b : -7.9068},
+        {m : 0.0247, b : -7.0848},
+        {m : 0.0261, b : -5.3047},
+        {m : 0.0281, b : -4.4901},
+        {m : 0.0305, b : -3.9959},
+        {m : 0.0329, b : -3.0667}
+    ];
+
+    lineIntercepts = [];
+    for (i=0; i < lines.length; i++){
+        bottomIntercept = parseFloat(lines[i].m) * 2535 + parseFloat(lines[i].b);
+        if (i+1 >= lines.length){
+            /*We have reached the end of lines but haven't found our value, so use top line and add a skew*/
+            return parseFloat(lines[i].m) * landingWeight + parseFloat(lines[i].b) + parseFloat(lines[i].b) + (DA_Result - bottomIntercept);
+        }
+        else {
+            topIntercept = parseFloat(lines[i+1].m) * 2535 + parseFloat(lines[i+1].b);
+            /*We are below bottom line so just use bottom line with some skew*/
+            if (DA_Result < bottomIntercept){
+                return parseFloat(lines[i].m) * landingWeight + parseFloat(lines[i].b) - (bottomIntercept - DA_Result);
+            }
+            else if ((DA_Result >= bottomIntercept) && (DA_Result < topIntercept)){
+                /*Between two lines (usually we use this) */
+                skew = (DA_Result - bottomIntercept)/(topIntercept-bottomIntercept);
+                topValue = parseFloat(lines[i+1].m) * landingWeight + parseFloat(lines[i+1].b);
+                bottomValue = parseFloat(lines[i].m) * landingWeight + parseFloat(lines[i].b);
+                return ((topValue - bottomValue) * skew) + bottomValue;
+            }
+        }
+    }
+}
+
+function landingDA40FP_Wind(weight_Result, hwind){
+    /**Takes the weight result and finds either the headwind or tail wind section**/
+    const headLines = [
+        /* slope (m), y intercept (b) */
+        {m : -0.8322, b : 33.417},
+        {m : -0.8562, b : 37.363},
+        {m : -0.8743, b : 41.397},
+        {m : -0.8874, b : 45.828},
+        {m : -0.9312, b : 49.514},
+        {m : -0.9673, b : 56.446},
+        {m : -1.0173, b : 65.669},
+        {m : -1.0625, b : 72.054},
+        {m : -1.093, b : 78.732}
+    ];
+    const tailLines = [
+        /* slope (m), y intercept (b) */
+        {m : 2.5651, b : 33.41},
+        {m : 2.5934, b : 37.929},
+        {m : 2.7302, b : 41.74},
+        {m : 2.8103, b : 46.493},
+        {m : 2.8744, b : 50.016},
+        {m : 3.0296, b : 56.86},
+        {m : 3.2233, b : 66.132},
+        {m : 3.3221, b : 72.527},
+        {m : 3.5771, b : 79.021}
+    ];
+
+    if (hwind > 0){
+        return landingDA40FP_windCompute(weight_Result, hwind, headLines);
+    }
+    else if (hwind < 0){
+        return landingDA40FP_windCompute(weight_Result, Math.abs(hwind), tailLines);
+    }
+    else if (hwind === 0){
+        return weight_Result;
+    }
+}
+
+function landingDA40FP_windCompute(weight_Result, hwind, lines){
+    /**Interpolates the wind lines section of the landing data. Could technically use for any winds.**/
+    for (i=0; i < lines.length; i++){
+        bottomIntercept = parseFloat(lines[i].b);
+        if (i+1 >= lines.length){
+            /*We have reached the end of lines but haven't found our value, so use top line and add a skew*/
+            return parseFloat(lines[i].m) * hwind + parseFloat(lines[i].b) + parseFloat(lines[i].b) + (weight_Result - bottomIntercept);
+        }
+        else {
+            topIntercept = parseFloat(lines[i+1].b);
+            /*We are below bottom line so just use bottom line with some skew*/
+            if (weight_Result < bottomIntercept){
+                return parseFloat(lines[i].m) * hwind + parseFloat(lines[i].b) - (bottomIntercept - weight_Result);
+            }
+            else if ((weight_Result >= bottomIntercept) && (weight_Result < topIntercept)){
+                /*Between two lines (usually we use this) */
+                skew = (weight_Result - bottomIntercept)/(topIntercept-bottomIntercept);
+                topValue = parseFloat(lines[i+1].m) * hwind + parseFloat(lines[i+1].b);
+                bottomValue = parseFloat(lines[i].m) * hwind + parseFloat(lines[i].b);
+                return ((topValue - bottomValue) * skew) + bottomValue;
+            }
         }
     }
 }
