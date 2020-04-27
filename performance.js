@@ -140,12 +140,24 @@ function performanceCompute(winds){
     var fldAlt = parseFloat(weatherData.elevation_m)*3.281;
     var pressureAlt = fldAlt + ((29.92 - parseFloat(weatherData.altim_in_hg))*1000);
     if (aircraftObj.model === "DA40F"){
-        var takeoffDistance = takeoffDA40FP(pressureAlt, temp, takeoffWeight, winds.hWind)*3.281;
-        document.getElementById("TODistance").innerHTML = "Ground Roll: " + (takeoffDistance/10).toFixed(0)*10 + " ft";
+        /*var takeoffDistance = takeoffDA40FP(pressureAlt, temp, takeoffWeight, winds.hWind)*3.281;*/
+
+        var takeoffDistance = getPerformanceNumbers("takeoff", pressureAlt,
+            temp, landingWeight, winds.hWind, aircraftObj.maxWeight)*3.281;
+        document.getElementById("TODistance").innerHTML = "Ground Roll: "
+            + (takeoffDistance/10).toFixed(0)*10 + " ft";
         var takeoff50 = takeoffOver50(takeoffDistance/3.281)*3.281;
-        document.getElementById("TO50Distance").innerHTML = "Over 50': " + (takeoff50/10).toFixed(0)*10 + " ft";
-        var landingDistance = landingDA40FP(pressureAlt, temp, landingWeight, winds.hWind)*3.281;
-        document.getElementById("LDGDistance").innerHTML = "Ground Roll: " + (landingDistance/10).toFixed(0)*10 + " ft";
+        document.getElementById("TO50Distance").innerHTML = "Over 50': "
+            + (takeoff50/10).toFixed(0)*10 + " ft";
+        var landingDistance = getPerformanceNumbers("landing", pressureAlt,
+            temp, landingWeight, winds.hWind, aircraftObj.maxWeight)*3.281;
+        document.getElementById("LDGDistance").innerHTML = "Ground Roll: "
+            + (landingDistance/10).toFixed(0)*10 + " ft";
+        var landing50Distance = getPerformanceNumbers("landing50", pressureAlt,
+            temp, landingWeight, winds.hWind, aircraftObj.maxWeight)*3.281;
+        document.getElementById("LDG50Distance").innerHTML = "Over 50': "
+            + (landing50Distance/10).toFixed(0)*10 + " ft";
+
     }
 }
 
@@ -414,43 +426,52 @@ function takeoffOver50(toDistance) {
     }
 }
 
-function landingDA40FP(pressureAlt, temp, landingWeight, hWind){
-    /**Computes landing distance**/
-    var DA_Result = landingDA40FP_DA(pressureAlt, temp);
-    var weight_Result = landingDA40FP_Weight(DA_Result, landingWeight);
-    var wind_Result = landingDA40FP_Wind(weight_Result, hWind);
+function getPerformanceNumbers(typeString, pressureAlt, temp, landingWeight, hWind, maxWeight){
+    /**
+     * Takes data from perfdata.js. The function name is the type of aircraft.
+     * The first value passed is one of:
+     * "takeoff","takeoff50","landing","landing50"
+     * The second value passed is one of:
+     * "DA" -> this is for the first portion of the chart that computes the density altitude
+     * "weight" -> the weight portion of the chart
+     * "hwind"/"twind" -> the wind portion of the chart
+     *
+     * **/
+    var DA_Result = densityAltitudeChart(DA40FP(typeString, "DA"),pressureAlt, temp);
+    var weight_Result = weightChart(DA40FP(typeString, "weight"), DA_Result, landingWeight, maxWeight);
+    var wind_Result;
+    if (hWind > 0){
+        wind_Result = windChart(DA40FP(typeString, "hwind"), weight_Result, hWind);
+    }
+    else if (hWind < 0){
+        wind_Result = windChart(DA40FP(typeString, "twind"), weight_Result, Math.abs(hWind));
+    }
+    else if (hWind === 0){
+        wind_Result = weight_Result;
+    }
+    var scale = DA40FP(typeString, "scale");
+    return wind_Result*(parseFloat(scale.max) - parseFloat(scale.min))/100 + parseFloat(scale.min);
+}
+
+function landing50DA40FP(pressureAlt, temp, landingWeight, hWind){
+    var DA_Result = densityAltitudeChart(DA40FP("landing50", "DA"),pressureAlt, temp);
+    var weight_Result = weightChart(DA40FP("landing50", "weight"), DA_Result, landingWeight, maxWeight);
+    var wind_Result;
+    if (hWind > 0){
+        wind_Result = windChart(DA40FP("landing50", "hwind"), weight_Result, hwind);
+    }
+    else if (hWind < 0){
+        wind_Result = windChart(DA40FP("landing50", "twind"), weight_Result, Math.abs(hwind));
+    }
+    else if (hWind === 0){
+        wind_Result = weight_Result;
+    }
     /*Convert to scale (200 to 800) and return in meters*/
     return wind_Result*6 + 200;
 }
 
-function  landingDA40FP_DA(pressureAlt, temp){
+function  densityAltitudeChart(PA_lines, pressureAlt, temp){
     /**Takes pressure Altitude and OAT and outputs first part of landing chart**/
-    const PA_lines = {
-        0 : {
-            m : 0.2194,
-            b : 40.86
-        },
-        2000 : {
-            m : 0.2276,
-            b : 45.261
-        },
-        4000 : {
-            m : 0.2457,
-            b : 50.106
-        },
-        6000 : {
-            m : 0.2636,
-            b : 55.06
-        },
-        8000 : {
-            m : 0.2819,
-            b : 60.798
-        },
-        10000 : {
-            m : 0.2964,
-            b : 67.006
-        }
-    }
     const PA_Values = Object.keys(PA_lines);
     for (i = 0; i < PA_Values.length; i++) {
         bottomPA = parseFloat(PA_Values[i]);
@@ -474,31 +495,17 @@ function  landingDA40FP_DA(pressureAlt, temp){
     }
 }
 
-function landingDA40FP_Weight(DA_Result, landingWeight){
+function weightChart(lines, DA_Result, landingWeight, maxWeight){
     /**Takes the result from the first portion of the chart(DA_Result) and landing weight to find the next section**/
-    const lines = [
-        /* slope (m), y intercept (b) */
-        {m : 0.0174, b : -11.112},
-        {m : 0.0185, b : -9.8256},
-        {m : 0.0201, b : -9.4669},
-        {m : 0.0213, b : -8.1493},
-        {m : 0.0231, b : -7.9068},
-        {m : 0.0247, b : -7.0848},
-        {m : 0.0261, b : -5.3047},
-        {m : 0.0281, b : -4.4901},
-        {m : 0.0305, b : -3.9959},
-        {m : 0.0329, b : -3.0667}
-    ];
-
     lineIntercepts = [];
     for (i=0; i < lines.length; i++){
-        bottomIntercept = parseFloat(lines[i].m) * 2535 + parseFloat(lines[i].b);
+        bottomIntercept = parseFloat(lines[i].m) * maxWeight + parseFloat(lines[i].b);
         if (i+1 >= lines.length){
             /*We have reached the end of lines but haven't found our value, so use top line and add a skew*/
             return parseFloat(lines[i].m) * landingWeight + parseFloat(lines[i].b) + parseFloat(lines[i].b) + (DA_Result - bottomIntercept);
         }
         else {
-            topIntercept = parseFloat(lines[i+1].m) * 2535 + parseFloat(lines[i+1].b);
+            topIntercept = parseFloat(lines[i+1].m) * maxWeight + parseFloat(lines[i+1].b);
             /*We are below bottom line so just use bottom line with some skew*/
             if (DA_Result < bottomIntercept){
                 return parseFloat(lines[i].m) * landingWeight + parseFloat(lines[i].b) - (bottomIntercept - DA_Result);
@@ -514,45 +521,7 @@ function landingDA40FP_Weight(DA_Result, landingWeight){
     }
 }
 
-function landingDA40FP_Wind(weight_Result, hwind){
-    /**Takes the weight result and finds either the headwind or tail wind section**/
-    const headLines = [
-        /* slope (m), y intercept (b) */
-        {m : -0.8322, b : 33.417},
-        {m : -0.8562, b : 37.363},
-        {m : -0.8743, b : 41.397},
-        {m : -0.8874, b : 45.828},
-        {m : -0.9312, b : 49.514},
-        {m : -0.9673, b : 56.446},
-        {m : -1.0173, b : 65.669},
-        {m : -1.0625, b : 72.054},
-        {m : -1.093, b : 78.732}
-    ];
-    const tailLines = [
-        /* slope (m), y intercept (b) */
-        {m : 2.5651, b : 33.41},
-        {m : 2.5934, b : 37.929},
-        {m : 2.7302, b : 41.74},
-        {m : 2.8103, b : 46.493},
-        {m : 2.8744, b : 50.016},
-        {m : 3.0296, b : 56.86},
-        {m : 3.2233, b : 66.132},
-        {m : 3.3221, b : 72.527},
-        {m : 3.5771, b : 79.021}
-    ];
-
-    if (hwind > 0){
-        return landingDA40FP_windCompute(weight_Result, hwind, headLines);
-    }
-    else if (hwind < 0){
-        return landingDA40FP_windCompute(weight_Result, Math.abs(hwind), tailLines);
-    }
-    else if (hwind === 0){
-        return weight_Result;
-    }
-}
-
-function landingDA40FP_windCompute(weight_Result, hwind, lines){
+function windChart(lines, weight_Result, hwind){
     /**Interpolates the wind lines section of the landing data. Could technically use for any winds.**/
     for (i=0; i < lines.length; i++){
         bottomIntercept = parseFloat(lines[i].b);
