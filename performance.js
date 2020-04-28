@@ -140,243 +140,29 @@ function performanceCompute(winds){
     var fldAlt = parseFloat(weatherData.elevation_m)*3.281;
     var pressureAlt = fldAlt + ((29.92 - parseFloat(weatherData.altim_in_hg))*1000);
     if (aircraftObj.model === "DA40F"){
-        /*var takeoffDistance = takeoffDA40FP(pressureAlt, temp, takeoffWeight, winds.hWind)*3.281;*/
-
-        var takeoffDistance = getPerformanceNumbers("takeoff", pressureAlt,
-            temp, landingWeight, winds.hWind, aircraftObj.maxWeight)*3.281;
+        var takeoffDistance = getPerformanceNumbers("DA40F", "takeoff", pressureAlt,
+            temp, takeoffWeight, winds.hWind, aircraftObj.maxWeight)*3.281;
         document.getElementById("TODistance").innerHTML = "Ground Roll: "
             + (takeoffDistance/10).toFixed(0)*10 + " ft";
-        var takeoff50 = takeoffOver50(takeoffDistance/3.281)*3.281;
+        var takeoff50 = getPerformanceNumbers("DA40F", "takeoff50", pressureAlt,
+            temp, takeoffWeight, winds.hWind, aircraftObj.maxWeight)*3.281;
         document.getElementById("TO50Distance").innerHTML = "Over 50': "
             + (takeoff50/10).toFixed(0)*10 + " ft";
-        var landingDistance = getPerformanceNumbers("landing", pressureAlt,
+        var landingDistance = getPerformanceNumbers("DA40F", "landing", pressureAlt,
             temp, landingWeight, winds.hWind, aircraftObj.maxWeight)*3.281;
         document.getElementById("LDGDistance").innerHTML = "Ground Roll: "
             + (landingDistance/10).toFixed(0)*10 + " ft";
-        var landing50Distance = getPerformanceNumbers("landing50", pressureAlt,
+        var landing50Distance = getPerformanceNumbers("DA40F", "landing50", pressureAlt,
             temp, landingWeight, winds.hWind, aircraftObj.maxWeight)*3.281;
         document.getElementById("LDG50Distance").innerHTML = "Over 50': "
             + (landing50Distance/10).toFixed(0)*10 + " ft";
+    }
+    else if ((aircraftObj.model === "DA40CS") || (aircraftObj.model === "DA40XL")){
 
     }
-}
+    else if (aircraftObj.model === "DA42"){
 
-function takeoffDA40FP(pressureAlt, temp, takeoffWeight, hWind){
-    /**Takes pressure altitude, temperature, takeoff Weight, and head wind
-     * Computes takeoff distance using DA40F AFM chart for Takeoff distance gnd roll, see readme for more info
-     * Returns the takeoff distance ground roll in meters**/
-    var DA_result;
-    var skew;
-    /*Need to adapt this section to be more like 50ft obstacle function -> too much redundant code, need to set object
-    * to hold all the line data.*/
-
-    /*First section uses DA40 chart that takes OAT and pressure altitude to give result*/
-    if(pressureAlt<=0) {
-        /*Use 0ft line*/
-        DA_result = 0.1227*temp + 33.047;
     }
-    if((pressureAlt>0) && (pressureAlt<=2000)) {
-        skew = pressureAlt / 2000;
-        topValue = 0.1614 * temp + 38.683;
-        bottomValue = 0.1227 * temp + 33.047;
-        DA_result = ((topValue - bottomValue) * skew) + bottomValue;
-    }
-    else if((pressureAlt>2000) && (pressureAlt<=4000)) {
-        skew = (pressureAlt - 2000) / 2000;
-        topValue = 0.2189 * temp + 46.131;
-        bottomValue = 0.1614 * temp + 38.683;
-        DA_result = ((topValue - bottomValue) * skew) + bottomValue;
-    }
-    else if((pressureAlt>4000) && (pressureAlt<=6000)) {
-        skew = (pressureAlt - 4000) / 2000;
-        topValue = 0.3023 * temp + 56.14;
-        bottomValue = 0.2189 * temp + 46.131;
-        DA_result = ((topValue - bottomValue) * skew) + bottomValue;
-    }
-    else if((pressureAlt>6000) && (pressureAlt<=8000)) {
-        skew = (pressureAlt - 6000) / 2000;
-        topValue = 68.827 * Math.E ** (0.006 * temp);
-        bottomValue = 0.3023 * temp + 56.14;
-        DA_result = ((topValue - bottomValue) * skew) + bottomValue;
-    }
-    else if((pressureAlt>8000) && (pressureAlt<=10000)) {
-        skew = (pressureAlt - 8000) / 2000;
-        topValue = 0.5501 * temp + 88.008;
-        bottomValue = 68.827 * Math.E ** (0.006 * temp);
-        DA_result = ((topValue - bottomValue) * skew) + bottomValue;
-    }
-    else if(pressureAlt>10000) {
-        if (temp > 20) {
-            /*We are off the chart and T/O not allowed*/
-        } else {
-            DA_result = 0.5501 * temp + 88.008;
-            DA_result += ((pressureAlt - 10000) / 100);
-        }
-    }
-    /*We now have the value from the first portion of the chart,
-     * so now we take aircraft takeoff weight and find next value*/
-    var weightResult;
-    if (DA_result <= 29.05) {
-        weightResult = 0.0069 * takeoffWeight + 11.557;
-    }
-    else if((DA_result > 29.05) && (DA_result <= 33.4)) {
-        skew = (DA_result - 29.05) / (33.4 - 29.05);
-        topValue = 0.0088 * takeoffWeight + 11.092;
-        bottomValue = 0.0069 * takeoffWeight + 11.557;
-        weightResult = ((topValue - bottomValue) * skew) + bottomValue;
-    }
-    else if((DA_result > 33.4) && (DA_result <= 37.806)) {
-        skew = (DA_result - 33.4) / (37.806 - 33.4);
-        topValue = 0.0105 * takeoffWeight + 11.188;
-        bottomValue = 0.0088 * takeoffWeight + 11.092;
-        weightResult = ((topValue - bottomValue) * skew) + bottomValue;
-    }
-    else if((DA_result > 37.806) && (DA_result <= 45.391)) {
-        skew = (DA_result - 37.806) / (45.391 - 37.806);
-        topValue = 0.014 * takeoffWeight + 9.901;
-        bottomValue = 0.0105 * takeoffWeight + 11.188;
-        weightResult = ((topValue - bottomValue) * skew) + bottomValue;
-    }
-    else if((DA_result > 45.391) && (DA_result <= 55.049)) {
-        skew = (DA_result - 45.391) / (55.049 - 45.391);
-        topValue = 0.0183 * takeoffWeight + 8.658;
-        bottomValue = 0.014 * takeoffWeight + 9.901;
-        weightResult = ((topValue - bottomValue) * skew) + bottomValue;
-    }
-    else if((DA_result > 55.049) && (DA_result <= 68.645)) {
-        skew = (DA_result - 55.049) / (68.645 - 55.049);
-        topValue = 0.0246 * takeoffWeight + 6.284;
-        bottomValue = 0.0183 * takeoffWeight + 8.658;
-        weightResult = ((topValue - bottomValue) * skew) + bottomValue;
-    }
-    else if ((DA_result > 68.645) && (DA_result <= 87.185)) {
-        skew = (DA_result - 68.645) / (87.185 - 68.645);
-        topValue = 0.0335 * takeoffWeight + 2.263;
-        bottomValue = 0.0246 * takeoffWeight + 6.284;
-        weightResult = ((topValue - bottomValue) * skew) + bottomValue;
-    }
-    else if((DA_result > 87.185) && (DA_result <= 114.385)) {
-        skew = (DA_result - 87.185) / (114.385 - 87.185);
-        topValue = 0.0461 * takeoffWeight - 2.478;
-        bottomValue = 0.0335 * takeoffWeight + 2.263;
-        weightResult = ((topValue - bottomValue) * skew) + bottomValue;
-    }
-
-    /*Now we have value from weight portion of table and so we compute wind portion*/
-    var windResult;
-    if (!(hWind === 0)){
-        /*This is if we have a headwind*/
-        if(hWind > 0) {
-            if (weightResult <= 26.89) {
-                windResult = -0.1966 * hWind + 26.89;
-            }
-            else if ((weightResult > 26.89) && (weightResult <= 29.87)) {
-                skew = (weightResult - 26.89) / (29.87 - 26.89);
-                topValue = -0.2273 * hWind + 29.87;
-                bottomValue = -0.1966 * hWind + 26.89;
-                windResult = ((topValue - bottomValue) * skew) + bottomValue;
-            }
-            else if ((weightResult > 29.87) && (weightResult <= 34.865)) {
-                skew = (weightResult - 29.87) / (34.865 - 29.87);
-                topValue = -0.2968 * hWind + 34.865;
-                bottomValue = -0.2273 * hWind + 29.87;
-                windResult = ((topValue - bottomValue) * skew) + bottomValue;
-            }
-            else if ((weightResult > 34.865) && (weightResult <= 40.074)) {
-                skew = (weightResult - 34.865) / (40.074 - 34.865);
-                topValue = -0.3432 * hWind + 40.074;
-                bottomValue = -0.2968 * hWind + 34.865;
-                windResult = ((topValue - bottomValue) * skew) + bottomValue;
-            }
-            else if ((weightResult > 40.074) && (weightResult <= 47.127)) {
-                skew = (weightResult - 40.074) / (47.127 - 40.074);
-                topValue = -0.4051 * hWind + 47.127;
-                bottomValue = -0.3432 * hWind + 40.074;
-                windResult = ((topValue - bottomValue) * skew) + bottomValue;
-            }
-            else if ((weightResult > 47.127) && (weightResult <= 56.817)) {
-                skew = (weightResult-47.127)/(56.817-47.127);
-                topValue = -0.5423*hWind + 56.817;
-                bottomValue = -0.4051*hWind + 47.127;
-                windResult = ((topValue-bottomValue)*skew)+bottomValue;
-                }
-            else if ((weightResult > 56.817) && (weightResult <= 68.371)) {
-                skew = (weightResult - 56.817) / (68.371 - 56.817);
-                topValue = -0.6477 * hWind + 68.371;
-                bottomValue = -0.5423 * hWind + 56.817;
-                windResult = ((topValue - bottomValue) * skew) + bottomValue;
-                }
-            else if ((weightResult > 68.371) && (weightResult <= 84.633)) {
-                skew = (weightResult - 68.371) / (84.633 - 68.371);
-                topValue = -0.8103 * hWind + 84.633;
-                bottomValue = -0.6477 * hWind + 68.371;
-                windResult = ((topValue - bottomValue) * skew) + bottomValue;
-            }
-            else if (weightResult > 84.633) {
-                skew = weightResult - 84.633;
-                windResult = -0.8103 * hWind + 84.633 + skew;
-            }
-        }
-        else if(hWind < 0){
-            /*If we have a tail wind*/
-            hWind = Math.abs(hWind);
-            if (weightResult <= 26.58) {
-                windResult = .6829 * hWind + 26.58;
-            }
-            else if ((weightResult > 26.58) && (weightResult <= 30.057)) {
-                skew = (weightResult - 26.58) / (30.057 - 26.58);
-                topValue = 0.8055 * hWind + 30.057;
-                bottomValue = .6829 * hWind + 26.58;
-                windResult = ((topValue - bottomValue) * skew) + bottomValue;
-            }
-            else if ((weightResult > 30.057) && (weightResult <= 34.918)) {
-                skew = (weightResult - 30.057) / (34.918 - 30.057);
-                topValue = 1.0687 * hWind + 34.918;
-                bottomValue = 0.8055 * hWind + 30.057;
-                windResult = ((topValue - bottomValue) * skew) + bottomValue;
-            }
-            else if ((weightResult > 34.918) && (weightResult <= 40.052)) {
-                skew = (weightResult - 34.918) / (40.052 - 34.918);
-                topValue = 1.1517 * hWind + 40.052;
-                bottomValue = 1.0687 * hWind + 34.918;
-                windResult = ((topValue - bottomValue) * skew) + bottomValue;
-            }
-            else if ((weightResult > 40.052) && (weightResult <= 47.032)) {
-                skew = (weightResult - 40.052) / (47.032 - 40.052);
-                topValue = 1.3759 * hWind + 47.032;
-                bottomValue = 1.1517 * hWind + 40.052;
-                windResult = ((topValue - bottomValue) * skew) + bottomValue;
-            }
-            else if ((weightResult > 47.032) && (weightResult <= 56.6)) {
-                skew = (weightResult-47.032)/(56.6-47.032);
-                topValue = 1.8477 * hWind + 56.6;
-                bottomValue = 1.3759 * hWind + 47.032;
-                windResult = ((topValue-bottomValue)*skew)+bottomValue;
-            }
-            else if ((weightResult > 56.6) && (weightResult <= 68.379)) {
-                skew = (weightResult - 56.6) / (68.379 - 56.6);
-                topValue = 2.253 * hWind + 68.379;
-                bottomValue = 1.3759 * hWind + 56.6;
-                windResult = ((topValue - bottomValue) * skew) + bottomValue;
-            }
-            else if ((weightResult > 68.379) && (weightResult <= 84.863)) {
-                skew = (weightResult - 68.379) / (84.863- 68.379);
-                topValue = 2.6908 * hWind + 84.863;
-                bottomValue = 2.253 * hWind + 68.379;
-                windResult = ((topValue - bottomValue) * skew) + bottomValue;
-            }
-            else if (weightResult > 68.379) {
-                skew = weightResult - 68.379;
-                windResult = 2.6908 * hWind + 84.863 + skew;
-            }
-        }
-    }
-    else{
-        /*If we have no wind we just go straight across the chart*/
-        windResult = weightResult;
-    }
-    /*We now convert to the output scale (-200 to 1400m)*/
-    return (windResult*16 - 200);
 }
 
 function takeoffOver50(toDistance) {
@@ -426,7 +212,7 @@ function takeoffOver50(toDistance) {
     }
 }
 
-function getPerformanceNumbers(typeString, pressureAlt, temp, landingWeight, hWind, maxWeight){
+function getPerformanceNumbers(modelString, typeString, pressureAlt, temp, weight, hWind, maxWeight){
     /**
      * Takes data from perfdata.js. The function name is the type of aircraft.
      * The first value passed is one of:
@@ -438,7 +224,7 @@ function getPerformanceNumbers(typeString, pressureAlt, temp, landingWeight, hWi
      *
      * **/
     var DA_Result = densityAltitudeChart(DA40FP(typeString, "DA"),pressureAlt, temp);
-    var weight_Result = weightChart(DA40FP(typeString, "weight"), DA_Result, landingWeight, maxWeight);
+    var weight_Result = weightChart(DA40FP(typeString, "weight"), DA_Result, weight, maxWeight);
     var wind_Result;
     if (hWind > 0){
         wind_Result = windChart(DA40FP(typeString, "hwind"), weight_Result, hWind);
@@ -453,68 +239,106 @@ function getPerformanceNumbers(typeString, pressureAlt, temp, landingWeight, hWi
     return wind_Result*(parseFloat(scale.max) - parseFloat(scale.min))/100 + parseFloat(scale.min);
 }
 
-function landing50DA40FP(pressureAlt, temp, landingWeight, hWind){
-    var DA_Result = densityAltitudeChart(DA40FP("landing50", "DA"),pressureAlt, temp);
-    var weight_Result = weightChart(DA40FP("landing50", "weight"), DA_Result, landingWeight, maxWeight);
-    var wind_Result;
-    if (hWind > 0){
-        wind_Result = windChart(DA40FP("landing50", "hwind"), weight_Result, hwind);
-    }
-    else if (hWind < 0){
-        wind_Result = windChart(DA40FP("landing50", "twind"), weight_Result, Math.abs(hwind));
-    }
-    else if (hWind === 0){
-        wind_Result = weight_Result;
-    }
-    /*Convert to scale (200 to 800) and return in meters*/
-    return wind_Result*6 + 200;
-}
-
 function  densityAltitudeChart(PA_lines, pressureAlt, temp){
     /**Takes pressure Altitude and OAT and outputs first part of landing chart**/
     const PA_Values = Object.keys(PA_lines);
     for (i = 0; i < PA_Values.length; i++) {
         bottomPA = parseFloat(PA_Values[i]);
+        var useExp = false;
+        if ("e" in PA_lines[bottomPA]){
+            useExp = true;
+        }
         if (i + 1 >= PA_Values.length) {
             /*We have reached the end of lines but haven't found our value, so just use top line*/
-            return parseFloat(PA_lines[bottomPA].m) * temp + parseFloat(PA_lines[bottomPA].b);
+            if (useExp){
+                return parseFloat(PA_lines[bottomPA].m) * Math.E ** (parseFloat(PA_lines[bottomPA].e) * temp);
+            }
+            else{
+                return parseFloat(PA_lines[bottomPA].m) * temp + parseFloat(PA_lines[bottomPA].b);
+            }
         }
         else {
             topPA = parseFloat(PA_Values[i + 1]);
             if (pressureAlt < bottomPA) {
                 /*if less than 0 PA just use 0 PA*/
-                return parseFloat(PA_lines[bottomPA].m) * temp + parseFloat(PA_lines[bottomPA].b);
+                if (useExp){
+                    return parseFloat(PA_lines[bottomPA].m) * Math.E ** (parseFloat(PA_lines[bottomPA].e) * temp);
+                }
+                else {
+                    return parseFloat(PA_lines[bottomPA].m) * temp + parseFloat(PA_lines[bottomPA].b);
+                }
+
             } else if ((pressureAlt >= bottomPA) && (pressureAlt < topPA)) {
                 /*Between two lines (usually we use this) */
                 skew = (pressureAlt - bottomPA) / (topPA - bottomPA);
-                topValue = parseFloat(PA_lines[topPA].m) * temp + parseFloat(PA_lines[topPA].b);
-                bottomValue = parseFloat(PA_lines[bottomPA].m) * temp + parseFloat(PA_lines[bottomPA].b);
+                if ("e" in PA_lines[topPA]){
+                    topValue = parseFloat(PA_lines[topPA].m) * Math.E ** (parseFloat(PA_lines[topPA].e) * temp);
+                    bottomValue = parseFloat(PA_lines[bottomPA].m) * Math.E ** (parseFloat(PA_lines[bottomPA].e) * temp);
+                }
+                else{
+                    topValue = parseFloat(PA_lines[topPA].m) * temp + parseFloat(PA_lines[topPA].b);
+                    bottomValue = parseFloat(PA_lines[bottomPA].m) * temp + parseFloat(PA_lines[bottomPA].b);
+                }
                 return ((topValue - bottomValue) * skew) + bottomValue;
             }
         }
     }
 }
 
-function weightChart(lines, DA_Result, landingWeight, maxWeight){
+function weightChart(lines, DA_Result, weight, maxWeight){
     /**Takes the result from the first portion of the chart(DA_Result) and landing weight to find the next section**/
-    lineIntercepts = [];
+
     for (i=0; i < lines.length; i++){
-        bottomIntercept = parseFloat(lines[i].m) * maxWeight + parseFloat(lines[i].b);
-        if (i+1 >= lines.length){
-            /*We have reached the end of lines but haven't found our value, so use top line and add a skew*/
-            return parseFloat(lines[i].m) * landingWeight + parseFloat(lines[i].b) + parseFloat(lines[i].b) + (DA_Result - bottomIntercept);
+        var useExp = false;
+        if ("e" in lines[i]){
+            useExp = true;
+            bottomIntercept = parseFloat(lines[i].m) * Math.E ** (parseFloat(lines[i].e) * maxWeight);
         }
         else {
-            topIntercept = parseFloat(lines[i+1].m) * maxWeight + parseFloat(lines[i+1].b);
+            bottomIntercept = parseFloat(lines[i].m) * maxWeight + parseFloat(lines[i].b);
+        }
+        if (i+1 >= lines.length) {
+            /*We have reached the end of lines but haven't found our value, so use top line and add a skew*/
+            if (useExp) {
+                return (parseFloat(lines[i].m) * Math.E ** (parseFloat(lines[i].e) * weight)) + (DA_Result - bottomIntercept);
+            }
+            else {
+                return parseFloat(lines[i].m) * weight + parseFloat(lines[i].b) + (DA_Result - bottomIntercept);
+            }
+        }
+        else {
+            var useExp1 = false;
+            if("e" in lines[i+1]){
+                useExp1 = true;
+                topIntercept = parseFloat(lines[i+1].m) * Math.E ** (parseFloat(lines[i+1].e) * maxWeight);
+            }
+            else{
+                topIntercept = parseFloat(lines[i+1].m) * maxWeight + parseFloat(lines[i+1].b);
+            }
             /*We are below bottom line so just use bottom line with some skew*/
             if (DA_Result < bottomIntercept){
-                return parseFloat(lines[i].m) * landingWeight + parseFloat(lines[i].b) - (bottomIntercept - DA_Result);
+                if (useExp){
+                    return (parseFloat(lines[i].m) * Math.E ** (parseFloat(lines[i].e) * weight)) - (bottomIntercept - DA_Result);
+                }
+                else{
+                    return parseFloat(lines[i].m) * weight + parseFloat(lines[i].b) - (bottomIntercept - DA_Result);
+                }
             }
             else if ((DA_Result >= bottomIntercept) && (DA_Result < topIntercept)){
                 /*Between two lines (usually we use this) */
                 skew = (DA_Result - bottomIntercept)/(topIntercept-bottomIntercept);
-                topValue = parseFloat(lines[i+1].m) * landingWeight + parseFloat(lines[i+1].b);
-                bottomValue = parseFloat(lines[i].m) * landingWeight + parseFloat(lines[i].b);
+                if (useExp1){
+                    topValue = parseFloat(lines[i+1].m) * Math.E ** (parseFloat(lines[i+1].e) * weight);
+                }
+                else{
+                    topValue = parseFloat(lines[i+1].m) * weight + parseFloat(lines[i+1].b);
+                }
+                if (useExp){
+                    bottomValue = parseFloat(lines[i].m) * Math.E ** (parseFloat(lines[i].e) * weight);
+                }
+                else{
+                    bottomValue = parseFloat(lines[i].m) * weight + parseFloat(lines[i].b);
+                }
                 return ((topValue - bottomValue) * skew) + bottomValue;
             }
         }
@@ -527,7 +351,7 @@ function windChart(lines, weight_Result, hwind){
         bottomIntercept = parseFloat(lines[i].b);
         if (i+1 >= lines.length){
             /*We have reached the end of lines but haven't found our value, so use top line and add a skew*/
-            return parseFloat(lines[i].m) * hwind + parseFloat(lines[i].b) + parseFloat(lines[i].b) + (weight_Result - bottomIntercept);
+            return parseFloat(lines[i].m) * hwind + parseFloat(lines[i].b) + (weight_Result - bottomIntercept);
         }
         else {
             topIntercept = parseFloat(lines[i+1].b);
