@@ -163,6 +163,9 @@ function performanceCompute(winds){
     else if (aircraftObj.model === "DA42"){
 
     }
+    document.getElementById("tgDistance").innerHTML = ((takeoffDistance + landingDistance)/10).toFixed(0)*10 + " ft";
+
+
 }
 
 function takeoffOver50(toDistance) {
@@ -251,7 +254,7 @@ function  densityAltitudeChart(PA_lines, pressureAlt, temp){
         if (i + 1 >= PA_Values.length) {
             /*We have reached the end of lines but haven't found our value, so just use top line*/
             if (useExp){
-                return parseFloat(PA_lines[bottomPA].m) * Math.E ** (parseFloat(PA_lines[bottomPA].e) * temp);
+                return parseFloat(PA_lines[bottomPA].b) * Math.E ** (parseFloat(PA_lines[bottomPA].e) * temp);
             }
             else{
                 return parseFloat(PA_lines[bottomPA].m) * temp + parseFloat(PA_lines[bottomPA].b);
@@ -262,7 +265,7 @@ function  densityAltitudeChart(PA_lines, pressureAlt, temp){
             if (pressureAlt < bottomPA) {
                 /*if less than 0 PA just use 0 PA*/
                 if (useExp){
-                    return parseFloat(PA_lines[bottomPA].m) * Math.E ** (parseFloat(PA_lines[bottomPA].e) * temp);
+                    return parseFloat(PA_lines[bottomPA].b) * Math.E ** (parseFloat(PA_lines[bottomPA].e) * temp);
                 }
                 else {
                     return parseFloat(PA_lines[bottomPA].m) * temp + parseFloat(PA_lines[bottomPA].b);
@@ -272,8 +275,8 @@ function  densityAltitudeChart(PA_lines, pressureAlt, temp){
                 /*Between two lines (usually we use this) */
                 skew = (pressureAlt - bottomPA) / (topPA - bottomPA);
                 if ("e" in PA_lines[topPA]){
-                    topValue = parseFloat(PA_lines[topPA].m) * Math.E ** (parseFloat(PA_lines[topPA].e) * temp);
-                    bottomValue = parseFloat(PA_lines[bottomPA].m) * Math.E ** (parseFloat(PA_lines[bottomPA].e) * temp);
+                    topValue = parseFloat(PA_lines[topPA].b) * Math.E ** (parseFloat(PA_lines[topPA].e) * temp);
+                    bottomValue = parseFloat(PA_lines[bottomPA].b) * Math.E ** (parseFloat(PA_lines[bottomPA].e) * temp);
                 }
                 else{
                     topValue = parseFloat(PA_lines[topPA].m) * temp + parseFloat(PA_lines[topPA].b);
@@ -292,7 +295,7 @@ function weightChart(lines, DA_Result, weight, maxWeight){
         var useExp = false;
         if ("e" in lines[i]){
             useExp = true;
-            bottomIntercept = parseFloat(lines[i].m) * Math.E ** (parseFloat(lines[i].e) * maxWeight);
+            bottomIntercept = parseFloat(lines[i].b) * Math.E ** (parseFloat(lines[i].e) * maxWeight);
         }
         else {
             bottomIntercept = parseFloat(lines[i].m) * maxWeight + parseFloat(lines[i].b);
@@ -300,7 +303,7 @@ function weightChart(lines, DA_Result, weight, maxWeight){
         if (i+1 >= lines.length) {
             /*We have reached the end of lines but haven't found our value, so use top line and add a skew*/
             if (useExp) {
-                return (parseFloat(lines[i].m) * Math.E ** (parseFloat(lines[i].e) * weight)) + (DA_Result - bottomIntercept);
+                return (parseFloat(lines[i].b) * Math.E ** (parseFloat(lines[i].e) * weight)) + (DA_Result - bottomIntercept);
             }
             else {
                 return parseFloat(lines[i].m) * weight + parseFloat(lines[i].b) + (DA_Result - bottomIntercept);
@@ -310,7 +313,7 @@ function weightChart(lines, DA_Result, weight, maxWeight){
             var useExp1 = false;
             if("e" in lines[i+1]){
                 useExp1 = true;
-                topIntercept = parseFloat(lines[i+1].m) * Math.E ** (parseFloat(lines[i+1].e) * maxWeight);
+                topIntercept = parseFloat(lines[i+1].b) * Math.E ** (parseFloat(lines[i+1].e) * maxWeight);
             }
             else{
                 topIntercept = parseFloat(lines[i+1].m) * maxWeight + parseFloat(lines[i+1].b);
@@ -318,7 +321,7 @@ function weightChart(lines, DA_Result, weight, maxWeight){
             /*We are below bottom line so just use bottom line with some skew*/
             if (DA_Result < bottomIntercept){
                 if (useExp){
-                    return (parseFloat(lines[i].m) * Math.E ** (parseFloat(lines[i].e) * weight)) - (bottomIntercept - DA_Result);
+                    return (parseFloat(lines[i].b) * Math.E ** (parseFloat(lines[i].e) * weight)) - (bottomIntercept - DA_Result);
                 }
                 else{
                     return parseFloat(lines[i].m) * weight + parseFloat(lines[i].b) - (bottomIntercept - DA_Result);
@@ -328,13 +331,13 @@ function weightChart(lines, DA_Result, weight, maxWeight){
                 /*Between two lines (usually we use this) */
                 skew = (DA_Result - bottomIntercept)/(topIntercept-bottomIntercept);
                 if (useExp1){
-                    topValue = parseFloat(lines[i+1].m) * Math.E ** (parseFloat(lines[i+1].e) * weight);
+                    topValue = parseFloat(lines[i+1].b) * Math.E ** (parseFloat(lines[i+1].e) * weight);
                 }
                 else{
                     topValue = parseFloat(lines[i+1].m) * weight + parseFloat(lines[i+1].b);
                 }
                 if (useExp){
-                    bottomValue = parseFloat(lines[i].m) * Math.E ** (parseFloat(lines[i].e) * weight);
+                    bottomValue = parseFloat(lines[i].b) * Math.E ** (parseFloat(lines[i].e) * weight);
                 }
                 else{
                     bottomValue = parseFloat(lines[i].m) * weight + parseFloat(lines[i].b);
