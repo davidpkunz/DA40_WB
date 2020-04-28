@@ -296,6 +296,7 @@ function DA40FP(firstType, secondType){
                         max : 2000
                     }
             }
+            break;
         case "climb":
             switch (secondType){
                 case "DA":
@@ -331,15 +332,20 @@ function DA40FP(firstType, secondType){
                     }
                 case "weight":
                     return [
-                        /* slope (m), y intercept (b) */
-                        {m: 0.6316, b: 24.399},
-                        {m: 0.7586, b: 28.063},
-                        {m: 0.9121, b: 32.665},
-                        {m: 1.2369, b: 39.526},
-                        {m: 1.4435, b: 47.831},
-                        {m: 1.8267, b: 58.062},
-                        {m: 2.1869, b: 72.351},
-                        {m: 2.7618, b: 93.652}
+                        /* c ln(x) + b
+                        * or mx+b*/
+                        {c: 99.627, b: -738.15},
+                        {c: 91.967, b: -668.51},
+                        {c: 81.519, b: -578.48},
+                        {c: 73.055, b: -504.49},
+                        {c: 65.648, b: -439.15},
+                        {c: 57.691, b: -370.21},
+                        {c: 51.059, b: -312.19},
+                        {c: 48.87, b: -290.02},
+                        {c: 42.262, b: -232.73},
+                        {c: 37.35, b: -188.24},
+                        {m: 0.0188, b: 66.164}
+
                     ];
                 case "scale":
                     return {
@@ -347,6 +353,6 @@ function DA40FP(firstType, secondType){
                         max : 0
                     }
             }
-        break;
     }
 }
+

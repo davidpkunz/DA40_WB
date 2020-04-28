@@ -139,33 +139,28 @@ function performanceCompute(winds){
     var temp = parseFloat(weatherData.temp_c);
     var fldAlt = parseFloat(weatherData.elevation_m)*3.281;
     var pressureAlt = fldAlt + ((29.92 - parseFloat(weatherData.altim_in_hg))*1000);
-    if (aircraftObj.model === "DA40F"){
-        var takeoffDistance = getPerformanceNumbers("DA40F", "takeoff", pressureAlt,
-            temp, takeoffWeight, winds.hWind, aircraftObj.maxWeight)*3.281;
-        document.getElementById("TODistance").innerHTML = "Ground Roll: "
-            + (takeoffDistance/10).toFixed(0)*10 + " ft";
-        var takeoff50 = getPerformanceNumbers("DA40F", "takeoff50", pressureAlt,
-            temp, takeoffWeight, winds.hWind, aircraftObj.maxWeight)*3.281;
-        document.getElementById("TO50Distance").innerHTML = "Over 50': "
-            + (takeoff50/10).toFixed(0)*10 + " ft";
-        var landingDistance = getPerformanceNumbers("DA40F", "landing", pressureAlt,
-            temp, landingWeight, winds.hWind, aircraftObj.maxWeight)*3.281;
-        document.getElementById("LDGDistance").innerHTML = "Ground Roll: "
-            + (landingDistance/10).toFixed(0)*10 + " ft";
-        var landing50Distance = getPerformanceNumbers("DA40F", "landing50", pressureAlt,
-            temp, landingWeight, winds.hWind, aircraftObj.maxWeight)*3.281;
-        document.getElementById("LDG50Distance").innerHTML = "Over 50': "
-            + (landing50Distance/10).toFixed(0)*10 + " ft";
-    }
-    else if ((aircraftObj.model === "DA40CS") || (aircraftObj.model === "DA40XL")){
 
-    }
-    else if (aircraftObj.model === "DA42"){
-
-    }
+    var takeoffDistance = getPerformanceNumbers(aircraftObj.model, "takeoff", pressureAlt,
+        temp, takeoffWeight, winds.hWind, aircraftObj.maxWeight)*3.281;
+    document.getElementById("TODistance").innerHTML = "Ground Roll: "
+        + (takeoffDistance/10).toFixed(0)*10 + " ft";
+    var takeoff50 = getPerformanceNumbers(aircraftObj.model, "takeoff50", pressureAlt,
+        temp, takeoffWeight, winds.hWind, aircraftObj.maxWeight)*3.281;
+    document.getElementById("TO50Distance").innerHTML = "Over 50': "
+        + (takeoff50/10).toFixed(0)*10 + " ft";
+    var landingDistance = getPerformanceNumbers(aircraftObj.model, "landing", pressureAlt,
+        temp, landingWeight, winds.hWind, aircraftObj.maxWeight)*3.281;
+    document.getElementById("LDGDistance").innerHTML = "Ground Roll: "
+        + (landingDistance/10).toFixed(0)*10 + " ft";
+    var landing50Distance = getPerformanceNumbers(aircraftObj.model, "landing50", pressureAlt,
+        temp, landingWeight, winds.hWind, aircraftObj.maxWeight)*3.281;
+    document.getElementById("LDG50Distance").innerHTML = "Over 50': "
+        + (landing50Distance/10).toFixed(0)*10 + " ft";
+    var climbPerf = getPerformanceNumbers(aircraftObj.model, "climb", pressureAlt, temp,
+        takeoffWeight, winds.hWind, aircraftObj.maxWeight);
+    document.getElementById("climbFPM").innerHTML = (climbPerf/10).toFixed(0)*10 + " FPM";
+    document.getElementById("climbNM").innerHTML = ((climbPerf/1.1)/10).toFixed(0)*10 + " FT/NM"
     document.getElementById("tgDistance").innerHTML = ((takeoffDistance + landingDistance)/10).toFixed(0)*10 + " ft";
-
-
 }
 
 function takeoffOver50(toDistance) {
@@ -226,20 +221,35 @@ function getPerformanceNumbers(modelString, typeString, pressureAlt, temp, weigh
      * "hwind"/"twind" -> the wind portion of the chart
      *
      * **/
-    var DA_Result = densityAltitudeChart(DA40FP(typeString, "DA"),pressureAlt, temp);
-    var weight_Result = weightChart(DA40FP(typeString, "weight"), DA_Result, weight, maxWeight);
-    var wind_Result;
-    if (hWind > 0){
-        wind_Result = windChart(DA40FP(typeString, "hwind"), weight_Result, hWind);
+    if (modelString === "DA40F"){
+        var last_result;
+        if (typeString === "climb"){
+            DA_Result = densityAltitudeChart(DA40FP(typeString, "DA"), pressureAlt, temp);
+            last_result = weightChart(DA40FP(typeString, "weight"), DA_Result, weight, maxWeight);
+        }
+        else {
+            var DA_Result = densityAltitudeChart(DA40FP(typeString, "DA"),pressureAlt, temp);
+            var weight_Result = weightChart(DA40FP(typeString, "weight"), DA_Result, weight, maxWeight);
+
+            if (hWind > 0){
+                last_result = windChart(DA40FP(typeString, "hwind"), weight_Result, hWind);
+            }
+            else if (hWind < 0){
+                last_result = windChart(DA40FP(typeString, "twind"), weight_Result, Math.abs(hWind));
+            }
+            else if (hWind === 0){
+                last_result = weight_Result;
+            }
+        }
+        var scale = DA40FP(typeString, "scale");
+        return last_result*(parseFloat(scale.max) - parseFloat(scale.min))/100 + parseFloat(scale.min);
     }
-    else if (hWind < 0){
-        wind_Result = windChart(DA40FP(typeString, "twind"), weight_Result, Math.abs(hWind));
+    else if ((modelString === "DA40CS") || (modelString === "DA40XL")){
+
     }
-    else if (hWind === 0){
-        wind_Result = weight_Result;
+    else if (modelString === "DA42"){
+
     }
-    var scale = DA40FP(typeString, "scale");
-    return wind_Result*(parseFloat(scale.max) - parseFloat(scale.min))/100 + parseFloat(scale.min);
 }
 
 function  densityAltitudeChart(PA_lines, pressureAlt, temp){
@@ -293,9 +303,14 @@ function weightChart(lines, DA_Result, weight, maxWeight){
 
     for (i=0; i < lines.length; i++){
         var useExp = false;
+        var useLog = false;
         if ("e" in lines[i]){
             useExp = true;
             bottomIntercept = parseFloat(lines[i].b) * Math.E ** (parseFloat(lines[i].e) * maxWeight);
+        }
+        else if ("c" in lines[i]){
+            useLog = true;
+            bottomIntercept = parseFloat(lines[i].c) * Math.log(maxWeight) + parseFloat(lines[i].b);
         }
         else {
             bottomIntercept = parseFloat(lines[i].m) * maxWeight + parseFloat(lines[i].b);
@@ -305,15 +320,23 @@ function weightChart(lines, DA_Result, weight, maxWeight){
             if (useExp) {
                 return (parseFloat(lines[i].b) * Math.E ** (parseFloat(lines[i].e) * weight)) + (DA_Result - bottomIntercept);
             }
+            else if (useLog){
+                return parseFloat(lines[i].c) * Math.log(weight) + parseFloat(lines[i].b) + (DA_Result - bottomIntercept);
+            }
             else {
                 return parseFloat(lines[i].m) * weight + parseFloat(lines[i].b) + (DA_Result - bottomIntercept);
             }
         }
         else {
             var useExp1 = false;
+            var useLog1 = false;
             if("e" in lines[i+1]){
                 useExp1 = true;
                 topIntercept = parseFloat(lines[i+1].b) * Math.E ** (parseFloat(lines[i+1].e) * maxWeight);
+            }
+            else if ("c" in lines[i+1]){
+                useLog1 = true;
+                topIntercept =  parseFloat(lines[i+1].c) * Math.log(maxWeight) + parseFloat(lines[i+1].b);
             }
             else{
                 topIntercept = parseFloat(lines[i+1].m) * maxWeight + parseFloat(lines[i+1].b);
@@ -322,6 +345,9 @@ function weightChart(lines, DA_Result, weight, maxWeight){
             if (DA_Result < bottomIntercept){
                 if (useExp){
                     return (parseFloat(lines[i].b) * Math.E ** (parseFloat(lines[i].e) * weight)) - (bottomIntercept - DA_Result);
+                }
+                else if (useLog){
+                    return (parseFloat(lines[i].c) * Math.log(weight) + parseFloat(lines[i].b)) - (bottomIntercept - DA_Result);
                 }
                 else{
                     return parseFloat(lines[i].m) * weight + parseFloat(lines[i].b) - (bottomIntercept - DA_Result);
@@ -333,11 +359,17 @@ function weightChart(lines, DA_Result, weight, maxWeight){
                 if (useExp1){
                     topValue = parseFloat(lines[i+1].b) * Math.E ** (parseFloat(lines[i+1].e) * weight);
                 }
+                else if (useLog1){
+                    topValue = parseFloat(lines[i+1].c) * Math.log(weight) + parseFloat(lines[i+1].b);
+                }
                 else{
                     topValue = parseFloat(lines[i+1].m) * weight + parseFloat(lines[i+1].b);
                 }
                 if (useExp){
                     bottomValue = parseFloat(lines[i].b) * Math.E ** (parseFloat(lines[i].e) * weight);
+                }
+                else if (useLog){
+                    bottomValue = parseFloat(lines[i].c) * Math.log(weight) + parseFloat(lines[i].b);
                 }
                 else{
                     bottomValue = parseFloat(lines[i].m) * weight + parseFloat(lines[i].b);
