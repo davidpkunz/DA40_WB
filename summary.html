@@ -39,7 +39,7 @@
         <div class="row">
             <div class="col-lg">
                 <h4>Summary</h4>
-                <div class="container" id="auditDiv" style="display: none">
+                <div class="container" id="auditDiv">
                     <h5 id="auditTitle">Audit</h5>
                     <table class="table table-sm table-striped table-bordered">
                         <thead>
@@ -158,6 +158,95 @@
                 <canvas id="cgCanvas" width="500" height="360" style="border: 1px solid black"></canvas>
             </div>
         </div>
+        <div class="row">
+            <div class="col-lg">
+                <h4>Weather</h4>
+                <div id="weatherData">
+                    <h5 id="weatherTitle">Station Weather</h5>
+                    <p id="wRaw"></p>
+                    <table class="table table-sm table-striped table-bordered">
+                        <tbody>
+                        <tr>
+                            <th scope="col">Time</th>
+                            <th id="wTime"></th>
+                        </tr>
+                        <tr>
+                            <th scope="col" >Wind Dir and Vel</th>
+                            <th id="wWind"></th>
+                        </tr>
+                        <tr>
+                            <th scope="col">Visibility</th>
+                            <th id="wVisibility"></th>
+                        </tr>
+                        <tr>
+                            <th scope="col">Clouds</th>
+                            <th id="wCeilings"></th>
+                        </tr>
+                        <tr>
+                            <th scope="col">Temperature</th>
+                            <th id="wTemp"></th>
+                        </tr>
+                        <tr>
+                            <th scope="col">Dew Point</th>
+                            <th id="wDewpoint"></th>
+                        </tr>
+                        <tr>
+                            <th scope="col">Altimeter</th>
+                            <th id="wAltimeter"></th>
+                        </tr>
+                        <tr>
+                            <th scope="col">Density Alt.</th>
+                            <th id="wDensityAlt"></th>
+                        </tr>
+                        <tr>
+                            <th scope="col">Pressure Alt.</th>
+                            <th id="wPressureAlt"></th>
+                        </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-lg">
+                <h4>Takeoff and Landing Performance</h4>
+                <p>Performance data is an estimate only and does not take into
+                    consideration runway condition, aircraft condition, or pilot technique.</p>
+                <h5 id="runwayHdg">Runway </h5>
+                <table class="table table-sm table-bordered">
+                    <tbody>
+                    <tr>
+                        <th scope="row">Head Wind</th>
+                        <td id="headWind"></td>
+
+                    </tr>
+                    <tr>
+                        <th scope="row">Cross Wind</th>
+                        <td id="xWind"></td>
+
+                    </tr>
+                    <tr>
+                        <th scope="row">Takeoff</th>
+                        <td id ="TODistance">Ground Roll:</td>
+                        <td id ="TO50Distance">Over 50':</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Landing</th>
+                        <td id="LDGDistance">Ground Roll:</td>
+                        <td id="LDG50Distance">Over 50':</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Touch and Go Distance</th>
+                        <td id="tgDistance"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Rate of Climb</th>
+                        <td id="climbFPM"></td>
+                        <td id="climbNM"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </main><!-- /.container -->
 
@@ -166,8 +255,9 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 
 <script src="aircraft.js"></script>
-<script src="summary.js"></script>
 <script src="draw.js"></script>
+<script src="summary.js"></script>
+
 <script src="printThis/printThis.js"></script>
 
 </body>

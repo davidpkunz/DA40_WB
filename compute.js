@@ -371,7 +371,8 @@ function reCompute(){
     if (cgValid) {
         resultSuccess();
     }
-
+    localStorage.setItem("colors", JSON.stringify(colors));
+    localStorage.setItem("fwdCG", toFwdCG.toString());
     drawCG(newData, userInput, modelData, colors);
     auditMode(newData, userInput, toFwdCG);
 }
@@ -603,7 +604,7 @@ function auditMode(computedData, userInput, fwdCG){
 
     document.getElementById("zero_wt_td").innerHTML = computedData.zeroFuelWeight;
     document.getElementById("zero_cg_td").innerHTML = computedData.zeroFuelCG;
-    document.getElementById("zero_mnt_td").innerHTML = computedData.zeroFuelMoment;
+    document.getElementById("zero_mnt_td").innerHTML = computedData.zeroFuelMoment.toFixed(2);
 
     document.getElementById("fuel_wt_td").innerHTML = userInput.fuelWeight;
     document.getElementById("fuel_cg_td").innerHTML = modelData.fuelStationCG;
@@ -611,7 +612,7 @@ function auditMode(computedData, userInput, fwdCG){
 
     document.getElementById("takeoff_wt_td").innerHTML = computedData.takeOffWeight;
     document.getElementById("takeoff_cg_td").innerHTML = computedData.takeoffCG;
-    document.getElementById("takeoff_mnt_td").innerHTML = computedData.takeOffMoment;
+    document.getElementById("takeoff_mnt_td").innerHTML = computedData.takeOffMoment.toFixed(2);
 
     document.getElementById("burn_wt_td").innerHTML = userInput.fuelBurnWeight;
     document.getElementById("burn_cg_td").innerHTML = modelData.fuelStationCG;
