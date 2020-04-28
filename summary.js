@@ -201,4 +201,14 @@ function fillWB(computedData, userInput, fwdCG){
     }
 }
 
+function printResults(){
+    /**Called when user clicks print button
+     * First we show the elements that need to be printed then we use printThis to print those elements**/
+    $('#row1, #row2').printThis({
+        importCSS : false,
+        loadCSS : "css/print.css",
+        canvas : true
+    });
+}
+
 fillData();

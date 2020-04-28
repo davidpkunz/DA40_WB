@@ -34,9 +34,13 @@
 </nav>
 
 <main role="main" class="container">
-
     <div class="container">
         <div class="row">
+            <br>
+            <button type="button" class="btn btn-secondary m-2" onclick="emailResults()">Email</button>
+            <button type="button" class="btn btn-secondary m-2" onclick="printResults()">Print</button>
+        </div>
+        <div class="row" id="row1">
             <div class="col-lg">
                 <h4>Summary</h4>
                 <div class="container" id="auditDiv">
@@ -153,12 +157,12 @@
                     </table>
                 </div>
             </div>
-            <div class="col-lg">
+            <div class="col-lg" id="canvasDiv">
                 <h4>CG Envelope</h4>
                 <canvas id="cgCanvas" width="500" height="360" style="border: 1px solid black"></canvas>
             </div>
         </div>
-        <div class="row">
+        <div class="row" id="row2">
             <div class="col-lg">
                 <h4>Weather</h4>
                 <div id="weatherData">

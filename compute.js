@@ -698,17 +698,6 @@ function resultSuccess(){
     document.getElementById("overall_result").innerHTML = "Aircraft within limits.";
 }
 
-function printResults(){
-    /**Called when user clicks print button
-     * First we show the elements that need to be printed then we use printThis to print those elements**/
-    document.getElementById("auditDiv").style.display = "block";
-    $('#auditDiv, #cgCanvas').printThis({
-        importCSS : false,
-        loadCSS : "https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css",
-        canvas : true
-    });
-}
-
 function emailResults(){
     /**Called when user clicks email button (not implemented)
      * We will open a mailto link with the subject and body filled in with info
