@@ -100,6 +100,7 @@ function runwayChange(str){
     if ((heading > 360)|| (heading < 1)){
         document.getElementById("xWind").innerHTML = "";
         document.getElementById("headWind").innerHTML = "";
+        heading = "";
         return;
     }
     var weatherData = JSON.parse(localStorage.getItem("weatherData"));
@@ -114,7 +115,7 @@ function runwayChange(str){
     else{
         document.getElementById("xWind").innerHTML = winds.xWind.toFixed(0) + " (Left)";
     }
-    performanceCompute(winds)
+    performanceCompute(winds, heading)
 }
 
 function windComponents(heading, windDir, windSpeed){
@@ -127,7 +128,7 @@ function windComponents(heading, windDir, windSpeed){
     return {xWind : xWindSpd, hWind : hWindSpd};
 }
 
-function performanceCompute(winds){
+function performanceCompute(winds, heading){
     /**Takes wind data, then imports weight data, weather data, aircraft data from local storage
      * Uses stored data to compute takeoff/landing/climb performance values depending on aircraft model**/
     var userData = JSON.parse(localStorage.getItem("userInput"));
@@ -144,10 +145,10 @@ function performanceCompute(winds){
         temp, takeoffWeight, winds.hWind, aircraftObj.maxWeight)*3.281;
     document.getElementById("TODistance").innerHTML = "Ground Roll: "
         + (takeoffDistance/10).toFixed(0)*10 + " ft";
-    var takeoff50 = getPerformanceNumbers(aircraftObj.model, "takeoff50", pressureAlt,
+    var takeoff50Distance = getPerformanceNumbers(aircraftObj.model, "takeoff50", pressureAlt,
         temp, takeoffWeight, winds.hWind, aircraftObj.maxWeight)*3.281;
     document.getElementById("TO50Distance").innerHTML = "Over 50': "
-        + (takeoff50/10).toFixed(0)*10 + " ft";
+        + (takeoff50Distance/10).toFixed(0)*10 + " ft";
     var landingDistance = getPerformanceNumbers(aircraftObj.model, "landing", pressureAlt,
         temp, landingWeight, winds.hWind, aircraftObj.maxWeight)*3.281;
     document.getElementById("LDGDistance").innerHTML = "Ground Roll: "
@@ -161,6 +162,18 @@ function performanceCompute(winds){
     document.getElementById("climbFPM").innerHTML = (climbPerf/10).toFixed(0)*10 + " FPM";
     document.getElementById("climbNM").innerHTML = ((climbPerf/1.1)/10).toFixed(0)*10 + " FT/NM"
     document.getElementById("tgDistance").innerHTML = ((takeoffDistance + landingDistance)/10).toFixed(0)*10 + " ft";
+    const performanceData = {
+        "takeoffDistance" : takeoffDistance,
+        "takeoff50Distance" : takeoff50Distance,
+        "landingDistance" : landingDistance,
+        "landing50Distance" : landing50Distance,
+        "climbPerf" : climbPerf,
+        "pressureAlt" : pressureAlt,
+        "headWind" : winds.hWind,
+        "crossWind" : winds.xWind,
+        "runwayHdg" : heading
+    }
+    localStorage.setItem("performanceData", JSON.stringify(performanceData));
 }
 
 function takeoffOver50(toDistance) {

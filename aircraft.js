@@ -196,6 +196,16 @@ const aircraftModels = [
             minWgt: 1720,
             midWgt: 2161,
             maxWgt: 2535
+        },
+        vSpeeds : {
+            vr : 59,
+            vx : 66,
+            vy : 66,
+            vg : 73,
+            va : {
+                2161 : 94,
+                2535 : 108
+            }
         }
     },
     {
@@ -217,6 +227,17 @@ const aircraftModels = [
             minWgt: 1720,
             midWgt: 2161,
             maxWgt: 2535
+        },
+        vSpeeds : {
+            vr : 59,
+            vx : 66,
+            vy : 66,
+            vg : 73,
+            vaTop : 108,
+            va : {
+                2161 : 94,
+                2535 : 108
+            }
         }
     },
     {
@@ -241,6 +262,16 @@ const aircraftModels = [
             minWgt: 1720,
             midWgt: 2161,
             maxWgt: 2646
+        },
+        vSpeeds : {
+            vr : 59,
+            vx : 66,
+            vy : 66,
+            vg : 73,
+            va : {
+                2161 : 94,
+                2646 : 111
+            }
         }
     },
     {
