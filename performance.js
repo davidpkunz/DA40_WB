@@ -17,75 +17,8 @@ function getWeather(){
     request.onreadystatechange=function(){
         if (this.readyState===4 && this.status===200){
             var weatherData = JSON.parse(this.responseText);
-
-            document.getElementById("weatherData").style.display = "block";
-            document.getElementById("wRaw").innerHTML = weatherData.raw_text;
-            var obsTime = new Date(weatherData.observation_time);
-            document.getElementById("wTime").innerHTML = obsTime.getHours() + ":" + obsTime.getMinutes()
-                + " (UTC " + -(obsTime.getTimezoneOffset()/60) + ")";
-            var windDir = "";
-            if ((weatherData.wind_dir_degrees === "0") && (weatherData.wind_speed_kt === "0")){
-                windDir = "Calm";
-                document.getElementById("wWind").innerHTML = windDir;
-            }
-            else{
-                if (weatherData.wind_dir_degrees === "0"){
-                    windDir = "Variable";
-                }
-                else{
-                    windDir = parseFloat(weatherData.wind_dir_degrees);
-                    if (windDir < 100){
-                        windDir = "0" + windDir.toFixed(0).toString() + "&deg";
-                    }
-                    else{
-                        windDir = windDir.toFixed(0).toString() + "&deg";
-                    }
-                }
-                if ("wind_gust_kt" in weatherData){
-                    document.getElementById("wWind").innerHTML = windDir + " @ " + weatherData.wind_speed_kt
-                                                                         + " kts G " + weatherData.wind_gust_kt + " kts";
-                }
-                else {
-                    document.getElementById("wWind").innerHTML = windDir + " @ " + weatherData.wind_speed_kt + " kts";
-                }
-            }
-            document.getElementById("wVisibility").innerHTML = parseFloat(weatherData.visibility_statute_mi) + " sm";
-            var rawCeilings = weatherData.sky_condition;
-            var ceilingString = "";
-            if (Array.isArray(rawCeilings)){
-                for (var i = 0; i < rawCeilings.length; i++){
-                    var ceilingAttribute = rawCeilings[i]["@attributes"];
-                    ceilingString += "<p style='margin: 0'>" + ceilingAttribute["sky_cover"] + " @ " + ceilingAttribute["cloud_base_ft_agl"] + "'</p>";
-                }
-            }
-            else{
-                ceilingAttribute = rawCeilings["@attributes"];
-                if (ceilingAttribute["sky_cover"] === "CLR"){
-                    ceilingString = "Clear";
-                }
-                else{
-                    ceilingString += "<p style='margin: 0'>" + ceilingAttribute["sky_cover"] + " @ "
-                                    + ceilingAttribute["cloud_base_ft_agl"] + "'</p>";
-                }
-            }
-
-            document.getElementById("wCeilings").innerHTML = ceilingString;
-
-            var temp = parseFloat(weatherData.temp_c);
-            var dewpoint = parseFloat(weatherData.dewpoint_c);
-            document.getElementById("wTemp").innerHTML = temp + " &degC";
-            document.getElementById("wDewpoint").innerHTML = dewpoint + " &degC";
-            document.getElementById("wAltimeter").innerHTML = parseFloat(weatherData.altim_in_hg).toFixed(2) + " inHg";
-            var fldAlt = parseFloat(weatherData.elevation_m)*3.281;
-            var pressureAlt = fldAlt + ((29.92 - parseFloat(weatherData.altim_in_hg))*1000);
-            var altimeterHg = parseFloat(weatherData.altim_in_hg);
-            /*variables below used to compute Density altitude without humidity compensation, so slightly off*/
-            var stationPressure = ((altimeterHg**0.1903)-(.00001313*fldAlt))**5.255;
-            var tempRankine = ((9/5)*(temp+273.15));
-            var densityAlt = (145442.16*(1-((17.326*stationPressure)/(tempRankine))**0.235));
-            document.getElementById("wPressureAlt").innerHTML = pressureAlt.toFixed(0) + " ft";
-            document.getElementById("wDensityAlt").innerHTML = densityAlt.toFixed(0) + " ft";
-            localStorage.setItem("weatherData", JSON.stringify(weatherData));
+            setWeather(weatherData);
+            sessionStorage.setItem("weatherData", JSON.stringify(weatherData));
             runwayChange(document.getElementById("runwayHdg").value);
         }
     }
@@ -93,17 +26,97 @@ function getWeather(){
     request.send();
 }
 
+function loadStoredWeather(){
+    /**If previously stored weather is available, retrieve it.**/
+    if (sessionStorage.getItem("weatherData") !== null){
+        return JSON.parse(sessionStorage.getItem("weatherData"));
+    }
+}
+
+function setWeather(weatherData) {
+    /**Fills the weather table with retrieved weather data**/
+    document.getElementById("weatherData").style.display = "block";
+    document.getElementById("wRaw").innerHTML = weatherData.raw_text;
+    var obsTime = new Date(weatherData.observation_time);
+    document.getElementById("wTime").innerHTML = obsTime.getHours() + ":" + obsTime.getMinutes()
+        + " (UTC " + -(obsTime.getTimezoneOffset()/60) + ")";
+    var windDir = "";
+    if ((weatherData.wind_dir_degrees === "0") && (weatherData.wind_speed_kt === "0")){
+        windDir = "Calm";
+        document.getElementById("wWind").innerHTML = windDir;
+    }
+    else{
+        if (weatherData.wind_dir_degrees === "0"){
+            windDir = "Variable";
+        }
+        else{
+            windDir = parseFloat(weatherData.wind_dir_degrees);
+            if (windDir < 100){
+                windDir = "0" + windDir.toFixed(0).toString() + "&deg";
+            }
+            else{
+                windDir = windDir.toFixed(0).toString() + "&deg";
+            }
+        }
+        if ("wind_gust_kt" in weatherData){
+            document.getElementById("wWind").innerHTML = windDir + " @ " + weatherData.wind_speed_kt
+                + " kts G " + weatherData.wind_gust_kt + " kts";
+        }
+        else {
+            document.getElementById("wWind").innerHTML = windDir + " @ " + weatherData.wind_speed_kt + " kts";
+        }
+    }
+    document.getElementById("wVisibility").innerHTML = parseFloat(weatherData.visibility_statute_mi) + " sm";
+    var rawCeilings = weatherData.sky_condition;
+    var ceilingString = "";
+    if (Array.isArray(rawCeilings)){
+        for (var i = 0; i < rawCeilings.length; i++){
+            var ceilingAttribute = rawCeilings[i]["@attributes"];
+            ceilingString += "<p style='margin: 0'>" + ceilingAttribute["sky_cover"] + " @ " + ceilingAttribute["cloud_base_ft_agl"] + "'</p>";
+        }
+    }
+    else{
+        ceilingAttribute = rawCeilings["@attributes"];
+        if (ceilingAttribute["sky_cover"] === "CLR"){
+            ceilingString = "Clear";
+        }
+        else{
+            ceilingString += "<p style='margin: 0'>" + ceilingAttribute["sky_cover"] + " @ "
+                + ceilingAttribute["cloud_base_ft_agl"] + "'</p>";
+        }
+    }
+
+    document.getElementById("wCeilings").innerHTML = ceilingString;
+    var temp = parseFloat(weatherData.temp_c);
+    var dewpoint = parseFloat(weatherData.dewpoint_c);
+    document.getElementById("wTemp").innerHTML = temp + " &degC";
+    document.getElementById("wDewpoint").innerHTML = dewpoint + " &degC";
+    document.getElementById("wAltimeter").innerHTML = parseFloat(weatherData.altim_in_hg).toFixed(2) + " inHg";
+    var fldAlt = parseFloat(weatherData.elevation_m)*3.281;
+    var pressureAlt = fldAlt + ((29.92 - parseFloat(weatherData.altim_in_hg))*1000);
+    var altimeterHg = parseFloat(weatherData.altim_in_hg);
+    /*variables below used to compute Density altitude without humidity compensation, so slightly off*/
+    var stationPressure = ((altimeterHg**0.1903)-(.00001313*fldAlt))**5.255;
+    var tempRankine = ((9/5)*(temp+273.15));
+    var densityAlt = (145442.16*(1-((17.326*stationPressure)/(tempRankine))**0.235));
+    document.getElementById("wPressureAlt").innerHTML = pressureAlt.toFixed(0) + " ft";
+    document.getElementById("wDensityAlt").innerHTML = densityAlt.toFixed(0) + " ft";
+}
+
 function runwayChange(str){
     /**Called when the runway heading input changes,
      * it then calls the compute functions to recalculate distances**/
+    if (str === ""){
+        return;
+    }
     heading = parseFloat(str);
-    if ((heading > 360)|| (heading < 1)){
+    if ((heading > 360) || (heading < 1)){
         document.getElementById("xWind").innerHTML = "";
         document.getElementById("headWind").innerHTML = "";
         heading = "";
         return;
     }
-    var weatherData = JSON.parse(localStorage.getItem("weatherData"));
+    var weatherData = JSON.parse(sessionStorage.getItem("weatherData"));
     winds = windComponents(heading, weatherData["wind_dir_degrees"], weatherData["wind_speed_kt"]);
     document.getElementById("headWind").innerHTML = winds.hWind.toFixed(0);
     if (winds.xWind < 0){
@@ -115,7 +128,7 @@ function runwayChange(str){
     else{
         document.getElementById("xWind").innerHTML = winds.xWind.toFixed(0) + " (Left)";
     }
-    performanceCompute(winds, heading)
+    performanceCompute(winds, heading);
 }
 
 function windComponents(heading, windDir, windSpeed){
@@ -131,9 +144,19 @@ function windComponents(heading, windDir, windSpeed){
 function performanceCompute(winds, heading){
     /**Takes wind data, then imports weight data, weather data, aircraft data from local storage
      * Uses stored data to compute takeoff/landing/climb performance values depending on aircraft model**/
+    if (localStorage.getItem("userInput") == null){
+        return;
+    }
+    else if (localStorage.getItem("computedData") == null){
+        return;
+    }
+    else if (sessionStorage.getItem("weatherData") == null){
+        return;
+    }
     var userData = JSON.parse(localStorage.getItem("userInput"));
-    var weatherData = JSON.parse(localStorage.getItem("weatherData"));
     var computedData = JSON.parse(localStorage.getItem("computedData"));
+    var weatherData = JSON.parse(sessionStorage.getItem("weatherData"));
+
     var aircraftObj = aircraft.find(x => x.tail === userData.tail);
     var takeoffWeight = computedData.takeOffWeight;
     var landingWeight = computedData.landingWeight;
@@ -160,7 +183,12 @@ function performanceCompute(winds, heading){
     var climbPerf = getPerformanceNumbers(aircraftObj.model, "climb", pressureAlt, temp,
         takeoffWeight, winds.hWind, aircraftObj.maxWeight);
     document.getElementById("climbFPM").innerHTML = (climbPerf/10).toFixed(0)*10 + " FPM";
-    document.getElementById("climbNM").innerHTML = ((climbPerf/1.1)/10).toFixed(0)*10 + " FT/NM"
+    if (aircraftObj.model !== "DA42"){
+        document.getElementById("climbNM").innerHTML = ((climbPerf/1.1)/10).toFixed(0)*10 + " FT/NM";
+    }
+    else {
+        document.getElementById("climbNM").innerHTML = ((climbPerf/1.1)/10).toFixed(0)*10 + " FT/NM";
+    }
     document.getElementById("tgDistance").innerHTML = ((takeoffDistance + landingDistance)/10).toFixed(0)*10 + " ft";
     const performanceData = {
         "takeoffDistance" : takeoffDistance,
@@ -173,54 +201,8 @@ function performanceCompute(winds, heading){
         "crossWind" : winds.xWind,
         "runwayHdg" : heading
     }
-    localStorage.setItem("performanceData", JSON.stringify(performanceData));
-}
-
-function takeoffOver50(toDistance) {
-    /**Given takeoff distance in meters, use table to convert to takeoff over 50 feet
-     * This uses the chart in the DA40CS POH, the values are representive of the DA40FP standalone 50ft chart.
-     * This means we can use it for all DA40 type aircraft.
-     * Returns takeoff over 50 ft distance in meters**/
-    const lines = {
-        /*y intercept : slope(m)*/
-        138.57 : 2.4851,
-        225.7 : 2.5519,
-        315.52 : 2.7423,
-        392.03 : 3.5998,
-        469.22 : 4.3267,
-        517.52 : 5.3505,
-        617.45 : 5.5147,
-        722.18 : 6.8121,
-        942.59 : 7.8029
-    }
-    const lineIntercepts = Object.keys(lines);
-    for (i = 0; i < lineIntercepts.length; i++){
-        bottomIntercept = parseFloat(lineIntercepts[i]);
-        if (i+1 >= lineIntercepts.length){
-            /*This means we are on the last(top) line, so we should only be here if takeoff distance is at or above line*/
-            if (toDistance >= bottomIntercept){
-                return parseFloat(lines[lineIntercepts[i]]) * 50 + bottomIntercept + (toDistance - bottomIntercept);
-            }
-            else{
-                /*Hopefully will never get here*/
-                return 0;
-            }
-        }
-        else{
-            topIntercept = parseFloat(lineIntercepts[i+1]);
-        }
-        /*Should only get it when takeoff distance is below the lowest line*/
-        if (toDistance < bottomIntercept){
-            return parseFloat(lines[lineIntercepts[i]]) * 50 + bottomIntercept - (bottomIntercept-toDistance);
-        }
-        /*Most should fall in this statement, being between 2 lines*/
-        else if ((toDistance >= bottomIntercept) && (toDistance < topIntercept)){
-            skew = (toDistance - bottomIntercept)/(topIntercept-bottomIntercept);
-            topValue = parseFloat(lines[lineIntercepts[i+1]]) * 50 + topIntercept;
-            bottomValue = parseFloat(lines[lineIntercepts[i]]) * 50 + bottomIntercept;
-            return ((topValue - bottomValue) * skew) + bottomValue;
-        }
-    }
+    document.getElementById("perfTable").style.display = "block";
+    sessionStorage.setItem("performanceData", JSON.stringify(performanceData));
 }
 
 function getPerformanceNumbers(modelString, typeString, pressureAlt, temp, weight, hWind, maxWeight){
@@ -414,6 +396,53 @@ function windChart(lines, weight_Result, hwind){
                 bottomValue = parseFloat(lines[i].m) * hwind + parseFloat(lines[i].b);
                 return ((topValue - bottomValue) * skew) + bottomValue;
             }
+        }
+    }
+}
+
+
+function obstacleChart(toDistance, height = 50) {
+    /**Given takeoff distance in meters and obstacle height, use table to convert to takeoff over obstacle
+     * This uses the chart in the DA40CS POH.
+     * Returns takeoff over 50 ft distance in meters by default**/
+    const lines = {
+        /*y intercept : slope(m)*/
+        138.57 : 2.4851,
+        225.7 : 2.5519,
+        315.52 : 2.7423,
+        392.03 : 3.5998,
+        469.22 : 4.3267,
+        517.52 : 5.3505,
+        617.45 : 5.5147,
+        722.18 : 6.8121,
+        942.59 : 7.8029
+    }
+    const lineIntercepts = Object.keys(lines);
+    for (i = 0; i < lineIntercepts.length; i++){
+        bottomIntercept = parseFloat(lineIntercepts[i]);
+        if (i+1 >= lineIntercepts.length){
+            /*This means we are on the last(top) line, so we should only be here if takeoff distance is at or above line*/
+            if (toDistance >= bottomIntercept){
+                return parseFloat(lines[lineIntercepts[i]]) * height + bottomIntercept + (toDistance - bottomIntercept);
+            }
+            else{
+                /*Hopefully will never get here*/
+                return 0;
+            }
+        }
+        else{
+            topIntercept = parseFloat(lineIntercepts[i+1]);
+        }
+        /*Should only get it when takeoff distance is below the lowest line*/
+        if (toDistance < bottomIntercept){
+            return parseFloat(lines[lineIntercepts[i]]) * height + bottomIntercept - (bottomIntercept-toDistance);
+        }
+        /*Most should fall in this statement, being between 2 lines*/
+        else if ((toDistance >= bottomIntercept) && (toDistance < topIntercept)){
+            skew = (toDistance - bottomIntercept)/(topIntercept-bottomIntercept);
+            topValue = parseFloat(lines[lineIntercepts[i+1]]) * height + topIntercept;
+            bottomValue = parseFloat(lines[lineIntercepts[i]]) * height + bottomIntercept;
+            return ((topValue - bottomValue) * skew) + bottomValue;
         }
     }
 }

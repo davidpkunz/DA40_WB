@@ -1,15 +1,15 @@
 
 function fillData(){
     var userData = JSON.parse(localStorage.getItem("userInput"));
-    var weatherData = JSON.parse(localStorage.getItem("weatherData"));
+    var weatherData = JSON.parse(sessionStorage.getItem("weatherData"));
     var computedData = JSON.parse(localStorage.getItem("computedData"));
-    var performanceData = JSON.parse(localStorage.getItem("performanceData"));
-    var fwdCG = parseFloat(localStorage.getItem("fwdCG"));
+    var performanceData = JSON.parse(sessionStorage.getItem("performanceData"));
+    var resultCG = JSON.parse(localStorage.getItem("CG"));
     var colors = JSON.parse(localStorage.getItem("colors"));
     var tailNumber = userData.tail;
     var aircraftObj = aircraft.find(x => x.tail === tailNumber);
     var modelData = aircraftModels.find(x => x.model === aircraftObj.model);
-    fillWB(computedData, userData, fwdCG);
+    fillWB(computedData, userData, resultCG.fwdCG, resultCG.validCG);
     drawCG(computedData, userData, modelData, colors);
     fillWeather(weatherData);
     fillPerformance(performanceData);
@@ -106,14 +106,21 @@ function fillPerformance(performanceData) {
 
 }
 
-function fillWB(computedData, userInput, fwdCG){
+function fillWB(computedData, userInput, fwdCG, validCG){
     /**Show detailed view in table format**/
 
     var tailNumber = userInput.tail;
     var aircraftObj = aircraft.find(x => x.tail === tailNumber);
     var modelData = aircraftModels.find(x => x.model === aircraftObj.model);
 
-    document.getElementById("auditTitle").innerHTML = tailNumber + " Weight and Balance";
+    if (!validCG){
+        document.getElementById("auditTitle").innerHTML = tailNumber + " NOT WITHIN LIMITS!!";
+        document.getElementById("auditTitle").classList.add("text-danger");
+    }
+    else {
+        document.getElementById("auditTitle").innerHTML = tailNumber + " is within limits!";
+        document.getElementById("auditTitle").classList.add("text-success");
+    }
 
     document.getElementById("empty_wt_td").innerHTML = aircraftObj.emptyWeight;
     document.getElementById("empty_cg_td").innerHTML = aircraftObj.aircraftArm;
@@ -209,6 +216,50 @@ function printResults(){
         loadCSS : "css/print.css",
         canvas : true
     });
+}
+
+function emailResults(){
+    /**Called when user clicks email button (not implemented)
+     * We will open a mailto link with the subject and body filled in with info
+     * Still need to come up with body text to send. Can't send the canvas image or tables, only text**/
+
+    var userData = JSON.parse(localStorage.getItem("userInput"));
+    var weatherData = JSON.parse(sessionStorage.getItem("weatherData"));
+    var computedData = JSON.parse(localStorage.getItem("computedData"));
+    var performanceData = JSON.parse(sessionStorage.getItem("performanceData"));
+    var resultCG = JSON.parse(localStorage.getItem("CG"));
+    var bodyString = "";
+    if (!resultCG.validCG){
+        bodyString += "!!!!CG NOT VALID. CHECK VALUES.!!!!"
+    }
+    else {
+        bodyString += "Weight and Balance %0d%0A";
+        bodyString += "Takeoff Weight: " + computedData.takeOffWeight + " lbs | Takeoff CG: " + computedData.takeoffCG +  "%0d%0A";
+        bodyString += "Allowed CG Range: " + resultCG.fwdCG + " - " + resultCG.aftCG + "%0d%0A";
+        bodyString += "Fuel Burn: " + userData.fuelBurnWeight + " lbs %0d%0A";
+        bodyString += "Landing Weight: " + computedData.landingWeight + " lbs | Landing CG: " + computedData.landingCG +  "%0d%0A %0d%0A";
+
+        if (sessionStorage.getItem("weatherData") !== null){
+            bodyString += "Weather %0d%0A" + weatherData.raw_text + "%0d%0A %0d%0A";
+        }
+        else{
+            bodyString += "Weather not available%0d%0A %0d%0A";
+        }
+
+        if (sessionStorage.getItem("performanceData") !== null){
+            bodyString += "Performance Data%0d%0ARunway Heading: " + performanceData.runwayHdg + "%0d%0A";
+            bodyString += "Head Wind: " + performanceData.headWind + "%0d%0A";
+            bodyString += "Cross Wind: " + performanceData.crossWind + "%0d%0A";
+            bodyString += "Takeoff: Ground Roll: " + performanceData.takeoffDistance.toFixed(0) + " ft. Over 50': " + performanceData.takeoff50Distance.toFixed(0) + " ft.%0d%0A";
+            bodyString += "Landing: Ground Roll: " + performanceData.landingDistance.toFixed(0) + " ft. Over 50': " + performanceData.landing50Distance.toFixed(0) + " ft.%0d%0A";
+            bodyString += "Rate of Climb: " + performanceData.climbPerf.toFixed(0) + " FPM %0d%0A";
+        }
+        else{
+            bodyString += "Performance data not available"
+        }
+    }
+    window.open('mailto:dispatchusu@gmail.com?subject=' + userData.tail + ' Weight and Balance&body=' +
+        bodyString);
 }
 
 fillData();

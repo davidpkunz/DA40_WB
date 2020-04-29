@@ -371,8 +371,15 @@ function reCompute(){
     if (cgValid) {
         resultSuccess();
     }
+    var resultCG = {
+        "validCG" : cgValid,
+        "fwdCG" : toFwdCG,
+        "aftCG" : toAftCG
+    };
     localStorage.setItem("colors", JSON.stringify(colors));
-    localStorage.setItem("fwdCG", toFwdCG.toString());
+    localStorage.setItem("CG", JSON.stringify(resultCG));
+
+
     drawCG(newData, userInput, modelData, colors);
     auditMode(newData, userInput, toFwdCG);
 }
@@ -697,16 +704,6 @@ function resultSuccess(){
     }
     document.getElementById("overall_result").innerHTML = "Aircraft within limits.";
 }
-
-function emailResults(){
-    /**Called when user clicks email button (not implemented)
-     * We will open a mailto link with the subject and body filled in with info
-     * Still need to come up with body text to send. Can't send the canvas image or tables, only text**/
-    var tailNumber = document.getElementById('aircraftSelect').value;
-    window.open('mailto:dispatchusu@gmail.com?subject=' + tailNumber + ' Weight and Balance&body=' +
-        '');
-}
-
 
 /*call to fill in the dropdown selector with tail numbers*/
 fillData()
