@@ -44,6 +44,46 @@
                         <button type="button" class="btn btn-secondary" onclick="getWeather()">Submit</button>
                     </div>
                 </div>
+                <div id="weatherInput" style="display: none">
+                    <p id="weatherAltTitle"></p>
+                    <form id="altWeatherForm">
+                        <div class="form-group row">
+                            <label for="temperature" class="col-sm-4 col-form-label">Temperature:</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" id="temperature" form="altWeatherForm" placeholder="&deg C" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="fieldAlt" class="col-sm-4 col-form-label">Field Elevation:</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" id="fieldAlt" form="altWeatherForm" placeholder="feet" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="altimeter" class="col-sm-4 col-form-label">Altimeter Setting:</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" id="altimeter" form="altWeatherForm" placeholder="inHg" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="windHeading" class="col-sm-4 col-form-label">Wind Heading:</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" id="windHeading" form="altWeatherForm" placeholder="&deg" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="windSpeed" class="col-sm-4 col-form-label">Wind Speed:</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" id="windSpeed" form="altWeatherForm" placeholder="kts" required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <button type="button" class="btn btn-secondary" onclick="weatherInputClick()">Submit</button>
+                            <small class="col-sm-6 col-form-label text-success" id="weatherInfo">
+                            </small>
+                        </div>
+                    </form>
+                </div>
                 <div id="weatherData" style="display: none">
                     <h5 id="weatherTitle">Station Weather</h5>
                     <p id="wRaw"></p>
@@ -101,39 +141,41 @@
                         <input type="number" class="form-control" id="runwayHdg" min=1 max=360 placeholder="Degrees" onchange=runwayChange(this.value)>
                     </div>
                 </div>
-                <table class="table table-sm table-bordered" id="perfTable" style="display: none">
-                    <tbody>
-                    <tr>
-                        <th scope="row">Head Wind</th>
-                        <td id="headWind"></td>
+                <div id="perfTable" style="display: none">
+                    <table class="table table-sm table-bordered">
+                        <tbody>
+                        <tr>
+                            <th scope="row">Head Wind</th>
+                            <td id="headWind"></td>
 
-                    </tr>
-                    <tr>
-                        <th scope="row">Cross Wind</th>
-                        <td id="xWind"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Cross Wind</th>
+                            <td id="xWind"></td>
 
-                    </tr>
-                    <tr>
-                        <th scope="row">Takeoff</th>
-                        <td id ="TODistance">Ground Roll:</td>
-                        <td id ="TO50Distance">Over 50':</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Landing</th>
-                        <td id="LDGDistance">Ground Roll:</td>
-                        <td id="LDG50Distance">Over 50':</td>
-                    </tr>
-                    <tr>
-                        <th scope="row" colspan="2">Touch and Go Distance</th>
-                        <td id="tgDistance"></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Rate of Climb</th>
-                        <td id="climbFPM"></td>
-                        <td id="climbNM"></td>
-                    </tr>
-                    </tbody>
-                </table>
+                        </tr>
+                        <tr>
+                            <th scope="row">Takeoff</th>
+                            <td id ="TODistance">Ground Roll:</td>
+                            <td id ="TO50Distance">Over 50':</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Landing</th>
+                            <td id="LDGDistance">Ground Roll:</td>
+                            <td id="LDG50Distance">Over 50':</td>
+                        </tr>
+                        <tr>
+                            <th scope="row" colspan="2">Touch and Go Distance</th>
+                            <td id="tgDistance"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Rate of Climb</th>
+                            <td id="climbFPM"></td>
+                            <td id="climbNM"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

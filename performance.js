@@ -6,6 +6,7 @@ function getWeather(){
     if (stationID===""){
         return;
     }
+    document.getElementById("weatherInput").style.display = "none";
     /*Section retrieves weather from aviationweather.gov using simple PHP backend.
     * Won't work if no PHP server setup*/
     if (window.XMLHttpRequest){
@@ -16,10 +17,18 @@ function getWeather(){
     }
     request.onreadystatechange=function(){
         if (this.readyState===4 && this.status===200){
-            var weatherData = JSON.parse(this.responseText);
-            setWeather(weatherData);
-            sessionStorage.setItem("weatherData", JSON.stringify(weatherData));
-            runwayChange(document.getElementById("runwayHdg").value);
+
+            if(this.responseText){
+                try {
+                    var weatherData = JSON.parse(this.responseText);
+                    setWeather(weatherData);
+                    sessionStorage.setItem("weatherData", JSON.stringify(weatherData));
+                    runwayChange(document.getElementById("runwayHdg").value);
+                } catch(e){
+                    /*Most likely due to the PHP server not being setup/running*/
+                    inputWeather();
+                }
+            }
         }
     }
     request.open("GET", "server.php?q="+stationID,true);
@@ -30,6 +39,30 @@ function loadStoredWeather(){
     /**If previously stored weather is available, retrieve it.**/
     if (sessionStorage.getItem("weatherData") !== null){
         return JSON.parse(sessionStorage.getItem("weatherData"));
+    }
+}
+
+function inputWeather(){
+    document.getElementById("weatherAltTitle").innerHTML = "Weather retrieval failed. " +
+        "Check Station ID, if correct, server not working. Try again or manually input required data below.";
+    document.getElementById("weatherInput").style.display = "block";
+    document.getElementById("weatherData").style.display = "none";
+}
+
+function weatherInputClick(){
+    var weatherData = {};
+    weatherData["temp_c"] = parseFloat(document.getElementById("temperature").value);
+    weatherData["elevation_m"] = parseFloat(document.getElementById("fieldAlt").value)/3.2808;
+    weatherData["altim_in_hg"] = parseFloat(document.getElementById("altimeter").value);
+    weatherData["wind_dir_degrees"] = parseFloat(document.getElementById("windHeading").value);
+    weatherData["wind_speed_kt"] = parseFloat(document.getElementById("windSpeed").value);
+    sessionStorage.setItem("weatherData", JSON.stringify(weatherData));
+    if (document.getElementById("runwayHdg").value === ""){
+        document.getElementById("weatherInfo").innerHTML = "Input runway heading next";
+    }
+    else{
+        document.getElementById("weatherInfo").innerHTML = "";
+        runwayChange(document.getElementById("runwayHdg").value);
     }
 }
 
@@ -201,7 +234,7 @@ function performanceCompute(winds, heading){
         "crossWind" : winds.xWind,
         "runwayHdg" : heading
     }
-    document.getElementById("perfTable").style.display = "block";
+    document.getElementById("perfTable").style.display = "flex";
     sessionStorage.setItem("performanceData", JSON.stringify(performanceData));
 }
 
