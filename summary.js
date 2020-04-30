@@ -16,72 +16,83 @@ function fillData(){
 }
 
 function fillWeather(weatherData){
-    document.getElementById("wRaw").innerHTML = weatherData.raw_text;
-    var obsTime = new Date(weatherData.observation_time);
-    document.getElementById("wTime").innerHTML = obsTime.getHours() + ":" + obsTime.getMinutes()
-        + " (UTC " + -(obsTime.getTimezoneOffset()/60) + ")";
-    var windDir = "";
-    if ((weatherData.wind_dir_degrees === "0") && (weatherData.wind_speed_kt === "0")){
-        windDir = "Calm";
-        document.getElementById("wWind").innerHTML = windDir;
+    if (!("raw_text" in weatherData)){
+        var temp = parseFloat(weatherData.temp_c);
+        document.getElementById("wWind").innerHTML = weatherData.wind_dir_degrees + " @ " + weatherData.wind_speed_kt + " kts";
+        document.getElementById("wTemp").innerHTML = temp + " &degC";
+        document.getElementById("wAltimeter").innerHTML = parseFloat(weatherData.altim_in_hg).toFixed(2) + " inHg";
+        var fldAlt = parseFloat(weatherData.elevation_m)*3.281;
+        var pressureAlt = fldAlt + ((29.92 - parseFloat(weatherData.altim_in_hg))*1000);
+        var altimeterHg = parseFloat(weatherData.altim_in_hg);
+        /*variables below used to compute Density altitude without humidity compensation, so slightly off*/
+        var stationPressure = ((altimeterHg**0.1903)-(.00001313*fldAlt))**5.255;
+        var tempRankine = ((9/5)*(temp+273.15));
+        var densityAlt = (145442.16*(1-((17.326*stationPressure)/(tempRankine))**0.235));
+        document.getElementById("wPressureAlt").innerHTML = pressureAlt.toFixed(0) + " ft";
+        document.getElementById("wDensityAlt").innerHTML = densityAlt.toFixed(0) + " ft";
     }
-    else{
-        if (weatherData.wind_dir_degrees === "0"){
-            windDir = "Variable";
-        }
-        else{
-            windDir = parseFloat(weatherData.wind_dir_degrees);
-            if (windDir < 100){
-                windDir = "0" + windDir.toFixed(0).toString() + "&deg";
+    else {
+        document.getElementById("wRaw").innerHTML = weatherData.raw_text;
+        var obsTime = new Date(weatherData.observation_time);
+        document.getElementById("wTime").innerHTML = obsTime.getHours() + ":" + obsTime.getMinutes()
+            + " (UTC " + -(obsTime.getTimezoneOffset() / 60) + ")";
+        var windDir = "";
+        if ((weatherData.wind_dir_degrees === "0") && (weatherData.wind_speed_kt === "0")) {
+            windDir = "Calm";
+            document.getElementById("wWind").innerHTML = windDir;
+        } else {
+            if (weatherData.wind_dir_degrees === "0") {
+                windDir = "Variable";
+            } else {
+                windDir = parseFloat(weatherData.wind_dir_degrees);
+                if (windDir < 100) {
+                    windDir = "0" + windDir.toFixed(0).toString() + "&deg";
+                } else {
+                    windDir = windDir.toFixed(0).toString() + "&deg";
+                }
             }
-            else{
-                windDir = windDir.toFixed(0).toString() + "&deg";
+            if ("wind_gust_kt" in weatherData) {
+                document.getElementById("wWind").innerHTML = windDir + " @ " + weatherData.wind_speed_kt
+                    + " kts G " + weatherData.wind_gust_kt + " kts";
+            } else {
+                document.getElementById("wWind").innerHTML = windDir + " @ " + weatherData.wind_speed_kt + " kts";
             }
         }
-        if ("wind_gust_kt" in weatherData){
-            document.getElementById("wWind").innerHTML = windDir + " @ " + weatherData.wind_speed_kt
-                + " kts G " + weatherData.wind_gust_kt + " kts";
+        document.getElementById("wVisibility").innerHTML = parseFloat(weatherData.visibility_statute_mi) + " sm";
+        var rawCeilings = weatherData.sky_condition;
+        var ceilingString = "";
+        if (Array.isArray(rawCeilings)) {
+            for (var i = 0; i < rawCeilings.length; i++) {
+                var ceilingAttribute = rawCeilings[i]["@attributes"];
+                ceilingString += "<p style='margin: 0'>" + ceilingAttribute["sky_cover"] + " @ " + ceilingAttribute["cloud_base_ft_agl"] + "'</p>";
+            }
+        } else {
+            ceilingAttribute = rawCeilings["@attributes"];
+            if (ceilingAttribute["sky_cover"] === "CLR") {
+                ceilingString = "Clear";
+            } else {
+                ceilingString += "<p style='margin: 0'>" + ceilingAttribute["sky_cover"] + " @ "
+                    + ceilingAttribute["cloud_base_ft_agl"] + "'</p>";
+            }
         }
-        else {
-            document.getElementById("wWind").innerHTML = windDir + " @ " + weatherData.wind_speed_kt + " kts";
-        }
-    }
-    document.getElementById("wVisibility").innerHTML = parseFloat(weatherData.visibility_statute_mi) + " sm";
-    var rawCeilings = weatherData.sky_condition;
-    var ceilingString = "";
-    if (Array.isArray(rawCeilings)){
-        for (var i = 0; i < rawCeilings.length; i++){
-            var ceilingAttribute = rawCeilings[i]["@attributes"];
-            ceilingString += "<p style='margin: 0'>" + ceilingAttribute["sky_cover"] + " @ " + ceilingAttribute["cloud_base_ft_agl"] + "'</p>";
-        }
-    }
-    else{
-        ceilingAttribute = rawCeilings["@attributes"];
-        if (ceilingAttribute["sky_cover"] === "CLR"){
-            ceilingString = "Clear";
-        }
-        else{
-            ceilingString += "<p style='margin: 0'>" + ceilingAttribute["sky_cover"] + " @ "
-                + ceilingAttribute["cloud_base_ft_agl"] + "'</p>";
-        }
-    }
 
-    document.getElementById("wCeilings").innerHTML = ceilingString;
+        document.getElementById("wCeilings").innerHTML = ceilingString;
 
-    var temp = parseFloat(weatherData.temp_c);
-    var dewpoint = parseFloat(weatherData.dewpoint_c);
-    document.getElementById("wTemp").innerHTML = temp + " &degC";
-    document.getElementById("wDewpoint").innerHTML = dewpoint + " &degC";
-    document.getElementById("wAltimeter").innerHTML = parseFloat(weatherData.altim_in_hg).toFixed(2) + " inHg";
-    var fldAlt = parseFloat(weatherData.elevation_m)*3.281;
-    var pressureAlt = fldAlt + ((29.92 - parseFloat(weatherData.altim_in_hg))*1000);
-    var altimeterHg = parseFloat(weatherData.altim_in_hg);
-    /*variables below used to compute Density altitude without humidity compensation, so slightly off*/
-    var stationPressure = ((altimeterHg**0.1903)-(.00001313*fldAlt))**5.255;
-    var tempRankine = ((9/5)*(temp+273.15));
-    var densityAlt = (145442.16*(1-((17.326*stationPressure)/(tempRankine))**0.235));
-    document.getElementById("wPressureAlt").innerHTML = pressureAlt.toFixed(0) + " ft";
-    document.getElementById("wDensityAlt").innerHTML = densityAlt.toFixed(0) + " ft";
+        temp = parseFloat(weatherData.temp_c);
+        var dewpoint = parseFloat(weatherData.dewpoint_c);
+        document.getElementById("wTemp").innerHTML = temp + " &degC";
+        document.getElementById("wDewpoint").innerHTML = dewpoint + " &degC";
+        document.getElementById("wAltimeter").innerHTML = parseFloat(weatherData.altim_in_hg).toFixed(2) + " inHg";
+        fldAlt = parseFloat(weatherData.elevation_m) * 3.281;
+        pressureAlt = fldAlt + ((29.92 - parseFloat(weatherData.altim_in_hg)) * 1000);
+        altimeterHg = parseFloat(weatherData.altim_in_hg);
+        /*variables below used to compute Density altitude without humidity compensation, so slightly off*/
+        stationPressure = ((altimeterHg ** 0.1903) - (.00001313 * fldAlt)) ** 5.255;
+        tempRankine = ((9 / 5) * (temp + 273.15));
+        densityAlt = (145442.16 * (1 - ((17.326 * stationPressure) / (tempRankine)) ** 0.235));
+        document.getElementById("wPressureAlt").innerHTML = pressureAlt.toFixed(0) + " ft";
+        document.getElementById("wDensityAlt").innerHTML = densityAlt.toFixed(0) + " ft";
+    }
 }
 
 function fillPerformance(performanceData) {
@@ -90,8 +101,8 @@ function fillPerformance(performanceData) {
         runway = 36;
     }
     document.getElementById("runwayHdg").innerHTML = "Runway " + runway;
-    document.getElementById("xWind").innerHTML = performanceData.crossWind;
-    document.getElementById("headWind").innerHTML = performanceData.headWind;
+    document.getElementById("xWind").innerHTML = performanceData.crossWind.toFixed(0);
+    document.getElementById("headWind").innerHTML = performanceData.headWind.toFixed(0);
     document.getElementById("TODistance").innerHTML = "Ground Roll: "
         + (performanceData.takeoffDistance/10).toFixed(0)*10 + " ft";
     document.getElementById("TO50Distance").innerHTML = "Over 50': "
@@ -239,7 +250,12 @@ function emailResults(){
         bodyString += "Landing Weight: " + computedData.landingWeight + " lbs | Landing CG: " + computedData.landingCG +  "%0d%0A %0d%0A";
 
         if (sessionStorage.getItem("weatherData") !== null){
-            bodyString += "Weather %0d%0A" + weatherData.raw_text + "%0d%0A %0d%0A";
+            if ("raw_text" in weatherData){
+                bodyString += "Weather %0d%0A" + weatherData.raw_text + "%0d%0A %0d%0A";
+            }
+            else{
+                bodyString += "Weather not available (user inputted).%0d%0A %0d%0A";
+            }
         }
         else{
             bodyString += "Weather not available%0d%0A %0d%0A";
@@ -247,8 +263,8 @@ function emailResults(){
 
         if (sessionStorage.getItem("performanceData") !== null){
             bodyString += "Performance Data%0d%0ARunway Heading: " + performanceData.runwayHdg + "%0d%0A";
-            bodyString += "Head Wind: " + performanceData.headWind + "%0d%0A";
-            bodyString += "Cross Wind: " + performanceData.crossWind + "%0d%0A";
+            bodyString += "Head Wind: " + performanceData.headWind.toFixed(0) + "%0d%0A";
+            bodyString += "Cross Wind: " + performanceData.crossWind.toFixed(0) + "%0d%0A";
             bodyString += "Takeoff: Ground Roll: " + performanceData.takeoffDistance.toFixed(0) + " ft. Over 50': " + performanceData.takeoff50Distance.toFixed(0) + " ft.%0d%0A";
             bodyString += "Landing: Ground Roll: " + performanceData.landingDistance.toFixed(0) + " ft. Over 50': " + performanceData.landing50Distance.toFixed(0) + " ft.%0d%0A";
             bodyString += "Rate of Climb: " + performanceData.climbPerf.toFixed(0) + " FPM %0d%0A";
