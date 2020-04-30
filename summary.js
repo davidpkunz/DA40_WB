@@ -123,6 +123,8 @@ function fillWB(computedData, userInput, fwdCG, validCG){
     var tailNumber = userInput.tail;
     var aircraftObj = aircraft.find(x => x.tail === tailNumber);
     var modelData = aircraftModels.find(x => x.model === aircraftObj.model);
+    var now = new Date();
+    document.getElementById("dateInfo").innerHTML = "Prepared " + now;
 
     if (!validCG){
         document.getElementById("auditTitle").innerHTML = tailNumber + " NOT WITHIN LIMITS!!";
@@ -243,6 +245,8 @@ function emailResults(){
         bodyString += "!!!!CG NOT VALID. CHECK VALUES.!!!!"
     }
     else {
+        var now = new Date();
+        bodyString += "Prepared on " + now + "%0d%0A %0d%0A";
         bodyString += "Weight and Balance %0d%0A";
         bodyString += "Takeoff Weight: " + computedData.takeOffWeight + " lbs | Takeoff CG: " + computedData.takeoffCG +  "%0d%0A";
         bodyString += "Allowed CG Range: " + resultCG.fwdCG + " - " + resultCG.aftCG + "%0d%0A";
