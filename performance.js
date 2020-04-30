@@ -277,30 +277,40 @@ function getPerformanceNumbers(modelString, typeString, pressureAlt, temp, weigh
             DA_Result = densityAltitudeChart(DA40CS(typeString, "DA"), pressureAlt, temp);
             last_result = weightChart(DA40CS(typeString, "weight"), DA_Result, weight, 2646);
         }
-        var use50 = false;
-        if (typeString === "landing50"){
-            typeString = "landing";
-            use50 = true;
-        }
-        else if (typeString === "takeoff50"){
-            typeString = "takeoff";
-            use50 = true;
-        }
-        else {
+        else{
+            var use50 = false;
+            var reverse = false;
+            if (typeString === "landing50"){
+                typeString = "landing";
+            }
+            else if (typeString === "takeoff50"){
+                use50 = true;
+                typeString = "takeoff";
+            }
+            else if (typeString === "landing"){
+                use50 = true;
+                reverse = true;
+            }
             var wind_result;
             DA_Result = densityAltitudeChart(DA40CS(typeString, "DA"),pressureAlt, temp);
             weight_Result = weightChart(DA40CS(typeString, "weight"), DA_Result, weight, 2646);
             if (hWind > 0){
-                wind_result = windObstacleChart(DA40CS(typeString, "hwind"), weight_Result, hWind);
+                wind_result = windObstacleChart(DA40CS(typeString, "hwind"), weight_Result, hWind, false);
             }
             else if (hWind < 0){
-                wind_result = windObstacleChart(DA40CS(typeString, "twind"), weight_Result, Math.abs(hWind));
+                wind_result = windObstacleChart(DA40CS(typeString, "twind"), weight_Result, Math.abs(hWind), false);
             }
             else if (hWind === 0){
                 wind_result = weight_Result;
             }
             if (use50){
-                last_result = windObstacleChart(DA40CS(typeString, "obstacle"), wind_result, 50);
+                if (reverse){
+                    last_result = windObstacleChart(DA40CS(typeString, "obstacle"), wind_result, 0, true);
+                }
+                else {
+                    last_result = windObstacleChart(DA40CS(typeString, "obstacle"), wind_result, 50, false);
+                }
+
             }
             else {
                 last_result = wind_result;
@@ -320,6 +330,7 @@ function  densityAltitudeChart(PA_lines, pressureAlt, temp){
     for (i = 0; i < PA_Values.length; i++) {
         bottomPA = parseFloat(PA_Values[i]);
         var useExp = false;
+        var useExp1= false;
         if ("e" in PA_lines[bottomPA]){
             useExp = true;
         }
@@ -334,6 +345,9 @@ function  densityAltitudeChart(PA_lines, pressureAlt, temp){
         }
         else {
             topPA = parseFloat(PA_Values[i + 1]);
+            if ("e" in PA_lines[topPA]){
+                useExp1 = true;
+            }
             if (pressureAlt < bottomPA) {
                 /*if less than 0 PA just use 0 PA*/
                 if (useExp){
@@ -346,13 +360,17 @@ function  densityAltitudeChart(PA_lines, pressureAlt, temp){
             } else if ((pressureAlt >= bottomPA) && (pressureAlt < topPA)) {
                 /*Between two lines (usually we use this) */
                 skew = (pressureAlt - bottomPA) / (topPA - bottomPA);
-                if ("e" in PA_lines[topPA]){
-                    topValue = parseFloat(PA_lines[topPA].b) * Math.E ** (parseFloat(PA_lines[topPA].e) * temp);
+                if (useExp){
                     bottomValue = parseFloat(PA_lines[bottomPA].b) * Math.E ** (parseFloat(PA_lines[bottomPA].e) * temp);
                 }
                 else{
-                    topValue = parseFloat(PA_lines[topPA].m) * temp + parseFloat(PA_lines[topPA].b);
                     bottomValue = parseFloat(PA_lines[bottomPA].m) * temp + parseFloat(PA_lines[bottomPA].b);
+                }
+                if (useExp1){
+                    topValue = parseFloat(PA_lines[topPA].b) * Math.E ** (parseFloat(PA_lines[topPA].e) * temp);
+                }
+                else{
+                    topValue = parseFloat(PA_lines[topPA].m) * temp + parseFloat(PA_lines[topPA].b);
                 }
                 return ((topValue - bottomValue) * skew) + bottomValue;
             }
@@ -442,16 +460,28 @@ function weightChart(lines, DA_Result, weight, maxWeight){
     }
 }
 
-function windObstacleChart(lines, previous_result, input_x){
+function windObstacleChart(lines, previous_result, input_x, reverse= false){
     /**Interpolates the wind or obstacle lines section of the landing data.
      * It will do either since both start at 0
      * **/
     for (i=0; i < lines.length; i++){
         var useExp = false;
+        var useExp1 = false;
         if ("e" in lines[i]){
             useExp = true;
         }
-        bottomIntercept = parseFloat(lines[i].b);
+        if (reverse){
+            if (useExp){
+                bottomIntercept = parseFloat(lines[i].b) * Math.E ** (parseFloat(lines[i].e) * 50);
+            }
+            else{
+                bottomIntercept = parseFloat(lines[i].m)*50 + parseFloat(lines[i].b);
+            }
+        }
+        else{
+            bottomIntercept = parseFloat(lines[i].b);
+        }
+
         if (i+1 >= lines.length){
             /*We have reached the end of lines but haven't found our value, so use top line and add a skew*/
             if (useExp){
@@ -462,7 +492,21 @@ function windObstacleChart(lines, previous_result, input_x){
             }
         }
         else {
-            topIntercept = parseFloat(lines[i+1].b);
+            if ("e" in lines[i+1]){
+                useExp1 = true;
+            }
+            if (reverse){
+                if (useExp1) {
+                    topIntercept = parseFloat(lines[i+1].b) * Math.E ** (parseFloat(lines[i+1].e) * 50);
+                }
+                else {
+                    topIntercept = parseFloat(lines[i + 1].m) * 50 + parseFloat(lines[i + 1].b);
+                }
+            }
+            else{
+                topIntercept = parseFloat(lines[i+1].b);
+            }
+
             /*We are below bottom line so just use bottom line with some skew*/
             if (previous_result < bottomIntercept){
                 if (useExp){
@@ -476,12 +520,16 @@ function windObstacleChart(lines, previous_result, input_x){
                 /*Between two lines (usually we use this) */
                 skew = (previous_result - bottomIntercept)/(topIntercept-bottomIntercept);
                 if (useExp){
-                    topValue = parseFloat(lines[i+1].b) * Math.E ** (parseFloat(lines[i+1].e) * input_x);
                     bottomValue = parseFloat(lines[i].b) * Math.E ** (parseFloat(lines[i].e) * input_x);
                 }
                 else {
-                    topValue = parseFloat(lines[i+1].m) * input_x + parseFloat(lines[i+1].b);
                     bottomValue = parseFloat(lines[i].m) * input_x + parseFloat(lines[i].b);
+                }
+                if (useExp1){
+                    topValue = parseFloat(lines[i+1].b) * Math.E ** (parseFloat(lines[i+1].e) * input_x);
+                }
+                else{
+                    topValue = parseFloat(lines[i+1].m) * input_x + parseFloat(lines[i+1].b);
                 }
                 return ((topValue - bottomValue) * skew) + bottomValue;
             }

@@ -253,7 +253,7 @@ function DA40FP(firstType, secondType){
                             m : 0.9652,
                             b : 106.09,
                         }
-                    }
+                    };
                 case "weight":
                     return [
                         /* slope (m), y intercept (b) */
@@ -294,7 +294,7 @@ function DA40FP(firstType, secondType){
                     return {
                         min : -200,
                         max : 2000
-                    }
+                    };
             }
             break;
         case "climb":
@@ -355,6 +355,7 @@ function DA40FP(firstType, secondType){
             }
     }
 }
+
 function DA40CS(firstType, secondType){
     switch (firstType) {
         case "landing":
