@@ -246,7 +246,7 @@ function getPerformanceNumbers(modelString, typeString, pressureAlt, temp, weigh
      * The second value passed is one of:
      * "DA" -> this is for the first portion of the chart that computes the density altitude
      * "weight" -> the weight portion of the chart
-     * "hwind"/"twind" -> the wind portion of the chart
+     * "hwind"-> the wind portion of the chart
      *
      * **/
     if (modelString === "DA40F"){
@@ -260,10 +260,10 @@ function getPerformanceNumbers(modelString, typeString, pressureAlt, temp, weigh
             var weight_Result = weightChart(DA40FP(typeString, "weight"), DA_Result, weight, maxWeight);
 
             if (hWind > 0){
-                last_result = windChart(DA40FP(typeString, "hwind"), weight_Result, hWind);
+                last_result = windObstacleChart(DA40FP(typeString, "hwind"), weight_Result, hWind);
             }
             else if (hWind < 0){
-                last_result = windChart(DA40FP(typeString, "twind"), weight_Result, Math.abs(hWind));
+                last_result = windObstacleChart(DA40FP(typeString, "twind"), weight_Result, Math.abs(hWind));
             }
             else if (hWind === 0){
                 last_result = weight_Result;
@@ -273,7 +273,41 @@ function getPerformanceNumbers(modelString, typeString, pressureAlt, temp, weigh
         return last_result*(parseFloat(scale.max) - parseFloat(scale.min))/100 + parseFloat(scale.min);
     }
     else if ((modelString === "DA40CS") || (modelString === "DA40XL")){
-
+        if (typeString === "climb"){
+            DA_Result = densityAltitudeChart(DA40CS(typeString, "DA"), pressureAlt, temp);
+            last_result = weightChart(DA40CS(typeString, "weight"), DA_Result, weight, 2646);
+        }
+        var use50 = false;
+        if (typeString === "landing50"){
+            typeString = "landing";
+            use50 = true;
+        }
+        else if (typeString === "takeoff50"){
+            typeString = "takeoff";
+            use50 = true;
+        }
+        else {
+            var wind_result;
+            DA_Result = densityAltitudeChart(DA40CS(typeString, "DA"),pressureAlt, temp);
+            weight_Result = weightChart(DA40CS(typeString, "weight"), DA_Result, weight, 2646);
+            if (hWind > 0){
+                wind_result = windObstacleChart(DA40CS(typeString, "hwind"), weight_Result, hWind);
+            }
+            else if (hWind < 0){
+                wind_result = windObstacleChart(DA40CS(typeString, "twind"), weight_Result, Math.abs(hWind));
+            }
+            else if (hWind === 0){
+                wind_result = weight_Result;
+            }
+            if (use50){
+                last_result = windObstacleChart(DA40CS(typeString, "obstacle"), wind_result, 50);
+            }
+            else {
+                last_result = wind_result;
+            }
+        }
+        scale = DA40CS(typeString, "scale");
+        return last_result*(parseFloat(scale.max) - parseFloat(scale.min))/100 + parseFloat(scale.min);
     }
     else if (modelString === "DA42"){
 
@@ -408,74 +442,49 @@ function weightChart(lines, DA_Result, weight, maxWeight){
     }
 }
 
-function windChart(lines, weight_Result, hwind){
-    /**Interpolates the wind lines section of the landing data. Could technically use for any winds.**/
+function windObstacleChart(lines, previous_result, input_x){
+    /**Interpolates the wind or obstacle lines section of the landing data.
+     * It will do either since both start at 0
+     * **/
     for (i=0; i < lines.length; i++){
+        var useExp = false;
+        if ("e" in lines[i]){
+            useExp = true;
+        }
         bottomIntercept = parseFloat(lines[i].b);
         if (i+1 >= lines.length){
             /*We have reached the end of lines but haven't found our value, so use top line and add a skew*/
-            return parseFloat(lines[i].m) * hwind + parseFloat(lines[i].b) + (weight_Result - bottomIntercept);
+            if (useExp){
+                return (parseFloat(lines[i].b) * Math.E ** (parseFloat(lines[i].e) * input_x)) + (previous_result - bottomIntercept);
+            }
+            else{
+                return parseFloat(lines[i].m) * input_x + parseFloat(lines[i].b) + (previous_result - bottomIntercept);
+            }
         }
         else {
             topIntercept = parseFloat(lines[i+1].b);
             /*We are below bottom line so just use bottom line with some skew*/
-            if (weight_Result < bottomIntercept){
-                return parseFloat(lines[i].m) * hwind + parseFloat(lines[i].b) - (bottomIntercept - weight_Result);
+            if (previous_result < bottomIntercept){
+                if (useExp){
+                    return (parseFloat(lines[i].b) * Math.E ** (parseFloat(lines[i].e) * input_x)) + (bottomIntercept - previous_result);
+                }
+                else{
+                    return parseFloat(lines[i].m) * input_x + parseFloat(lines[i].b) - (bottomIntercept - previous_result);
+                }
             }
-            else if ((weight_Result >= bottomIntercept) && (weight_Result < topIntercept)){
+            else if ((previous_result >= bottomIntercept) && (previous_result < topIntercept)){
                 /*Between two lines (usually we use this) */
-                skew = (weight_Result - bottomIntercept)/(topIntercept-bottomIntercept);
-                topValue = parseFloat(lines[i+1].m) * hwind + parseFloat(lines[i+1].b);
-                bottomValue = parseFloat(lines[i].m) * hwind + parseFloat(lines[i].b);
+                skew = (previous_result - bottomIntercept)/(topIntercept-bottomIntercept);
+                if (useExp){
+                    topValue = parseFloat(lines[i+1].b) * Math.E ** (parseFloat(lines[i+1].e) * input_x);
+                    bottomValue = parseFloat(lines[i].b) * Math.E ** (parseFloat(lines[i].e) * input_x);
+                }
+                else {
+                    topValue = parseFloat(lines[i+1].m) * input_x + parseFloat(lines[i+1].b);
+                    bottomValue = parseFloat(lines[i].m) * input_x + parseFloat(lines[i].b);
+                }
                 return ((topValue - bottomValue) * skew) + bottomValue;
             }
-        }
-    }
-}
-
-
-function obstacleChart(toDistance, height = 50) {
-    /**Given takeoff distance in meters and obstacle height, use table to convert to takeoff over obstacle
-     * This uses the chart in the DA40CS POH.
-     * Returns takeoff over 50 ft distance in meters by default**/
-    const lines = {
-        /*y intercept : slope(m)*/
-        138.57 : 2.4851,
-        225.7 : 2.5519,
-        315.52 : 2.7423,
-        392.03 : 3.5998,
-        469.22 : 4.3267,
-        517.52 : 5.3505,
-        617.45 : 5.5147,
-        722.18 : 6.8121,
-        942.59 : 7.8029
-    }
-    const lineIntercepts = Object.keys(lines);
-    for (i = 0; i < lineIntercepts.length; i++){
-        bottomIntercept = parseFloat(lineIntercepts[i]);
-        if (i+1 >= lineIntercepts.length){
-            /*This means we are on the last(top) line, so we should only be here if takeoff distance is at or above line*/
-            if (toDistance >= bottomIntercept){
-                return parseFloat(lines[lineIntercepts[i]]) * height + bottomIntercept + (toDistance - bottomIntercept);
-            }
-            else{
-                /*Hopefully will never get here*/
-                return 0;
-            }
-        }
-        else{
-            topIntercept = parseFloat(lineIntercepts[i+1]);
-        }
-        /*Should only get it when takeoff distance is below the lowest line*/
-        if (toDistance < bottomIntercept){
-            return parseFloat(lines[lineIntercepts[i]]) * height + bottomIntercept - (bottomIntercept-toDistance);
-        }
-        /*Most should fall in this statement, being between 2 lines*/
-        else if ((toDistance >= bottomIntercept) && (toDistance < topIntercept)){
-            skew = (toDistance - bottomIntercept)/(topIntercept-bottomIntercept);
-            topValue = parseFloat(lines[lineIntercepts[i+1]]) * height + topIntercept;
-            bottomValue = parseFloat(lines[lineIntercepts[i]]) * height + bottomIntercept;
-            return ((topValue - bottomValue) * skew) + bottomValue;
         }
     }
 }
