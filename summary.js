@@ -313,13 +313,8 @@ function fillVSpeeds(computedData, modelData) {
 }
 
 function printResults(){
-    /**Called when user clicks print button
-     * First we show the elements that need to be printed then we use printThis to print those elements
-     *
-     *
-     * **/
+    /**Called when user clicks print button**/
     window.open("print.html");
-
 }
 
 function emailResults(){
