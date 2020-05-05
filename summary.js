@@ -1,5 +1,7 @@
 
 function fillData(){
+    /**Main call to fetch all data from local or session storage and call all the fill functions**/
+
     var userData = JSON.parse(localStorage.getItem("userInput"));
     var weatherData = JSON.parse(sessionStorage.getItem("weatherData"));
     var computedData = JSON.parse(localStorage.getItem("computedData"));
@@ -9,13 +11,45 @@ function fillData(){
     var tailNumber = userData.tail;
     var aircraftObj = aircraft.find(x => x.tail === tailNumber);
     var modelData = aircraftModels.find(x => x.model === aircraftObj.model);
-    fillWB(computedData, userData, resultCG.fwdCG, resultCG.validCG);
+    document.getElementById("title").innerHTML = tailNumber + " Summary";
+    fillWB(computedData, userData, resultCG.fwdCG, resultCG.validCG, false);
     drawCG(computedData, userData, modelData, colors);
-    fillWeather(weatherData);
-    fillPerformance(performanceData);
+    fillWeather(weatherData, false);
+    fillPerformance(performanceData, false, tailNumber);
 }
 
-function fillWeather(weatherData){
+function fillPrintData() {
+    /**Call to fetch all data from local or session storage and call all the print fills**/
+    var userData = JSON.parse(localStorage.getItem("userInput"));
+    var weatherData = JSON.parse(sessionStorage.getItem("weatherData"));
+    var computedData = JSON.parse(localStorage.getItem("computedData"));
+    var performanceData = JSON.parse(sessionStorage.getItem("performanceData"));
+    var resultCG = JSON.parse(localStorage.getItem("CG"));
+    var colors = JSON.parse(localStorage.getItem("colors"));
+    var tailNumber = userData.tail;
+    var aircraftObj = aircraft.find(x => x.tail === tailNumber);
+    var modelData = aircraftModels.find(x => x.model === aircraftObj.model);
+    document.getElementById("title").innerHTML = tailNumber + " Summary";
+    fillWB(computedData, userData, resultCG.fwdCG, resultCG.validCG, true);
+    drawCG(computedData, userData, modelData, colors);
+    fillWeather(weatherData, true);
+    fillPerformance(performanceData, true, tailNumber);
+    fillVSpeeds(computedData, modelData);
+    document.getElementById("acType").innerHTML += " " + aircraftObj.model;
+    document.getElementById("acTail").innerHTML += " " + tailNumber;
+    var obsTime = new Date();
+    document.getElementById("date").innerHTML += obsTime.toDateString();
+    if (aircraftObj.model !== "DA42"){
+        document.getElementById("fuelOnboard").innerHTML += " " + userData.fuelWeight/6.0 + " gal";
+    }
+    else
+    {
+        document.getElementById("fuelOnboard").innerHTML += " " + userData.fuelWeight/6.75;
+    }
+}
+
+function fillWeather(weatherData, isPrint){
+    /**Fills HTML elements with weather data**/
     if (!("raw_text" in weatherData)){
         var temp = parseFloat(weatherData.temp_c);
         document.getElementById("wWind").innerHTML = weatherData.wind_dir_degrees + " @ " + weatherData.wind_speed_kt + " kts";
@@ -32,7 +66,21 @@ function fillWeather(weatherData){
         document.getElementById("wDensityAlt").innerHTML = densityAlt.toFixed(0) + " ft";
     }
     else {
-        document.getElementById("wRaw").innerHTML = weatherData.raw_text;
+        if (isPrint){
+            document.getElementById("wLocation").innerHTML = weatherData.station_id + " Weather";
+            temp = parseFloat(weatherData.temp_c);
+            var dewpoint = parseFloat(weatherData.dewpoint_c);
+            document.getElementById("wTemp").innerHTML = temp + "/" + dewpoint + " &degC";
+
+        }
+        else{
+            document.getElementById("wRaw").innerHTML = weatherData.raw_text;
+            temp = parseFloat(weatherData.temp_c);
+            dewpoint = parseFloat(weatherData.dewpoint_c);
+            document.getElementById("wTemp").innerHTML = temp + " &degC";
+            document.getElementById("wDewpoint").innerHTML = dewpoint + " &degC";
+        }
+
         var obsTime = new Date(weatherData.observation_time);
         document.getElementById("wTime").innerHTML = obsTime.getHours() + ":" + obsTime.getMinutes()
             + " (UTC " + -(obsTime.getTimezoneOffset() / 60) + ")";
@@ -77,11 +125,6 @@ function fillWeather(weatherData){
         }
 
         document.getElementById("wCeilings").innerHTML = ceilingString;
-
-        temp = parseFloat(weatherData.temp_c);
-        var dewpoint = parseFloat(weatherData.dewpoint_c);
-        document.getElementById("wTemp").innerHTML = temp + " &degC";
-        document.getElementById("wDewpoint").innerHTML = dewpoint + " &degC";
         document.getElementById("wAltimeter").innerHTML = parseFloat(weatherData.altim_in_hg).toFixed(2) + " inHg";
         fldAlt = parseFloat(weatherData.elevation_m) * 3.281;
         pressureAlt = fldAlt + ((29.92 - parseFloat(weatherData.altim_in_hg)) * 1000);
@@ -95,14 +138,36 @@ function fillWeather(weatherData){
     }
 }
 
-function fillPerformance(performanceData) {
+function fillPerformance(performanceData, isPrint, tailNumber) {
+    /**Fills HTML elements with performance data**/
+    if (tailNumber !== performanceData.tail){
+        document.getElementById("runwayHdg").innerHTML = "Please recompute performance data using new Tail #";
+        return;
+    }
     runway = (performanceData.runwayHdg/10).toFixed(0);
     if (runway == 0){
         runway = 36;
     }
-    document.getElementById("runwayHdg").innerHTML = "Runway " + runway;
-    document.getElementById("xWind").innerHTML = performanceData.crossWind.toFixed(0);
+    if (!isPrint){
+        document.getElementById("runwayHdg").innerHTML = "Runway " + runway;
+        document.getElementById("climbNM").innerHTML = ((performanceData.climbPerf/1.1)/10).toFixed(0)*10 + " FT/NM"
+
+    }
+    else{
+
+    }
+
     document.getElementById("headWind").innerHTML = performanceData.headWind.toFixed(0);
+    if (performanceData.crossWind < 0){
+        document.getElementById("xWind").innerHTML = -performanceData.crossWind.toFixed(0) + " (Right)";
+    }
+    else if (performanceData.crossWind === 0){
+        document.getElementById("xWind").innerHTML = performanceData.crossWind.toFixed(0);
+    }
+    else{
+        document.getElementById("xWind").innerHTML = performanceData.crossWind.toFixed(0) + " (Left)";
+    }
+
     document.getElementById("TODistance").innerHTML = "Ground Roll: "
         + (performanceData.takeoffDistance/10).toFixed(0)*10 + " ft";
     document.getElementById("TO50Distance").innerHTML = "Over 50': "
@@ -112,19 +177,16 @@ function fillPerformance(performanceData) {
     document.getElementById("LDG50Distance").innerHTML = "Over 50': "
         + (performanceData.landing50Distance/10).toFixed(0)*10 + " ft";
     document.getElementById("climbFPM").innerHTML = (performanceData.climbPerf/10).toFixed(0)*10 + " FPM";
-    document.getElementById("climbNM").innerHTML = ((performanceData.climbPerf/1.1)/10).toFixed(0)*10 + " FT/NM"
     document.getElementById("tgDistance").innerHTML = ((performanceData.takeoffDistance + performanceData.landingDistance)/10).toFixed(0)*10 + " ft";
 
 }
 
-function fillWB(computedData, userInput, fwdCG, validCG){
-    /**Show detailed view in table format**/
+function fillWB(computedData, userInput, fwdCG, validCG, isPrint){
+    /**Fill HTML elements with weight and balance data**/
 
     var tailNumber = userInput.tail;
     var aircraftObj = aircraft.find(x => x.tail === tailNumber);
     var modelData = aircraftModels.find(x => x.model === aircraftObj.model);
-    var now = new Date();
-    document.getElementById("dateInfo").innerHTML = "Prepared " + now;
 
     if (!validCG){
         document.getElementById("auditTitle").innerHTML = tailNumber + " NOT WITHIN LIMITS!!";
@@ -198,8 +260,9 @@ function fillWB(computedData, userInput, fwdCG, validCG){
     }
     else {
         document.getElementById("max_wt_td").innerHTML = aircraftObj.maxWeight;
-        document.getElementById("bag2_tr").style.display = "none";
-
+        if (!isPrint){
+            document.getElementById("bag2_tr").style.display = "none";
+        }
         document.getElementById("nose_wt_td").innerHTML = "-";
         document.getElementById("nose_cg_td").innerHTML = "-";
         document.getElementById("nose_mnt_td").innerHTML = "-";
@@ -211,6 +274,11 @@ function fillWB(computedData, userInput, fwdCG, validCG){
         document.getElementById("aux_wt_td").innerHTML = "-";
         document.getElementById("aux_cg_td").innerHTML = "-";
         document.getElementById("aux_mnt_td").innerHTML = "-";
+
+        document.getElementById("bag2_wt_td").innerHTML = "-";
+        document.getElementById("bag2_cg_td").innerHTML = "-";
+        document.getElementById("bag2_mnt_td").innerHTML = "-";
+
     }
 
     if (aircraftObj.model === "DA40XL") {
@@ -221,13 +289,37 @@ function fillWB(computedData, userInput, fwdCG, validCG){
     }
 }
 
+function fillVSpeeds(computedData, modelData) {
+    document.getElementById("Vr").innerHTML = modelData.vSpeeds.vr;
+    document.getElementById("Vx").innerHTML = modelData.vSpeeds.vx;
+    document.getElementById("Vy").innerHTML = modelData.vSpeeds.vy;
+    document.getElementById("Vg").innerHTML = modelData.vSpeeds.vg;
+    vaSpeeds = Object.keys(modelData.vSpeeds.va);
+    if (modelData.model === "DA42"){
+        document.getElementById("Vyse").innerHTML = modelData.vSpeeds.vyse;
+        document.getElementById("Vmc").innerHTML = modelData.vSpeeds.vmc;
+    }
+    else{
+        document.getElementById("Vyse").innerHTML = "-";
+        document.getElementById("Vmc").innerHTML = "-";
+    }
+    for (i=0; i < vaSpeeds.length; i++){
+        if (computedData.takeOffWeight <= parseFloat(vaSpeeds[i])){
+            document.getElementById("Va").innerHTML = modelData.vSpeeds.va[vaSpeeds[i]];
+            return;
+        }
+    }
+
+}
+
 function printResults(){
     /**Called when user clicks print button
-     * First we show the elements that need to be printed then we use printThis to print those elements**/
-    $('#row1, #row2').printThis({
-        loadCSS : "css/print.css",
-        canvas : true
-    });
+     * First we show the elements that need to be printed then we use printThis to print those elements
+     *
+     *
+     * **/
+    window.open("print.html");
+
 }
 
 function emailResults(){
@@ -280,5 +372,3 @@ function emailResults(){
     window.open('mailto:dispatchusu@gmail.com?subject=' + userData.tail + ' Weight and Balance&body=' +
         bodyString);
 }
-
-fillData();

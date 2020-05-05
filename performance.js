@@ -35,14 +35,8 @@ function getWeather(){
     request.send();
 }
 
-function loadStoredWeather(){
-    /**If previously stored weather is available, retrieve it.**/
-    if (sessionStorage.getItem("weatherData") !== null){
-        return JSON.parse(sessionStorage.getItem("weatherData"));
-    }
-}
-
 function inputWeather(){
+    /**We call this when fetching weather data fails so user can manually input**/
     document.getElementById("weatherAltTitle").innerHTML = "Weather retrieval failed. " +
         "Check Station ID, if correct, server not working. Try again or manually input required data below.";
     document.getElementById("weatherInput").style.display = "block";
@@ -50,6 +44,8 @@ function inputWeather(){
 }
 
 function weatherInputClick(){
+    /**When the manual weather input submit button is clicked
+     * We fetch all the user input and put into weatherData**/
     var weatherData = {};
     weatherData["temp_c"] = parseFloat(document.getElementById("temperature").value);
     weatherData["elevation_m"] = parseFloat(document.getElementById("fieldAlt").value)/3.2808;
@@ -149,19 +145,27 @@ function runwayChange(str){
         heading = "";
         return;
     }
-    var weatherData = JSON.parse(sessionStorage.getItem("weatherData"));
-    winds = windComponents(heading, weatherData["wind_dir_degrees"], weatherData["wind_speed_kt"]);
-    document.getElementById("headWind").innerHTML = winds.hWind.toFixed(0);
-    if (winds.xWind < 0){
-        document.getElementById("xWind").innerHTML = -winds.xWind.toFixed(0) + " (Right)";
-    }
-    else if (winds.xWind === 0){
-        document.getElementById("xWind").innerHTML = winds.xWind.toFixed(0);
+    if (sessionStorage.getItem("weatherData") !== null){
+        var weatherData = JSON.parse(sessionStorage.getItem("weatherData"));
+        document.getElementById("weatherWarning").style.display = "none";
+        winds = windComponents(heading, weatherData["wind_dir_degrees"], weatherData["wind_speed_kt"]);
+        setWeather(weatherData);
+        document.getElementById("headWind").innerHTML = winds.hWind.toFixed(0);
+        if (winds.xWind < 0){
+            document.getElementById("xWind").innerHTML = -winds.xWind.toFixed(0) + " (Right)";
+        }
+        else if (winds.xWind === 0){
+            document.getElementById("xWind").innerHTML = winds.xWind.toFixed(0);
+        }
+        else{
+            document.getElementById("xWind").innerHTML = winds.xWind.toFixed(0) + " (Left)";
+        }
+        performanceCompute(winds, heading);
     }
     else{
-        document.getElementById("xWind").innerHTML = winds.xWind.toFixed(0) + " (Left)";
+        document.getElementById("weatherWarning").style.display = "block";
+        document.getElementById("weatherWarning").innerHTML = "Enter Weather Data";
     }
-    performanceCompute(winds, heading);
 }
 
 function windComponents(heading, windDir, windSpeed){
@@ -224,6 +228,7 @@ function performanceCompute(winds, heading){
     }
     document.getElementById("tgDistance").innerHTML = ((takeoffDistance + landingDistance)/10).toFixed(0)*10 + " ft";
     const performanceData = {
+        "tail" : aircraftObj.tail,
         "takeoffDistance" : takeoffDistance,
         "takeoff50Distance" : takeoff50Distance,
         "landingDistance" : landingDistance,
@@ -298,7 +303,13 @@ function getPerformanceNumbers(modelString, typeString, pressureAlt, temp, weigh
                 wind_result = windObstacleChart(DA40CS(typeString, "hwind"), weight_Result, hWind, false);
             }
             else if (hWind < 0){
-                wind_result = windObstacleChart(DA40CS(typeString, "twind"), weight_Result, Math.abs(hWind), false);
+                /*There is no landing tailwind chart, so we will assume every 2 knots increases by 10%*/
+                if (typeString === "landing"){
+                    wind_result = weight_Result*(.05*Math.abs(hWind)) + weight_Result;
+                }
+                else{
+                    wind_result = windObstacleChart(DA40CS(typeString, "twind"), weight_Result, Math.abs(hWind), false);
+                }
             }
             else if (hWind === 0){
                 wind_result = weight_Result;
@@ -310,7 +321,6 @@ function getPerformanceNumbers(modelString, typeString, pressureAlt, temp, weigh
                 else {
                     last_result = windObstacleChart(DA40CS(typeString, "obstacle"), wind_result, 50, false);
                 }
-
             }
             else {
                 last_result = wind_result;

@@ -233,7 +233,6 @@ const aircraftModels = [
             vx : 66,
             vy : 66,
             vg : 73,
-            vaTop : 108,
             va : {
                 2161 : 94,
                 2535 : 108
@@ -270,6 +269,7 @@ const aircraftModels = [
             vg : 73,
             va : {
                 2161 : 94,
+                2535 : 108,
                 2646 : 111
             }
         }
@@ -303,6 +303,18 @@ const aircraftModels = [
             midWgtFwd: 3236,
             midWgtAft: 3527,
             maxWgt: 3935
+        },
+        vSpeeds : {
+            vr : "70-72",
+            vx : "-",
+            vy : "78/86",
+            vg : "-",
+            vyse : 82,
+            vmc : 68,
+            va : {
+                3400 : 120,
+                3935 : 126
+            }
         }
     }
     /* This is where you could add a new aircraft type, but if you have to add more variables then you would need

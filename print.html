@@ -6,115 +6,161 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
+
     <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="css/custom.css">
-    <title id="title">DA40/42</title>
+    <link rel="stylesheet" href="css/print.css">
+    <title id="title">Print</title>
 </head>
-<body>
-<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-    <a class="navbar-brand" href="index.html">DA40/42</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
 
-    <div class="collapse navbar-collapse" id="navbar">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href="index.html">Weight & Balance <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item active">
-                <a class="nav-link" href="performance.html">Weather & Performance <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item active">
-                <a class="nav-link" href="summary.html">Summary <span class="sr-only">(current)</span></a>
-            </li>
-        </ul>
-    </div>
-</nav>
-
-<main role="main" class="container">
+<main role="main" class="container printable">
     <div class="container">
-        <div class="row" id="buttonRow">
-            <br>
-            <button type="button" class="btn btn-secondary m-2" onclick="emailResults()">Email</button>
-            <button type="button" class="btn btn-secondary m-2" onclick="printResults()">Print</button>
-        </div>
-        <div class="row" id="row1">
+        <div class="row" id="full">
             <div class="col-lg">
-                <h4>Summary</h4>
                 <div class="container" id="auditDiv">
                     <h5 id="auditTitle">Audit</h5>
-                    <table class="table table-sm table-striped table-bordered">
-                        <thead>
+                    <table class="table table-sm table-bordered">
+                        <tbody>
+                        <tr>
+                            <td colspan="2">Name: </td>
+                            <td colspan="2" id="acType">A/C Type: </td>
+                            <td id="acTail">Tail #: </td>
+                            <td id="date">Date: </td>
+                            <td colspan="3">Flight Plan Filed: </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">Instructor: </td>
+                            <td colspan="4">Signature: </td>
+                            <td colspan="3">Flt Plan Reviewed: </td>
+                        </tr>
+                        <tr>
+                            <td colspan="9">Route/Practice Area:</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">Time enroute: </td>
+                            <td colspan="2">Time due Back: </td>
+                            <td colspan="3">Alternates: </td>
+                        </tr>
+                        <tr>
+                            <td colspan="9">Abnormals: </td>
+                        </tr>
+                        <tr>
+                            <td id="fuelOnboard" colspan="2">Fuel Onboard: </td>
+                            <td colspan="7"></td>
+
+                        </tr>
+
+
                         <tr>
                             <th scope="col" class="table-secondary"></th>
                             <th scope="col">Weight</th>
                             <th scope="col">Arm</th>
                             <th scope="col">Moment</th>
+                            <th scope="col" colspan="3" id="wLocation" class="border">Weather: Location: </th>
+                            <th scope="col" colspan="2">V Speeds</th>
                         </tr>
-                        </thead>
+
                         <tbody>
                         <tr>
                             <th scope="row">Empty Weight</th>
                             <td id="empty_wt_td"></td>
                             <td id="empty_cg_td"></td>
                             <td id="empty_mnt_td"></td>
+                            <th class="border-left">Time</th>
+                            <th>Wind Dir/Vel</th>
+                            <th class="border-right">Visibility</th>
+                            <td>Vr</td>
+                            <td id="Vr"></td>
                         </tr>
                         <tr>
                             <th scope="row">Nose Baggage</th>
                             <td id="nose_wt_td"></td>
                             <td id="nose_cg_td"></td>
                             <td id="nose_mnt_td"></td>
+                            <td id="wTime" class="border-left"></td>
+                            <td id="wWind"></td>
+                            <td id="wVisibility" class="border-right"></td>
+                            <td>Vx</td>
+                            <td id="Vx"></td>
                         </tr>
                         <tr>
                             <th scope="row">De-icing Fluid</th>
                             <td id="deIce_wt_td"></td>
                             <td id="deIce_cg_td"></td>
                             <td id="deIce_mnt_td"></td>
+                            <th class="border-left">Ceilings</th>
+                            <th >Temp/Dew</th>
+                            <th class="border-right">Altimeter</th>
+                            <td>Vy</td>
+                            <td id="Vy"></td>
                         </tr>
                         <tr>
                             <th scope="row">Pilot & Front PAX</th>
                             <td id="front_wt_td"></td>
                             <td id="front_cg_td"></td>
                             <td id="front_mnt_td"></td>
+                            <td id="wCeilings" rowspan="2" class="border-left border-bottom"></td>
+                            <td id="wTemp" rowspan="2" class="border-bottom"></td>
+                            <td id="wAltimeter" rowspan="2" class="border-right border-bottom"></td>
+
+                            <td>Vg</td>
+                            <td id="Vg"></td>
                         </tr>
+
                         <tr>
                             <th scope="row">Rear PAX</th>
                             <td id="rear_wt_td"></td>
                             <td id="rear_cg_td"></td>
                             <td id="rear_mnt_td"></td>
+                            <td> Va</td>
+                            <td id="Va"></td>
                         </tr>
                         <tr>
                             <th scope="row">Baggage</th>
                             <td id="bag_wt_td"></td>
                             <td id="bag_cg_td"></td>
                             <td id="bag_mnt_td"></td>
+                            <td id="weatherDA"  class="border-left">Density Alt.</td>
+                            <td id="wDensityAlt"></td>
+                            <td id="weatherRemarks" rowspan="4">Remarks</td>
+                            <td>Vyse</td>
+                            <td id="Vyse"></td>
                         </tr>
-
-                        <tr id="bag2_tr" style="display: none">
+                        <tr>
                             <th scope="row">Baggage 2</th>
                             <td id="bag2_wt_td"></td>
                             <td id="bag2_cg_td"></td>
                             <td id="bag2_mnt_td"></td>
+                            <td id="weatherPA"  class="border-left">Pressure Alt.</td>
+                            <td id="wPressureAlt"></td>
+                            <td>Vmc</td>
+                            <td id="Vmc"></td>
                         </tr>
-
-                        <tr style="border-top: 2px solid black;">
-                            <th scope="row">Zero Fuel CG</th>
-                            <td id="zero_wt_td"></td>
-                            <td id="zero_cg_td"></td>
-                            <td id="zero_mnt_td"></td>
+                        <tr>
+                            <th scope="row" class="border-top">Zero Fuel CG</th>
+                            <td id="zero_wt_td" class="border-top"></td>
+                            <td id="zero_cg_td" class="border-top"></td>
+                            <td id="zero_mnt_td" class="border-top"></td>
+                            <td class="border-left">Head Wind</td>
+                            <td id="headWind"></td>
+                            <td colspan="2"></td>
                         </tr>
                         <tr>
                             <th scope="row">AUX Fuel</th>
                             <td id="aux_wt_td"></td>
                             <td id="aux_cg_td"></td>
                             <td id="aux_mnt_td"></td>
+                            <td class="border-left">Cross Wind</td>
+                            <td id="xWind"></td>
+                            <td colspan="2"></td>
                         </tr>
                         <tr>
                             <th scope="row">Fuel in LBS</th>
                             <td id="fuel_wt_td"></td>
                             <td id="fuel_cg_td"></td>
                             <td id="fuel_mnt_td"></td>
+                            <td colspan="2" class="border-left"></td>
+                            <td colspan="2"></td>
                         </tr>
 
                         <tr style="border-top: 2px solid black;">
@@ -122,140 +168,70 @@
                             <td id="takeoff_wt_td"></td>
                             <td id="takeoff_cg_td"></td>
                             <td id="takeoff_mnt_td"></td>
+                            <td colspan="2" class="border-left">Take Off RWY LEN: </td>
+                            <td colspan="3">Landing RWY LEN: </td>
                         </tr>
                         <tr>
                             <th scope="row">Fuel Burn</th>
                             <td id="burn_wt_td"></td>
                             <td id="burn_cg_td"></td>
                             <td id="burn_mnt_td"></td>
+
+                            <td id="TODistance" colspan="2" class="border-left"></td>
+
+                            <td id="LDGDistance" colspan="3"></td>
                         </tr>
                         <tr>
                             <th scope="row">Landing Weight</th>
                             <td id="landing_wt_td"></td>
                             <td id="landing_cg_td"></td>
                             <td id="landing_mnt_td"></td>
+
+                            <td id="TO50Distance" colspan="2" class="border-left"></td>
+
+                            <td id="LDG50Distance" colspan="3"></td>
                         </tr>
                         <tr>
                             <th scope="row">Max Gross Weight</th>
                             <td colspan="2" id="max_wt_td"></td>
                             <td class="table-secondary"></td>
+                            <td colspan="2" class="border-left">Touch and Go Distance</td>
+                            <td id="tgDistance"></td>
+                            <td colspan="2"></td>
                         </tr>
                         <tr>
                             <th class = "table-secondary" scope="row"> </th>
                             <td >Forward</td>
                             <td>Actual</td>
                             <td>Aft</td>
+                            <td class="border-left">Rate of Climb</td>
+                            <td>Single Engine ROC</td>
+                            <td>Climb Grad (+3.3)</td>
+                            <td colspan="2" rowspan="2"> (ROC/TAS)*0.95</td>
                         </tr>
                         <tr>
                             <th scope="row">CG</th>
                             <td id="fwd_cg"></td>
-                            <td id="act_cg"></td>
+                            <td id="act_cg" class="border"></td>
                             <td id="aft_cg"></td>
+                            <td id="climbFPM" class="border-left"></td>
+                            <td id="singleClimb"></td>
+                            <td id="climbGrad"></td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
+        </div>
+        <div class="row" id="canvasRow">
             <div class="col-lg" id="canvasDiv">
                 <h4>CG Envelope</h4>
                 <canvas id="cgCanvas" width="500" height="360" style="border: 1px solid black"></canvas>
             </div>
         </div>
-
-        <div class="row" id="row2">
-            <div class="col-lg">
-                <h4>Weather</h4>
-                <div id="weatherData">
-                    <p id="wRaw"></p>
-                    <table class="table table-sm table-striped table-bordered">
-                        <tbody>
-                        <tr>
-                            <th scope="col">Time</th>
-                            <th id="wTime"></th>
-                        </tr>
-                        <tr>
-                            <th scope="col" >Wind Dir and Vel</th>
-                            <th id="wWind"></th>
-                        </tr>
-                        <tr>
-                            <th scope="col">Visibility</th>
-                            <th id="wVisibility"></th>
-                        </tr>
-                        <tr>
-                            <th scope="col">Clouds</th>
-                            <th id="wCeilings"></th>
-                        </tr>
-                        <tr>
-                            <th scope="col">Temperature</th>
-                            <th id="wTemp"></th>
-                        </tr>
-                        <tr>
-                            <th scope="col">Dew Point</th>
-                            <th id="wDewpoint"></th>
-                        </tr>
-                        <tr>
-                            <th scope="col">Altimeter</th>
-                            <th id="wAltimeter"></th>
-                        </tr>
-                        <tr>
-                            <th scope="col">Density Alt.</th>
-                            <th id="wDensityAlt"></th>
-                        </tr>
-                        <tr>
-                            <th scope="col">Pressure Alt.</th>
-                            <th id="wPressureAlt"></th>
-                        </tr>
-
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="col-lg">
-                <h4>Takeoff and Landing Performance</h4>
-                <p>Performance data is an estimate only and does not take into
-                    consideration runway condition, aircraft condition, or pilot technique.</p>
-                <h5 id="runwayHdg">Runway </h5>
-                <table class="table table-sm table-bordered">
-                    <tbody>
-                    <tr>
-                        <th scope="row">Head Wind</th>
-                        <td id="headWind"></td>
-
-                    </tr>
-                    <tr>
-                        <th scope="row">Cross Wind</th>
-                        <td id="xWind"></td>
-
-                    </tr>
-                    <tr>
-                        <th scope="row">Takeoff</th>
-                        <td id ="TODistance">Ground Roll:</td>
-                        <td id ="TO50Distance">Over 50':</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Landing</th>
-                        <td id="LDGDistance">Ground Roll:</td>
-                        <td id="LDG50Distance">Over 50':</td>
-                    </tr>
-                    <tr>
-                        <th scope="row" colspan="2">Touch and Go Distance</th>
-                    </tr>
-                    <tr>
-                        <th scope="row">Rate of Climb</th>
-                        <td id="climbFPM"></td>
-                        <td id="climbNM"></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="row" id="row3" style="display: none">
-            <div class="col-lg">
-
-            </div>
-        </div>
     </div>
-</main><!-- /.container -->
+</main>
+
 
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
@@ -266,8 +242,8 @@
 <script src="summary.js"></script>
 <script src="printThis/printThis.js"></script>
 <script>
-    fillData();
+    fillPrintData();
+    window.print();
 </script>
-
 </body>
 </html>
