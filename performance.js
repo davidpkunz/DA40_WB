@@ -148,7 +148,13 @@ function runwayChange(str){
     if (sessionStorage.getItem("weatherData") !== null){
         var weatherData = JSON.parse(sessionStorage.getItem("weatherData"));
         document.getElementById("weatherWarning").style.display = "none";
-        winds = windComponents(heading, weatherData["wind_dir_degrees"], weatherData["wind_speed_kt"]);
+
+        if (weatherData["wind_dir_degrees"] === "0"){
+            winds = windComponents(heading, heading, weatherData["wind_speed_kt"]);
+        }
+        else{
+            winds = windComponents(heading, weatherData["wind_dir_degrees"], weatherData["wind_speed_kt"]);
+        }
         setWeather(weatherData);
         document.getElementById("headWind").innerHTML = winds.hWind.toFixed(0);
         if (winds.xWind < 0){
@@ -220,12 +226,7 @@ function performanceCompute(winds, heading){
     var climbPerf = getPerformanceNumbers(aircraftObj.model, "climb", pressureAlt, temp,
         takeoffWeight, winds.hWind, aircraftObj.maxWeight);
     document.getElementById("climbFPM").innerHTML = (climbPerf/10).toFixed(0)*10 + " FPM";
-    if (aircraftObj.model !== "DA42"){
-        document.getElementById("climbNM").innerHTML = ((climbPerf/1.1)/10).toFixed(0)*10 + " FT/NM";
-    }
-    else {
-        document.getElementById("climbNM").innerHTML = ((climbPerf/1.1)/10).toFixed(0)*10 + " FT/NM";
-    }
+
     document.getElementById("tgDistance").innerHTML = ((takeoffDistance + landingDistance)/10).toFixed(0)*10 + " ft";
     const performanceData = {
         "tail" : aircraftObj.tail,
@@ -330,7 +331,30 @@ function getPerformanceNumbers(modelString, typeString, pressureAlt, temp, weigh
         return last_result*(parseFloat(scale.max) - parseFloat(scale.min))/100 + parseFloat(scale.min);
     }
     else if (modelString === "DA42"){
+        if (typeString === "climb"){
+            DA_Result = densityAltitudeChart(DA40CS(typeString, "DA"), pressureAlt, temp);
+            last_result = weightChart(DA40CS(typeString, "weight"), DA_Result, weight, maxWeight);
+        }
+        else{
+            if (weight > 3748){
+                typeString += "Heavy"
+            }
 
+            DA_Result = densityAltitudeChart(DA42(typeString, "DA"),pressureAlt, temp);
+            weight_Result = weightChart(DA42(typeString, "weight"), DA_Result, weight, maxWeight);
+
+            if (hWind > 0){
+                last_result = windObstacleChart(DA42(typeString, "hwind"), weight_Result, hWind);
+            }
+            else if (hWind < 0){
+                last_result = windObstacleChart(DA42(typeString, "twind"), weight_Result, Math.abs(hWind));
+            }
+            else if (hWind === 0){
+                last_result = weight_Result;
+            }
+        }
+        scale = DA42(typeString, "scale");
+        return last_result*(parseFloat(scale.max) - parseFloat(scale.min))/100 + parseFloat(scale.min);
     }
 }
 

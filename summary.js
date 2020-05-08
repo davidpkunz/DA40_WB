@@ -141,7 +141,12 @@ function fillWeather(weatherData, isPrint){
 function fillPerformance(performanceData, isPrint, tailNumber) {
     /**Fills HTML elements with performance data**/
     if (tailNumber !== performanceData.tail){
-        document.getElementById("runwayHdg").innerHTML = "Please recompute performance data using new Tail #";
+        if (!isPrint){
+            document.getElementById("runwayHdg").innerHTML = "Please recompute performance data using new Tail #";
+        }
+        else{
+            document.getElementById("perfInfo").innerHTML = "Performance Data not valid. Recompute using new Tail #";
+        }
         return;
     }
     runway = (performanceData.runwayHdg/10).toFixed(0);
@@ -150,8 +155,6 @@ function fillPerformance(performanceData, isPrint, tailNumber) {
     }
     if (!isPrint){
         document.getElementById("runwayHdg").innerHTML = "Runway " + runway;
-        document.getElementById("climbNM").innerHTML = ((performanceData.climbPerf/1.1)/10).toFixed(0)*10 + " FT/NM"
-
     }
     else{
 
