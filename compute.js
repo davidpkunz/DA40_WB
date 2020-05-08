@@ -539,8 +539,8 @@ function computeWB(aircraftObj, userInput){
         computedData["baggage2Moment"] = Math.round((parseFloat(modelData.baggageStation2CG) * userInput.baggage2Weight + Number.EPSILON) * 100) / 100;
         computedData["zeroFuelMoment"] = computedData.emptyMoment + computedData.frontMoment
             + computedData.rearMoment + computedData.baggageMoment + computedData.baggage2Moment;
-        computedData["zeroFuelWeight"] = aircraftObj.emptyWeight + userInput.frontStationWeight
-            + userInput.rearStationWeight + userInput.baggage1Weight +userInput.baggage2Weight;
+        computedData["zeroFuelWeight"] = Math.round((aircraftObj.emptyWeight + userInput.frontStationWeight
+            + userInput.rearStationWeight + userInput.baggage1Weight + userInput.baggage2Weight) *100)/100;
         computedData["takeOffMoment"] = computedData.zeroFuelMoment + computedData.fuelMoment
         computedData["takeOffWeight"] = computedData.zeroFuelWeight + userInput.fuelWeight;
 

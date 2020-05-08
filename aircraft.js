@@ -134,6 +134,20 @@ const aircraft = [
         maxWeight: 2646,
         aircraftArm: 97.91
     },
+/*    {
+        tail: "N78US",
+        model: "DA40XL",
+        emptyWeight: 1818.58,
+        maxWeight: 2646,
+        aircraftArm: 97.91
+    },
+    {
+        tail: "N79US",
+        model: "DA40XL",
+        emptyWeight: 1818.58,
+        maxWeight: 2646,
+        aircraftArm: 97.91
+    },*/
     {
         tail: "N132TS",
         model: "DA42",

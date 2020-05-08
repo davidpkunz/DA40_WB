@@ -282,7 +282,9 @@ function fillWB(computedData, userInput, fwdCG, validCG, isPrint){
     }
 
     if (aircraftObj.model === "DA40XL") {
-        document.getElementById("bag2_tr").style.display = "";
+        if (!isPrint){
+            document.getElementById("bag2_tr").style.display = "";
+        }
         document.getElementById("bag2_wt_td").innerHTML = userInput.baggage2Weight;
         document.getElementById("bag2_cg_td").innerHTML = modelData.baggageStation2CG;
         document.getElementById("bag2_mnt_td").innerHTML = computedData.baggage2Moment;
@@ -327,6 +329,9 @@ function emailResults(){
     var computedData = JSON.parse(localStorage.getItem("computedData"));
     var performanceData = JSON.parse(sessionStorage.getItem("performanceData"));
     var resultCG = JSON.parse(localStorage.getItem("CG"));
+    var tailNumber = userData.tail;
+    var aircraftObj = aircraft.find(x => x.tail === tailNumber);
+
     var bodyString = "";
     if (!resultCG.validCG){
         bodyString += "!!!!CG NOT VALID. CHECK VALUES.!!!!"
@@ -335,6 +340,23 @@ function emailResults(){
         var now = new Date();
         bodyString += "Prepared on " + now + "%0d%0A %0d%0A";
         bodyString += "Weight and Balance %0d%0A";
+        bodyString += "Empty: " + aircraftObj.emptyWeight + " lbs | CG: " + aircraftObj.aircraftArm + "%0d%0A";
+        if (aircraftObj.model === "DA42"){
+            bodyString += "Nose Baggage: " + userData.noseWeight + " lbs %0d%0A";
+            if (aircraftObj.deIce){
+                bodyString += "De-icing Fluid: " + userData.deIceWeight + " lbs%0d%0A";
+            }
+        }
+        bodyString += "Front: " + userData.frontStationWeight + " lbs %0d%0ARear: " + userData.rearStationWeight + " lbs %0d%0A";
+        bodyString += "Baggage: " + userData.baggage1Weight + " lbs %0d%0A";
+        if ((aircraftObj.model === "DA40XL") || aircraftObj.model === "DA42"){
+            bodyString += "Baggage 2: " + userData.baggage2Weight + " lbs %0d%0A";
+        }
+        bodyString += "Zero Fuel: " + computedData.zeroFuelWeight + " lbs | CG: " + computedData.zeroFuelCG + " %0d%0A";
+        bodyString += "Fuel: " + userData.fuelWeight + " lbs %0d%0A";
+        if (aircraftObj.auxTanks) {
+            bodyString += "Aux Fuel: " + userData.auxFuelWeight + " lbs %0d%0A";
+        }
         bodyString += "Takeoff Weight: " + computedData.takeOffWeight + " lbs | Takeoff CG: " + computedData.takeoffCG +  "%0d%0A";
         bodyString += "Allowed CG Range: " + resultCG.fwdCG + " - " + resultCG.aftCG + "%0d%0A";
         bodyString += "Fuel Burn: " + userData.fuelBurnWeight + " lbs %0d%0A";
@@ -353,12 +375,17 @@ function emailResults(){
         }
 
         if (sessionStorage.getItem("performanceData") !== null){
-            bodyString += "Performance Data%0d%0ARunway Heading: " + performanceData.runwayHdg + "%0d%0A";
-            bodyString += "Head Wind: " + performanceData.headWind.toFixed(0) + "%0d%0A";
-            bodyString += "Cross Wind: " + performanceData.crossWind.toFixed(0) + "%0d%0A";
-            bodyString += "Takeoff: Ground Roll: " + performanceData.takeoffDistance.toFixed(0) + " ft. Over 50': " + performanceData.takeoff50Distance.toFixed(0) + " ft.%0d%0A";
-            bodyString += "Landing: Ground Roll: " + performanceData.landingDistance.toFixed(0) + " ft. Over 50': " + performanceData.landing50Distance.toFixed(0) + " ft.%0d%0A";
-            bodyString += "Rate of Climb: " + performanceData.climbPerf.toFixed(0) + " FPM %0d%0A";
+            if(userData.tail !== performanceData.tail){
+                bodyString += "Performance data needs to be recomputed. See Weather & Performance Tab."
+            }
+            else{
+                bodyString += "Performance Data%0d%0ARunway Heading: " + performanceData.runwayHdg + "%0d%0A";
+                bodyString += "Head Wind: " + performanceData.headWind.toFixed(0) + "%0d%0A";
+                bodyString += "Cross Wind: " + performanceData.crossWind.toFixed(0) + "%0d%0A";
+                bodyString += "Takeoff: Ground Roll: " + performanceData.takeoffDistance.toFixed(0) + " ft. Over 50': " + performanceData.takeoff50Distance.toFixed(0) + " ft.%0d%0A";
+                bodyString += "Landing: Ground Roll: " + performanceData.landingDistance.toFixed(0) + " ft. Over 50': " + performanceData.landing50Distance.toFixed(0) + " ft.%0d%0A";
+                bodyString += "Rate of Climb: " + performanceData.climbPerf.toFixed(0) + " FPM %0d%0A";
+            }
         }
         else{
             bodyString += "Performance data not available"
