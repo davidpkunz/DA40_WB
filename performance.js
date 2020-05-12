@@ -20,9 +20,13 @@ function getWeather(){
 
             if(this.responseText){
                 try {
-                    var weatherData = JSON.parse(this.responseText);
-                    setWeather(weatherData);
+                    var weatherResults = JSON.parse(this.responseText);
+                    console.log(weatherResults);
+                    var weatherData = weatherResults["metar"];
+                    var weatherTAF = weatherResults["taf"];
+                    setWeather(weatherData, weatherTAF);
                     sessionStorage.setItem("weatherData", JSON.stringify(weatherData));
+                    sessionStorage.setItem("weatherTAF", JSON.stringify(weatherTAF))
                     runwayChange(document.getElementById("runwayHdg").value);
                 } catch(e){
                     /*Most likely due to the PHP server not being setup/running*/
@@ -62,7 +66,7 @@ function weatherInputClick(){
     }
 }
 
-function setWeather(weatherData) {
+function setWeather(weatherData, weatherTAF) {
     /**Fills the weather table with retrieved weather data**/
     document.getElementById("weatherData").style.display = "block";
     document.getElementById("wRaw").innerHTML = weatherData.raw_text;
@@ -130,6 +134,9 @@ function setWeather(weatherData) {
     var densityAlt = (145442.16*(1-((17.326*stationPressure)/(tempRankine))**0.235));
     document.getElementById("wPressureAlt").innerHTML = pressureAlt.toFixed(0) + " ft";
     document.getElementById("wDensityAlt").innerHTML = densityAlt.toFixed(0) + " ft";
+
+    /*TAF*/
+    document.getElementById("TAF").innerHTML = weatherTAF.raw_text;
 }
 
 function runwayChange(str){

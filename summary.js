@@ -4,6 +4,7 @@ function fillData(){
 
     var userData = JSON.parse(localStorage.getItem("userInput"));
     var weatherData = JSON.parse(sessionStorage.getItem("weatherData"));
+    var weatherTAF = JSON.parse(sessionStorage.getItem("weatherTAF"));
     var computedData = JSON.parse(localStorage.getItem("computedData"));
     var performanceData = JSON.parse(sessionStorage.getItem("performanceData"));
     var resultCG = JSON.parse(localStorage.getItem("CG"));
@@ -14,7 +15,7 @@ function fillData(){
     document.getElementById("title").innerHTML = tailNumber + " Summary";
     fillWB(computedData, userData, resultCG.fwdCG, resultCG.validCG, false);
     drawCG(computedData, userData, modelData, colors);
-    fillWeather(weatherData, false);
+    fillWeather(weatherData, weatherTAF, false);
     fillPerformance(performanceData, false, tailNumber);
 }
 
@@ -22,6 +23,7 @@ function fillPrintData() {
     /**Call to fetch all data from local or session storage and call all the print fills**/
     var userData = JSON.parse(localStorage.getItem("userInput"));
     var weatherData = JSON.parse(sessionStorage.getItem("weatherData"));
+    var weatherTAF = JSON.parse(sessionStorage.getItem("weatherTAF"));
     var computedData = JSON.parse(localStorage.getItem("computedData"));
     var performanceData = JSON.parse(sessionStorage.getItem("performanceData"));
     var resultCG = JSON.parse(localStorage.getItem("CG"));
@@ -32,7 +34,7 @@ function fillPrintData() {
     document.getElementById("title").innerHTML = tailNumber + " Summary";
     fillWB(computedData, userData, resultCG.fwdCG, resultCG.validCG, true);
     drawCG(computedData, userData, modelData, colors);
-    fillWeather(weatherData, true);
+    fillWeather(weatherData, weatherTAF,true);
     fillPerformance(performanceData, true, tailNumber);
     fillVSpeeds(computedData, modelData);
     document.getElementById("acType").innerHTML += " " + aircraftObj.model;
@@ -48,7 +50,7 @@ function fillPrintData() {
     }
 }
 
-function fillWeather(weatherData, isPrint){
+function fillWeather(weatherData, weatherTAF, isPrint){
     /**Fills HTML elements with weather data**/
     if (!("raw_text" in weatherData)){
         var temp = parseFloat(weatherData.temp_c);
@@ -135,6 +137,8 @@ function fillWeather(weatherData, isPrint){
         densityAlt = (145442.16 * (1 - ((17.326 * stationPressure) / (tempRankine)) ** 0.235));
         document.getElementById("wPressureAlt").innerHTML = pressureAlt.toFixed(0) + " ft";
         document.getElementById("wDensityAlt").innerHTML = densityAlt.toFixed(0) + " ft";
+
+        document.getElementById("TAF").innerHTML = weatherTAF.raw_text;
     }
 }
 
