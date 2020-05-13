@@ -138,7 +138,34 @@ function fillWeather(weatherData, weatherTAF, isPrint){
         document.getElementById("wPressureAlt").innerHTML = pressureAlt.toFixed(0) + " ft";
         document.getElementById("wDensityAlt").innerHTML = densityAlt.toFixed(0) + " ft";
 
-        document.getElementById("TAF").innerHTML = weatherTAF.raw_text;
+        /*TAF*/
+        var rawTAF = weatherTAF.raw_text;
+        var nLines = weatherTAF.forecast.length;
+        var index = 0;
+        var line = "";
+        var newLines = [];
+        var indicator = weatherTAF.forecast[1].change_indicator;
+        index = rawTAF.indexOf(indicator);
+        newLines.push(rawTAF.slice(0, index));
+        line = rawTAF.slice(index);
+        for (i = 1; i < nLines; i++){
+            var tempLine = line.slice(indicator.length);
+            if (i+1 === nLines){
+                newLines.push(indicator+tempLine);
+            }
+            else{
+                var nextIndicator = weatherTAF.forecast[i+1].change_indicator;
+                index = tempLine.indexOf(nextIndicator);
+                newLines.push(indicator+tempLine.slice(0,index));
+                indicator = nextIndicator;
+                line = tempLine.slice(index);
+            }
+        }
+        var now = new Date()
+        document.getElementById("TAF").innerHTML = "Current Time: " + now.toUTCString() + " UTC <br>";
+        for (i=0; i < newLines.length; i++){
+            document.getElementById("TAF").innerHTML += newLines[i] + "<br>"
+        }
     }
 }
 

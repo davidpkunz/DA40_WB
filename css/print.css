@@ -18,30 +18,24 @@
     .border {
         border: 2px solid black !important;
     }
+
+    body {
+        padding-top: 1rem;
+    }
+
+    th,td {
+        padding: 0.1rem;
+    }
 }
 canvas {
     width: auto;
     height: auto;
 }
 
-.border-top {
-    border-top: 2px solid black !important;
+@page {
+    margin-top: 1cm;
+    margin-bottom: 0cm;
+    margin-left: 0cm;
+    margin-right: 1cm;
 }
-
-.border-left {
-    border-left: 2px solid black !important;
-}
-
-.border-right {
-    border-right: 2px solid black !important;
-}
-
-.border-bottom {
-    border-bottom: 2px solid black !important;
-}
-
-.border {
-    border: 2px solid black !important;
-}
-
 

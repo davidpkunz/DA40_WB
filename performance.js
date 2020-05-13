@@ -136,7 +136,33 @@ function setWeather(weatherData, weatherTAF) {
     document.getElementById("wDensityAlt").innerHTML = densityAlt.toFixed(0) + " ft";
 
     /*TAF*/
-    document.getElementById("TAF").innerHTML = weatherTAF.raw_text;
+    var rawTAF = weatherTAF.raw_text;
+    var nLines = weatherTAF.forecast.length;
+    var index = 0;
+    var line = "";
+    var newLines = [];
+    var indicator = weatherTAF.forecast[1].change_indicator;
+    index = rawTAF.indexOf(indicator);
+    newLines.push(rawTAF.slice(0, index));
+    line = rawTAF.slice(index);
+    for (i = 1; i < nLines; i++){
+        var tempLine = line.slice(indicator.length);
+        if (i+1 === nLines){
+            newLines.push(indicator+tempLine);
+        }
+        else{
+            var nextIndicator = weatherTAF.forecast[i+1].change_indicator;
+            index = tempLine.indexOf(nextIndicator);
+            newLines.push(indicator+tempLine.slice(0,index));
+            indicator = nextIndicator;
+            line = tempLine.slice(index);
+        }
+    }
+    var now = new Date()
+    document.getElementById("TAF").innerHTML = "Current Time: " + now.toUTCString() + "<br>";
+    for (i=0; i < newLines.length; i++){
+        document.getElementById("TAF").innerHTML += newLines[i] + "<br>"
+    }
 }
 
 function runwayChange(str){
@@ -154,6 +180,7 @@ function runwayChange(str){
     }
     if (sessionStorage.getItem("weatherData") !== null){
         var weatherData = JSON.parse(sessionStorage.getItem("weatherData"));
+        var weatherTAF = JSON.parse(sessionStorage.getItem("weatherTAF"));
         document.getElementById("weatherWarning").style.display = "none";
 
         if (weatherData["wind_dir_degrees"] === "0"){
@@ -162,7 +189,7 @@ function runwayChange(str){
         else{
             winds = windComponents(heading, weatherData["wind_dir_degrees"], weatherData["wind_speed_kt"]);
         }
-        setWeather(weatherData);
+        setWeather(weatherData, weatherTAF);
         document.getElementById("headWind").innerHTML = winds.hWind.toFixed(0);
         if (winds.xWind < 0){
             document.getElementById("xWind").innerHTML = -winds.xWind.toFixed(0) + " (Right)";

@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="css/custom.css">
     <link rel="stylesheet" href="css/print.css">
     <title id="title">Print</title>
+
 </head>
 
 <main role="main" class="container printable">
@@ -18,7 +19,7 @@
             <div class="col-lg">
                 <div class="container" id="auditDiv">
                     <h5 id="auditTitle">Audit</h5>
-                    <table class="table table-sm table-bordered">
+                    <table class="table table-sm table-bordered d-print-table">
                         <tbody>
                         <tr>
                             <td colspan="2">Name: </td>
@@ -33,7 +34,8 @@
                             <td colspan="3"> </td>
                         </tr>
                         <tr>
-                            <td colspan="9">Route/Practice Area:</td>
+                            <td colspan="5">Route/Practice Area:</td>
+                            <td colspan="4">Alternates: </td>
                         </tr>
                         <tr>
                             <td colspan="4">Time enroute: </td>
@@ -219,9 +221,13 @@
             </div>
         </div>
         <div class="row" id="canvasRow">
-            <div class="col-lg" id="canvasDiv">
+            <div class="col-md" id="canvasDiv">
                 <h4>CG Envelope</h4>
                 <canvas id="cgCanvas" width="500" height="360" style="border: 1px solid black"></canvas>
+            </div>
+            <div class="col-md" id="weatherTAF">
+                <h5>TAF</h5>
+                <p id="TAF"></p>
             </div>
         </div>
     </div>
