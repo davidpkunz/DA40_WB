@@ -10,6 +10,12 @@ function aircraftSelection(){
     /**When the user selects a tail number from the dropdown menu, we then populate the proper user input fields
      **/
     var tailNumber = document.getElementById('aircraftSelect').value;
+
+    if (tailNumber === "Tail #"){
+        document.getElementById("emptyAircraftInfo").innerHTML = "";
+        clearResults();
+        return;
+    }
     var aircraftObj = aircraft.find(x => x.tail === tailNumber)
 
     document.getElementById("emptyAircraftInfo").innerHTML=
@@ -705,10 +711,21 @@ function resultSuccess(){
     document.getElementById("overall_result").innerHTML = "Aircraft within limits.";
 }
 
+function userAgreement(){
+    sessionStorage.setItem("userAgree", "true");
+}
+
 /*call to fill in the dropdown selector with tail numbers*/
 fillData()
 /*if local data exists, load it*/
 if (localStorage.getItem("userInput") !== null){
-    loadUserData();
-    aircraftSelection();
+    if (sessionStorage.getItem("userAgree") === null){
+        $('#Modal').modal({
+            backdrop: 'static'
+        })
+    }
+    else{
+        loadUserData();
+        aircraftSelection();
+    }
 }

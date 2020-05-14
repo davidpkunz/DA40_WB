@@ -9,11 +9,11 @@
     <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="css/custom.css">
 
-    <title>DA40/42</title>
+    <title>Weight & Balance</title>
 </head>
 <body>
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-    <a class="navbar-brand" href="index.html">DA40/42</a>
+    <a class="navbar-brand" href="index.html">USU Aviation</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -43,8 +43,35 @@
     </div>
 </nav>
 
-<main role="main" class="container">
+<!-- Modal -->
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModalLabel">Disclaimer</h5>
+            </div>
+            <div class="modal-body">
+                You acknowledge and agree that the aircraft's POH is the authoritative source of the aircraft's	information,
+                and must be kept up to date with manufacturers' updates	and to reflect any after-market modifications to the aircraft.
+                The App and any information provided by or available through the App is for
+                additional reference only and you acknowledge and agree that you will
+                confirm and verify all results obtained by using the App against the aircraft's POH
+                before operating the aircraft in reliance on or in accordance with any such results.
+                The algorithms and parameters in the App are approximations of POH values,
+                and are not warranted to be error free.	Parameters and algorithms in the App were derived from a
+                POH that may be different than the POH for the aircraft, and may not reflect the equipment installed on the aircraft.
+                You acknowledge and agree that you alone are responsible for verifying that all	parameters
+                and algorithms used are appropriate for the aircraft.
+                The App is not a commercial software product, and has not been thoroughly tested.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="userAgreement()" data-dismiss="modal">Accept</button>
+            </div>
+        </div>
+    </div>
+</div>
 
+<main role="main" class="container">
     <div class="container">
         <div class="row">
             <div class="col-lg">
