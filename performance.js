@@ -371,7 +371,10 @@ function getPerformanceNumbers(modelString, typeString, pressureAlt, temp, weigh
         }
         else{
             if (weight > 3748){
-                typeString += "Heavy"
+                typeString += "Heavy";
+            }
+            else{
+                maxWeight = 3748;
             }
 
             DA_Result = densityAltitudeChart(DA42(typeString, "DA"),pressureAlt, temp);
