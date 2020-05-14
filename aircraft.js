@@ -148,7 +148,7 @@ const aircraft = [
         maxWeight: 2646,
         aircraftArm: 97.91
     },*/
-    {
+   /* {
         tail: "N132TS",
         model: "DA42",
         emptyWeight: 2943.2,
@@ -177,7 +177,7 @@ const aircraft = [
         aircraftArm: 95.16,
         auxTanks: false,
         deIce: false
-    }
+    }*/
     /* To add a new aircraft, insert info block here. Note the DA42 requires more info (see DA42 block above)
         Follow the previous formatting:
     {

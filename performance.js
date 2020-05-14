@@ -22,12 +22,21 @@ function getWeather(){
                 try {
                     var weatherResults = JSON.parse(this.responseText);
                     console.log(weatherResults);
-                    var weatherData = weatherResults["metar"];
-                    var weatherTAF = weatherResults["taf"];
-                    setWeather(weatherData, weatherTAF);
-                    sessionStorage.setItem("weatherData", JSON.stringify(weatherData));
-                    sessionStorage.setItem("weatherTAF", JSON.stringify(weatherTAF))
-                    runwayChange(document.getElementById("runwayHdg").value);
+                    if (weatherResults["metar"] !== null){
+                        var weatherData = weatherResults["metar"];
+                        sessionStorage.setItem("weatherData", JSON.stringify(weatherData));
+                        setWeather(weatherData);
+                        runwayChange(document.getElementById("runwayHdg").value);
+                    }
+                    else {
+                        inputWeather();
+                    }
+                    if (weatherResults["taf"] !== null){
+                        var weatherTAF = weatherResults["taf"];
+                        sessionStorage.setItem("weatherTAF", JSON.stringify(weatherTAF))
+                        setTAF(weatherTAF);
+                    }
+
                 } catch(e){
                     /*Most likely due to the PHP server not being setup/running*/
                     inputWeather();
@@ -66,7 +75,7 @@ function weatherInputClick(){
     }
 }
 
-function setWeather(weatherData, weatherTAF) {
+function setWeather(weatherData) {
     /**Fills the weather table with retrieved weather data**/
     document.getElementById("weatherData").style.display = "block";
     document.getElementById("wRaw").innerHTML = weatherData.raw_text;
@@ -135,6 +144,10 @@ function setWeather(weatherData, weatherTAF) {
     document.getElementById("wPressureAlt").innerHTML = pressureAlt.toFixed(0) + " ft";
     document.getElementById("wDensityAlt").innerHTML = densityAlt.toFixed(0) + " ft";
 
+
+}
+
+function setTAF(weatherTAF){
     /*TAF*/
     var rawTAF = weatherTAF.raw_text;
     var nLines = weatherTAF.forecast.length;
@@ -450,7 +463,7 @@ function  densityAltitudeChart(PA_lines, pressureAlt, temp){
 }
 
 function weightChart(lines, DA_Result, weight, maxWeight){
-    /**Takes the result from the first portion of the chart(DA_Result) and landing weight to find the next section**/
+    /**Takes the result from the first portion of the chart (DA_Result) and landing weight to find the next section**/
 
     for (i=0; i < lines.length; i++){
         var useExp = false;
