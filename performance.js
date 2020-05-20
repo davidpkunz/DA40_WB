@@ -21,9 +21,17 @@ function getWeather(){
             if(this.responseText){
                 try {
                     var weatherResults = JSON.parse(this.responseText);
-                    console.log(weatherResults);
                     if (weatherResults["metar"] !== null){
                         var weatherData = weatherResults["metar"];
+                        var requiredFields = ["temp_c", "altim_in_hg", "wind_dir_degrees", "wind_speed_kt"];
+                        for (i = 0; i < requiredFields.length; i++){
+                            if (!(requiredFields[i] in weatherData)){
+                                /*We are missed one of the required fields for perf calculations*/
+                                inputWeather();
+                                document.getElementById("weatherAltTitle").innerHTML =
+                                    "The requested METAR is missing a required field. Please use manual entry."
+                            }
+                        }
                         sessionStorage.setItem("weatherData", JSON.stringify(weatherData));
                         setWeather(weatherData);
                         runwayChange(document.getElementById("runwayHdg").value);
@@ -36,7 +44,9 @@ function getWeather(){
                         sessionStorage.setItem("weatherTAF", JSON.stringify(weatherTAF))
                         setTAF(weatherTAF);
                     }
-
+                    else{
+                        document.getElementById("TAF").innerHTML = "No TAF Available";
+                    }
                 } catch(e){
                     /*Most likely due to the PHP server not being setup/running*/
                     inputWeather();
@@ -143,8 +153,6 @@ function setWeather(weatherData) {
     var densityAlt = (145442.16*(1-((17.326*stationPressure)/(tempRankine))**0.235));
     document.getElementById("wPressureAlt").innerHTML = pressureAlt.toFixed(0) + " ft";
     document.getElementById("wDensityAlt").innerHTML = densityAlt.toFixed(0) + " ft";
-
-
 }
 
 function setTAF(weatherTAF){
@@ -202,7 +210,13 @@ function runwayChange(str){
         else{
             winds = windComponents(heading, weatherData["wind_dir_degrees"], weatherData["wind_speed_kt"]);
         }
-        setWeather(weatherData, weatherTAF);
+        setWeather(weatherData);
+        if (weatherTAF !== null){
+            setTAF(weatherTAF);
+        }
+        else{
+            document.getElementById("TAF").innerHTML = "No TAF Available";
+        }
         document.getElementById("headWind").innerHTML = winds.hWind.toFixed(0);
         if (winds.xWind < 0){
             document.getElementById("xWind").innerHTML = -winds.xWind.toFixed(0) + " (Right)";

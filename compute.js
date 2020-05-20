@@ -719,13 +719,11 @@ function userAgreement(){
 fillData()
 /*if local data exists, load it*/
 if (localStorage.getItem("userInput") !== null){
+    loadUserData();
+    aircraftSelection();
     if (sessionStorage.getItem("userAgree") === null){
         $('#Modal').modal({
             backdrop: 'static'
         })
-    }
-    else{
-        loadUserData();
-        aircraftSelection();
     }
 }

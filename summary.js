@@ -31,7 +31,7 @@ function fillPrintData() {
     var tailNumber = userData.tail;
     var aircraftObj = aircraft.find(x => x.tail === tailNumber);
     var modelData = aircraftModels.find(x => x.model === aircraftObj.model);
-    document.getElementById("title").innerHTML = tailNumber + " Summary";
+    document.getElementById("title").innerHTML = tailNumber + " Print Summary";
     fillWB(computedData, userData, resultCG.fwdCG, resultCG.validCG, true);
     drawCG(computedData, userData, modelData, colors);
     fillWeather(weatherData, weatherTAF,true);
@@ -73,7 +73,6 @@ function fillWeather(weatherData, weatherTAF, isPrint){
             temp = parseFloat(weatherData.temp_c);
             var dewpoint = parseFloat(weatherData.dewpoint_c);
             document.getElementById("wTemp").innerHTML = temp + "/" + dewpoint + " &degC";
-
         }
         else{
             document.getElementById("wRaw").innerHTML = weatherData.raw_text;
@@ -139,33 +138,43 @@ function fillWeather(weatherData, weatherTAF, isPrint){
         document.getElementById("wDensityAlt").innerHTML = densityAlt.toFixed(0) + " ft";
 
         /*TAF*/
-        var rawTAF = weatherTAF.raw_text;
-        var nLines = weatherTAF.forecast.length;
-        var index = 0;
-        var line = "";
-        var newLines = [];
-        var indicator = weatherTAF.forecast[1].change_indicator;
-        index = rawTAF.indexOf(indicator);
-        newLines.push(rawTAF.slice(0, index));
-        line = rawTAF.slice(index);
-        for (i = 1; i < nLines; i++){
-            var tempLine = line.slice(indicator.length);
-            if (i+1 === nLines){
-                newLines.push(indicator+tempLine);
-            }
-            else{
-                var nextIndicator = weatherTAF.forecast[i+1].change_indicator;
-                index = tempLine.indexOf(nextIndicator);
-                newLines.push(indicator+tempLine.slice(0,index));
-                indicator = nextIndicator;
-                line = tempLine.slice(index);
-            }
+        if (weatherTAF !== null){
+            setTAF(weatherTAF);
         }
-        var now = new Date()
-        document.getElementById("TAF").innerHTML = "Current Time: " + now.toUTCString() + " UTC <br>";
-        for (i=0; i < newLines.length; i++){
-            document.getElementById("TAF").innerHTML += newLines[i] + "<br>"
+        else{
+            document.getElementById("TAF").innerHTML = "No TAF Available";
         }
+    }
+}
+
+function setTAF(weatherTAF){
+    /*TAF*/
+    var rawTAF = weatherTAF.raw_text;
+    var nLines = weatherTAF.forecast.length;
+    var index = 0;
+    var line = "";
+    var newLines = [];
+    var indicator = weatherTAF.forecast[1].change_indicator;
+    index = rawTAF.indexOf(indicator);
+    newLines.push(rawTAF.slice(0, index));
+    line = rawTAF.slice(index);
+    for (i = 1; i < nLines; i++){
+        var tempLine = line.slice(indicator.length);
+        if (i+1 === nLines){
+            newLines.push(indicator+tempLine);
+        }
+        else{
+            var nextIndicator = weatherTAF.forecast[i+1].change_indicator;
+            index = tempLine.indexOf(nextIndicator);
+            newLines.push(indicator+tempLine.slice(0,index));
+            indicator = nextIndicator;
+            line = tempLine.slice(index);
+        }
+    }
+    var now = new Date()
+    document.getElementById("TAF").innerHTML = "Current Time: " + now.toUTCString() + "<br>";
+    for (i=0; i < newLines.length; i++){
+        document.getElementById("TAF").innerHTML += newLines[i] + "<br>"
     }
 }
 
