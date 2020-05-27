@@ -114,13 +114,6 @@ const aircraft = [
         aircraftArm: 99.04
     },
     {
-        tail: "N759PA",
-        model: "DA40XL",
-        emptyWeight: 1800.56,
-        maxWeight: 2646,
-        aircraftArm: 97.11
-    },
-    {
         tail: "N704PA",
         model: "DA40XL",
         emptyWeight: 1803.86,
@@ -128,11 +121,11 @@ const aircraft = [
         aircraftArm: 97.74
     },
     {
-        tail: "N831JL",
+        tail: "N759PA",
         model: "DA40XL",
-        emptyWeight: 1818.58,
+        emptyWeight: 1800.56,
         maxWeight: 2646,
-        aircraftArm: 97.91
+        aircraftArm: 97.11
     },
     {
         tail: "N78US",
@@ -147,6 +140,13 @@ const aircraft = [
         emptyWeight: 1817.0,
         maxWeight: 2646,
         aircraftArm: 97.34
+    },
+    {
+        tail: "N831JL",
+        model: "DA40XL",
+        emptyWeight: 1818.58,
+        maxWeight: 2646,
+        aircraftArm: 97.91
     }
    /* {
         tail: "N132TS",

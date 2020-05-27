@@ -196,9 +196,6 @@ function fillPerformance(performanceData, isPrint, tailNumber) {
     if (!isPrint){
         document.getElementById("runwayHdg").innerHTML = "Runway " + runway;
     }
-    else{
-
-    }
 
     document.getElementById("headWind").innerHTML = performanceData.headWind.toFixed(0);
     if (performanceData.crossWind < 0){
@@ -220,7 +217,7 @@ function fillPerformance(performanceData, isPrint, tailNumber) {
     document.getElementById("LDG50Distance").innerHTML = "Over 50': "
         + (performanceData.landing50Distance/10).toFixed(0)*10 + " ft";
     document.getElementById("climbFPM").innerHTML = (performanceData.climbPerf/10).toFixed(0)*10 + " FPM";
-    document.getElementById("tgDistance").innerHTML = ((performanceData.takeoffDistance + performanceData.landingDistance)/10).toFixed(0)*10 + " ft";
+    document.getElementById("tgDistance").innerHTML = ((performanceData.takeoff50Distance + performanceData.landing50Distance)/10).toFixed(0)*10 + " ft";
 
 }
 

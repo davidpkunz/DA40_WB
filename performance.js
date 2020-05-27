@@ -294,7 +294,7 @@ function performanceCompute(winds, heading){
         takeoffWeight, winds.hWind, aircraftObj.maxWeight);
     document.getElementById("climbFPM").innerHTML = (climbPerf/10).toFixed(0)*10 + " FPM";
 
-    document.getElementById("tgDistance").innerHTML = ((takeoffDistance + landingDistance)/10).toFixed(0)*10 + " ft";
+    document.getElementById("tgDistance").innerHTML = ((takeoff50Distance + landing50Distance)/10).toFixed(0)*10 + " ft";
     const performanceData = {
         "tail" : aircraftObj.tail,
         "takeoffDistance" : takeoffDistance,
