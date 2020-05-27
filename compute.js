@@ -721,6 +721,9 @@ fillData()
 if (localStorage.getItem("userInput") !== null){
     loadUserData();
     aircraftSelection();
+    if (sessionStorage.getItem("performanceData") !== null){
+        document.getElementById("navbarSummary").classList.remove("disabled");
+    }
     if (sessionStorage.getItem("userAgree") === null){
         $('#Modal').modal({
             backdrop: 'static'
