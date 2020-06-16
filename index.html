@@ -20,6 +20,9 @@
 
     <div class="collapse navbar-collapse" id="navbar">
         <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="index.html" id="navbarHelp">Instructions <span class="sr-only">(current)</span></a>
+            </li>
             <li class="nav-item ">
                 <a class="nav-link" href="weightbalance.html">Weight & Balance <span class="sr-only">(current)</span></a>
             </li>
@@ -29,6 +32,7 @@
             <li class="nav-item ">
                 <a class="nav-link disabled" href="summary.html" id="navbarSummary">Summary <span class="sr-only">(current)</span></a>
             </li>
+
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     USU Links
@@ -44,6 +48,38 @@
 </nav>
 
 <main role="main" class="container">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg">
+                <h4>Instructions</h4>
+                <p>Use the navigation links above to switch between the multiple pages of this website.
+                    The 'Weight & Balance' tab is where you should begin by selecting your aircraft tail number
+                    and filling out the required weights. All weights should be filled in,
+                    if the station does not have a weight then please enter 0. Once all required fields are complete
+                    the results will inform you if you are within weight and balance.
+                    The show details button will show all the stations' weight, arm, and moment.
+                </p>
+
+                <p>
+                    After completing the weight and balance portion, you should now select the 'Weather & Performance' tab.
+                    This tab will retrieve weather and compute performance.
+                    Enter the departure airport station ID to retrieve the METAR and TAF (if available).
+                    If a METAR is not available or is missing key elements, manual entry will be required.
+                    Once you have retrieved the weather, input the runway heading you will be departing from (Runway 17 = 170).
+                    This now displays the performance numbers.
+                </p>
+
+                <p>
+                    The 'Summary' tab will now be available to click if you have filled out both previous tabs.
+                    The summary page shows all information and allows for an email to be generated or the page to be printed
+                    in a USU friendly format. The email button will generate a text only email and will be opened in the
+                    device's preferred email client. The print button will open a new tab or window, if the print dialog does not
+                    automatically open, pressing Ctrl+p will print the page.
+                </p>
+            </div>
+        </div>
+    </div>
+
 
 </main><!-- /.container -->
 
