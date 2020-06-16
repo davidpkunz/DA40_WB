@@ -731,3 +731,10 @@ if (localStorage.getItem("userInput") !== null){
         })
     }
 }
+else {
+    if (sessionStorage.getItem("userAgree") === null) {
+        $('#Modal').modal({
+            backdrop: 'static'
+        })
+    }
+}
