@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/custom.css">
+
+    <title>Weight & Balance</title>
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" href="index.html">USU Aviation</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbar">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="weightbalance.html">Weight & Balance <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item ">
+                <a class="nav-link" href="performance.html">Weather & Performance <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item ">
+                <a class="nav-link disabled" href="summary.html" id="navbarSummary">Summary <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    USU Links
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" target="_blank" href="https://aste.usu.edu/aviation/current-students/documents_forms">Documents and Forms</a>
+                    <a class="dropdown-item" target="_blank" href="http://www.talonsystems.com/usu/">ETA Talon</a>
+                    <a class="dropdown-item" target="_blank" href="https://usu.co1.qualtrics.com/jfe/form/SV_6JqMu9UuqhUXvZr">Safety Report</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Modal -->
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModalLabel">Disclaimer</h5>
+            </div>
+            <div class="modal-body">
+                You acknowledge and agree that the aircraft's POH is the authoritative source of the aircraft's	information,
+                and must be kept up to date with manufacturers' updates	and to reflect any after-market modifications to the aircraft.
+                The App and any information provided by or available through the App is for
+                additional reference only and you acknowledge and agree that you will
+                confirm and verify all results obtained by using the App against the aircraft's POH
+                before operating the aircraft in reliance on or in accordance with any such results.
+                The algorithms and parameters in the App are approximations of POH values,
+                and are not warranted to be error free.	Parameters and algorithms in the App were derived from a
+                POH that may be different than the POH for the aircraft, and may not reflect the equipment installed on the aircraft.
+                You acknowledge and agree that you alone are responsible for verifying that all	parameters
+                and algorithms used are appropriate for the aircraft.
+                The App is not a commercial software product, and has not been thoroughly tested.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="userAgreement()" data-dismiss="modal">Accept</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<main role="main" class="container">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg">
+                <h4>Weight and Balance</h4>
+                <form id="form_input">
+                    <div class="form-group row">
+                        <label for="aircraftSelect" class="col-sm-2 col-form-label">Aircraft:</label>
+                        <div class="col-sm-3">
+                            <select id="aircraftSelect" class="form-control" onchange="aircraftSelection()"> <!--Fill this with aircraft tail #s-->
+                                <option selected>Tail #</option>
+                            </select>
+                        </div>
+                            <small class="col-sm-6 col-form-label" id="emptyAircraftInfo">
+                                <!--Change this based on Tail #-->
+                            </small>
+                    </div>
+                    <hr>
+                    <div class="form-group row" id="noseStationDiv" style="display: none">
+                        <label for="noseStation" class="col-sm-4 col-form-label">Nose Baggage:</label>
+                        <div class="col-sm-3">
+                            <input type="number" class="form-control" id="noseStation" placeholder="lbs" min="0" max="66" form="form_input" onchange="reCompute()" required>
+                        </div>
+                        <small id="noseStationNote" class="col-sm-5">
+                            Max 66 lbs
+                        </small>
+                    </div>
+                    <div class="form-group row" id ="deIceStationDiv" style="display: none">
+                        <label for="deIceStation" class="col-sm-4 col-form-label">De-icing Fluid:</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control" id="deIceStation" placeholder="US Gal" form="form_input" onchange="reCompute()" required>
+                        </div>
+                        <small id="deIceStationNote" class="col-sm-5">
+                            Max 8.3 Gallons
+                        </small>
+                    </div>
+                    <div class="form-group row">
+                        <label for="frontStation" class="col-sm-4 col-form-label">Front Seats:</label>
+                        <div class="col-sm-3">
+                            <input type="number" class="form-control" id="frontStation" placeholder="lbs" min="0" form="form_input" onchange="reCompute()" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="rearStation" class="col-sm-4 col-form-label">Rear Seats:</label>
+                        <div class="col-sm-3">
+                            <input type="number" class="form-control" id="rearStation" placeholder="lbs" min="0" form="form_input" onchange="reCompute()" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="baggageStation1" class="col-sm-4 col-form-label">Baggage:</label>
+                        <div class="col-sm-3">
+                            <input type="number" class="form-control" id="baggageStation1" placeholder="lbs" min="0" max="66" form="form_input" onchange="reCompute()" required>
+                        </div>
+                        <small id="baggage1MaxNote" class="col-sm-5">
+                            Max 66 lbs
+                        </small>
+                    </div>
+                    <div class="form-group row" id="baggageStation2Div" style="display: none">
+                        <label for="baggageStation2" class="col-sm-4 col-form-label">Baggage Extension:</label>
+                        <div class="col-sm-3">
+                            <input type="number" class="form-control" id="baggageStation2" value="0" min="0" max="66" form="form_input" onchange="reCompute()" required>
+                        </div>
+                        <small id="baggage2MaxNote" class="col-sm-5">
+                            Max 40 lbs
+                        </small>
+                    </div>
+                    <div class="form-group row">
+                        <label for="fuelStation" class="col-sm-4 col-form-label">Fuel:</label>
+                        <div class="col-sm-3">
+                            <input type="number" class="form-control" id="fuelStation" placeholder="US Gal" min="0" max="40" form="form_input" onchange="reCompute()" required>
+                        </div>
+                        <small id="fuelMaxNote" class="col-sm-5">
+                            Max 40 Gallons
+                        </small>
+                    </div>
+                    <div class="form-group row" id="auxFuelStationDiv" style="display: none">
+                        <label for="auxFuelStation" class="col-sm-4 col-form-label">Aux Fuel:</label>
+                        <div class="col-sm-3">
+                            <input type="number" class="form-control" id="auxFuelStation" placeholder="US Gal" min="0" max="26" form="form_input" onchange="reCompute()" required>
+                        </div>
+                        <small id="auxFuelMaxNote" class="col-sm-5">
+                            Max 26 Gallons
+                        </small>
+                    </div>
+                    <div class="form-group row">
+                        <label for="fuelBurn" class="col-sm-4 col-form-label">Fuel Burn:</label>
+                        <div class="col-sm-3">
+                            <input type="number" class="form-control" id="fuelBurn" placeholder="US Gal" min="0" max="40" form="form_input" onchange="reCompute()" required>
+                        </div>
+                        <small id="fuelBurnNote" class="col-sm-5">
+                            In Flight Consumption
+                        </small>
+                    </div>
+                    <div>
+                        <hr>
+                        <h5>Results</h5>
+                        <ul class="list-group">
+                            <li id="overall_result" class="list-group-item">Limits:</li>
+                            <li id="result_zero" class="list-group-item">Zero Fuel:</li>
+                            <li id="result_takeoff" class="list-group-item">Takeoff:</li>
+                            <li id="result_landing" class="list-group-item">Landing:</li>
+                        </ul>
+                    </div>
+                    <button type="reset" class="btn btn-secondary m-2" onclick="clearResults()">Reset</button>
+                    <button type="button" class="btn btn-secondary m-2" id="audit_btn" onclick="showAudit()">Show Details</button>
+                </form>
+                <hr>
+                <div class="container" id="auditDiv" style="display: none">
+                    <h5 id="auditTitle">Audit</h5>
+                    <table class="table table-sm table-striped table-bordered">
+                        <thead>
+                        <tr>
+                            <th scope="col" class="table-secondary"></th>
+                            <th scope="col">Weight</th>
+                            <th scope="col">Arm</th>
+                            <th scope="col">Moment</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <th scope="row">Empty Weight</th>
+                            <td id="empty_wt_td"></td>
+                            <td id="empty_cg_td"></td>
+                            <td id="empty_mnt_td"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Nose Baggage</th>
+                            <td id="nose_wt_td"></td>
+                            <td id="nose_cg_td"></td>
+                            <td id="nose_mnt_td"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">De-icing Fluid</th>
+                            <td id="deIce_wt_td"></td>
+                            <td id="deIce_cg_td"></td>
+                            <td id="deIce_mnt_td"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Pilot & Front PAX</th>
+                            <td id="front_wt_td"></td>
+                            <td id="front_cg_td"></td>
+                            <td id="front_mnt_td"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Rear PAX</th>
+                            <td id="rear_wt_td"></td>
+                            <td id="rear_cg_td"></td>
+                            <td id="rear_mnt_td"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Baggage</th>
+                            <td id="bag_wt_td"></td>
+                            <td id="bag_cg_td"></td>
+                            <td id="bag_mnt_td"></td>
+                        </tr>
+
+                        <tr id="bag2_tr" style="display: none">
+                            <th scope="row">Baggage 2</th>
+                            <td id="bag2_wt_td"></td>
+                            <td id="bag2_cg_td"></td>
+                            <td id="bag2_mnt_td"></td>
+                        </tr>
+
+                        <tr style="border-top: 2px solid black;">
+                            <th scope="row">Zero Fuel CG</th>
+                            <td id="zero_wt_td"></td>
+                            <td id="zero_cg_td"></td>
+                            <td id="zero_mnt_td"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">AUX Fuel</th>
+                            <td id="aux_wt_td"></td>
+                            <td id="aux_cg_td"></td>
+                            <td id="aux_mnt_td"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Fuel in LBS</th>
+                            <td id="fuel_wt_td"></td>
+                            <td id="fuel_cg_td"></td>
+                            <td id="fuel_mnt_td"></td>
+                        </tr>
+
+                        <tr style="border-top: 2px solid black;">
+                            <th scope="row">Take Off Weight</th>
+                            <td id="takeoff_wt_td"></td>
+                            <td id="takeoff_cg_td"></td>
+                            <td id="takeoff_mnt_td"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Fuel Burn</th>
+                            <td id="burn_wt_td"></td>
+                            <td id="burn_cg_td"></td>
+                            <td id="burn_mnt_td"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Landing Weight</th>
+                            <td id="landing_wt_td"></td>
+                            <td id="landing_cg_td"></td>
+                            <td id="landing_mnt_td"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Max Gross Weight</th>
+                            <td colspan="2" id="max_wt_td"></td>
+                            <td class="table-secondary"></td>
+                        </tr>
+                        <tr>
+                            <th class = "table-secondary" scope="row"> </th>
+                            <td >Forward</td>
+                            <td>Actual</td>
+                            <td>Aft</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">CG</th>
+                            <td id="fwd_cg"></td>
+                            <td id="act_cg"></td>
+                            <td id="aft_cg"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="col-lg">
+                <h4>CG Envelope</h4>
+                <canvas id="cgCanvas" width="500" height="360" style="border: 1px solid black"></canvas>
+            </div>
+        </div>
+    </div>
+
+</main><!-- /.container -->
+
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+<script src="aircraft.js"></script>
+<script src="draw.js"></script>
+<script src="compute.js"></script>
+
+</body>
+</html>
