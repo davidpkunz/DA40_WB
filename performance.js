@@ -346,7 +346,7 @@ function getPerformanceNumbers(modelString, typeString, pressureAlt, temp, weigh
         var scale = DA40FP(typeString, "scale");
         return last_result*(parseFloat(scale.max) - parseFloat(scale.min))/100 + parseFloat(scale.min);
     }
-    else if ((modelString === "DA40CS") || (modelString === "DA40XL")){
+    else if ((modelString === "DA40CS") || (modelString === "DA40XL") || (modelString === "DA40XLS")){
         if (typeString === "climb"){
             DA_Result = densityAltitudeChart(DA40CS(typeString, "DA"), pressureAlt, temp);
             last_result = weightChart(DA40CS(typeString, "weight"), DA_Result, weight, 2646);

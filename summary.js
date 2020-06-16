@@ -321,7 +321,7 @@ function fillWB(computedData, userInput, fwdCG, validCG, isPrint){
 
     }
 
-    if (aircraftObj.model === "DA40XL") {
+    if ((aircraftObj.model === "DA40XL") || (aircraftObj.model === "DA40XLS")){
         if (!isPrint){
             document.getElementById("bag2_tr").style.display = "";
         }

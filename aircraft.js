@@ -94,56 +94,58 @@ const aircraft = [
     },
     {
         tail: "N127KC",
-        model: "DA40XL",
+        model: "DA40XLS",
         emptyWeight: 1809.0,
         maxWeight: 2646,
         aircraftArm: 98.32
     },
     {
         tail: "N230DC",
-        model: "DA40XL",
+        model: "DA40XLS",
         emptyWeight: 1842.0,
         maxWeight: 2646,
         aircraftArm: 97.94
     },
     {
         tail: "N605CA",
-        model: "DA40XL",
+        model: "DA40XLS",
         emptyWeight: 1804.0,
         maxWeight: 2646,
         aircraftArm: 99.04
     },
     {
         tail: "N704PA",
-        model: "DA40XL",
+        model: "DA40XLS",
         emptyWeight: 1803.86,
         maxWeight: 2646,
         aircraftArm: 97.74
     },
     {
         tail: "N759PA",
-        model: "DA40XL",
+        model: "DA40XLS",
         emptyWeight: 1800.56,
         maxWeight: 2646,
         aircraftArm: 97.11
     },
     {
         tail: "N78US",
-        model: "DA40CS",
+        model: "DA40XL",
         emptyWeight: 1815.84,
         maxWeight: 2646,
-        aircraftArm: 97.26
+        aircraftArm: 97.26,
+        standardTank: true
     },
     {
         tail: "N79US",
-        model: "DA40CS",
+        model: "DA40XL",
         emptyWeight: 1817.0,
         maxWeight: 2646,
-        aircraftArm: 97.34
+        aircraftArm: 97.34,
+        standardTank: true
     },
     {
         tail: "N831JL",
-        model: "DA40XL",
+        model: "DA40XLS",
         emptyWeight: 1818.58,
         maxWeight: 2646,
         aircraftArm: 97.91
@@ -255,6 +257,41 @@ const aircraftModels = [
     },
     {
         model: "DA40XL",
+        maxFuel: 50,
+        maxBaggage1 : 100,
+        maxBaggage2 : 40,
+        maxBaggage : 100,
+        frontStationCG: 90.6,
+        rearStationCG: 128,
+        baggageStationCG: 153.1,
+        baggageStation2CG: 178.7,
+        fuelStationCG: 103.5,
+        fuelType: "100LL",
+        cgRange: {
+            minAft: 102,
+            midAft: 102,
+            maxAft: 102,
+            minFwd: 94.5,
+            midFwd: 94.5,
+            maxFwd: 97.6,
+            minWgt: 1720,
+            midWgt: 2161,
+            maxWgt: 2646
+        },
+        vSpeeds : {
+            vr : 59,
+            vx : 66,
+            vy : 66,
+            vg : 73,
+            va : {
+                2161 : 94,
+                2535 : 108,
+                2646 : 111
+            }
+        }
+    },
+    {
+        model: "DA40XLS",
         maxFuel: 50,
         maxBaggage1 : 100,
         maxBaggage2 : 40,

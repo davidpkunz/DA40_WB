@@ -44,6 +44,7 @@ function aircraftSelection(){
             document.getElementById("fuelMaxNote").innerHTML = "Max 40 Gallons";
             break;
         case "DA40XL":
+        case "DA40XLS":
             document.getElementById("noseStationDiv").style.display = "none";
             document.getElementById("deIceStationDiv").style.display = "none";
             document.getElementById("auxFuelStationDiv").style.display = "none";
@@ -96,7 +97,7 @@ function reCompute(){
 
 
     userInput["baggage1Weight"] = parseFloat(document.getElementById("baggageStation1").value);
-    if (aircraftObj.model === "DA40XL"){
+    if ((aircraftObj.model === "DA40XL") || (aircraftObj.model === "DA40XLS")){
         userInput["baggage2Weight"] = parseFloat(document.getElementById("baggageStation2").value);
     }
     /*If DA42 we have to compute w/ JetA density*/
@@ -407,7 +408,7 @@ function checkInputConstraints(modelData, userInput){
             return "Fuel burn exceeds fuel available."
         }
     }
-    else if (modelData.model === "DA40XL"){
+    else if ((modelData.model === "DA40XL") || (modelData.model === "DA40XLS")){
         if (userInput.fuelWeight > modelData.maxFuel*6.0){
             return "Max fuel exceeded."
         }
@@ -465,7 +466,7 @@ function loadUserData(){
     document.getElementById("fuelStation").value = userData.fuelWeight/6;
     document.getElementById("fuelBurn").value = userData.fuelBurnWeight/6;
 
-    if (aircraftObj.model === "DA40XL"){
+    if ((aircraftObj.model === "DA40XL") || (aircraftObj.model === "DA40XLS")){
         document.getElementById("baggageStation2").value = userData.baggage2Weight;
     }
     if (aircraftObj.model === "DA42"){
@@ -541,7 +542,7 @@ function computeWB(aircraftObj, userInput){
         computedData["takeOffWeight"] = computedData.zeroFuelWeight + userInput.fuelWeight + userInput.auxFuelWeight;
     }
     /*XL for the second baggage area*/
-    else if(aircraftObj.model === "DA40XL"){
+    else if((aircraftObj.model === "DA40XL") || (aircraftObj.model === "DA40XLS")){
         computedData["baggage2Moment"] = Math.round((parseFloat(modelData.baggageStation2CG) * userInput.baggage2Weight + Number.EPSILON) * 100) / 100;
         computedData["zeroFuelMoment"] = computedData.emptyMoment + computedData.frontMoment
             + computedData.rearMoment + computedData.baggageMoment + computedData.baggage2Moment;
@@ -681,7 +682,7 @@ function auditMode(computedData, userInput, fwdCG){
         document.getElementById("aux_mnt_td").innerHTML = "-";
     }
 
-    if (aircraftObj.model === "DA40XL") {
+    if ((aircraftObj.model === "DA40XL") || (aircraftObj.model === "DA40XLS")){
         document.getElementById("bag2_tr").style.display = "";
         document.getElementById("bag2_wt_td").innerHTML = userInput.baggage2Weight;
         document.getElementById("bag2_cg_td").innerHTML = modelData.baggageStation2CG;
