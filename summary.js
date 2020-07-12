@@ -154,23 +154,29 @@ function setTAF(weatherTAF){
     var index = 0;
     var line = "";
     var newLines = [];
-    var indicator = weatherTAF.forecast[1].change_indicator;
-    index = rawTAF.indexOf(indicator);
-    newLines.push(rawTAF.slice(0, index));
-    line = rawTAF.slice(index);
-    for (i = 1; i < nLines; i++){
-        var tempLine = line.slice(indicator.length);
-        if (i+1 === nLines){
-            newLines.push(indicator+tempLine);
-        }
-        else{
-            var nextIndicator = weatherTAF.forecast[i+1].change_indicator;
-            index = tempLine.indexOf(nextIndicator);
-            newLines.push(indicator+tempLine.slice(0,index));
-            indicator = nextIndicator;
-            line = tempLine.slice(index);
+    if (nLines == null){
+        newLines.push(rawTAF);
+    }
+    else{
+        var indicator = weatherTAF.forecast[1].change_indicator;
+        index = rawTAF.indexOf(indicator);
+        newLines.push(rawTAF.slice(0, index));
+        line = rawTAF.slice(index);
+        for (i = 1; i < nLines; i++){
+            var tempLine = line.slice(indicator.length);
+            if (i+1 === nLines){
+                newLines.push(indicator+tempLine);
+            }
+            else{
+                var nextIndicator = weatherTAF.forecast[i+1].change_indicator;
+                index = tempLine.indexOf(nextIndicator);
+                newLines.push(indicator+tempLine.slice(0,index));
+                indicator = nextIndicator;
+                line = tempLine.slice(index);
+            }
         }
     }
+
     var now = new Date()
     document.getElementById("TAF").innerHTML = "Current Time: " + now.toUTCString() + "<br>";
     for (i=0; i < newLines.length; i++){

@@ -32,6 +32,9 @@ function aircraftSelection(){
             document.getElementById("baggage1MaxNote").innerHTML = "Max 66 lbs";
             document.getElementById("fuelStation").max = "40";
             document.getElementById("fuelMaxNote").innerHTML = "Max 40 Gallons";
+            if (document.getElementById("fuelStation").value > 40){
+                    document.getElementById("fuelStation").value = 40
+            }
             break;
         case "DA40CS":
             document.getElementById("noseStationDiv").style.display = "none";
@@ -42,8 +45,15 @@ function aircraftSelection(){
             document.getElementById("baggage1MaxNote").innerHTML = "Max 66 lbs";
             document.getElementById("fuelStation").max = "40";
             document.getElementById("fuelMaxNote").innerHTML = "Max 40 Gallons";
+            if (document.getElementById("fuelStation").value > 40){
+                document.getElementById("fuelStation").value = 40
+            }
             break;
         case "DA40XL":
+            if (document.getElementById("fuelStation").value > 40){
+                document.getElementById("fuelStation").value = 40
+            }
+            /*Let this case fall through to below*/
         case "DA40XLS":
             document.getElementById("noseStationDiv").style.display = "none";
             document.getElementById("deIceStationDiv").style.display = "none";
