@@ -31,6 +31,7 @@ function aircraftSelection(){
             document.getElementById("baggageStation1").max = "66";
             document.getElementById("baggage1MaxNote").innerHTML = "Max 66 lbs";
             document.getElementById("fuelStation").max = "40";
+            document.getElementById("fuelBurn").max = "40";
             document.getElementById("fuelMaxNote").innerHTML = "Max 40 Gallons";
             if (document.getElementById("fuelStation").value > 40){
                     document.getElementById("fuelStation").value = 40
@@ -44,16 +45,27 @@ function aircraftSelection(){
             document.getElementById("baggageStation1").max = "66";
             document.getElementById("baggage1MaxNote").innerHTML = "Max 66 lbs";
             document.getElementById("fuelStation").max = "40";
+            document.getElementById("fuelBurn").max = "40";
             document.getElementById("fuelMaxNote").innerHTML = "Max 40 Gallons";
             if (document.getElementById("fuelStation").value > 40){
                 document.getElementById("fuelStation").value = 40
             }
             break;
         case "DA40XL":
+            document.getElementById("noseStationDiv").style.display = "none";
+            document.getElementById("deIceStationDiv").style.display = "none";
+            document.getElementById("auxFuelStationDiv").style.display = "none";
+            document.getElementById("baggageStation1").max = "100";
+            document.getElementById("baggage1MaxNote").innerHTML = "Max 100 lbs";
+            document.getElementById("baggageStation2Div").style.display = "flex";
+            document.getElementById("baggage2MaxNote").innerHTML = "Max 40 lbs. Max 100 lbs Combined.";
+            document.getElementById("fuelStation").max = "40";
+            document.getElementById("fuelMaxNote").innerHTML = "Max 40 Gallons";
+            document.getElementById("fuelBurn").max = "40";
             if (document.getElementById("fuelStation").value > 40){
                 document.getElementById("fuelStation").value = 40
             }
-            /*Let this case fall through to below*/
+            break;
         case "DA40XLS":
             document.getElementById("noseStationDiv").style.display = "none";
             document.getElementById("deIceStationDiv").style.display = "none";
@@ -65,6 +77,7 @@ function aircraftSelection(){
             document.getElementById("fuelStation").max = "50";
             document.getElementById("fuelMaxNote").innerHTML = "Max 50 Gallons";
             document.getElementById("fuelBurn").max = "50";
+
             break;
         case "DA42":
             document.getElementById("noseStationDiv").style.display = "flex";
@@ -434,7 +447,6 @@ function checkInputConstraints(modelData, userInput){
         if (userInput.fuelBurnWeight > userInput.fuelWeight){
             return "Fuel burn exceeds fuel available."
         }
-
     }
     else if (modelData.model === "DA42"){
         if (userInput.fuelWeight > modelData.maxFuel*6.75){
@@ -493,8 +505,6 @@ function loadUserData(){
     }
     return userData;
 }
-
-
 
 function lineEquation(yValue,y,y1,x,x1){
     /**We take the yValue(aircraft weight) and two points on the line (x,y),(x1,y1)

@@ -257,7 +257,7 @@ const aircraftModels = [
     },
     {
         model: "DA40XL",
-        maxFuel: 50,
+        maxFuel: 40,
         maxBaggage1 : 100,
         maxBaggage2 : 40,
         maxBaggage : 100,
